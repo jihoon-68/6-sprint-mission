@@ -15,12 +15,23 @@ public class JCFUser implements UserService {
         User newUser =new User(username,age,email);
         userData.add(newUser);
     };
+    public User findUserByUserEmail(String userEmail) {
+        User target = null;
+        for (User user : userData) {
+            if (user.getEmail().equals(userEmail)) {
+                target = user;
+                break;
+            }
+        }
+        return target;
+    }
 
     public User findUserById(UUID id){
         User target = null;
         for (User user : userData){
             if(user.getUserId().equals(id)){
                 target = user;
+                break;
             }
         }
         return target;
