@@ -133,8 +133,7 @@ public class JavaApplication {
                             case 1:
                                 System.out.println("메시지를 보낸 유저 이름: ");
                                 String senderUser = sc.nextLine();
-                                User senderMsg = userList.stream().filter(user->user.getName().equals(senderUser)).findFirst().orElse(null);
-                                messageService.read(senderMsg);
+                                messageService.read(senderUser);
                                 break;
                             case 2:
 

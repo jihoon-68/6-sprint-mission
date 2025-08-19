@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 
 public interface MessageService {
-    Message read(User sender);
+    Message read(String sender);
     Message create(User sender, User reciever, String content, Channel channel);
     List<Message> allRead();
     void modify(String message);

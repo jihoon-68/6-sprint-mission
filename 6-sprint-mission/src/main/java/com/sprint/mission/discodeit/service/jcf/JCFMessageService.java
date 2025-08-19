@@ -13,18 +13,8 @@ public class JCFMessageService implements MessageService {
     private final List<Message> messageList = new ArrayList<>();
 
     @Override
-    public Message read(User sender){
-        for (Message message : messageList) {
-            if(message.getSender().equals(sender.getName())){
-                System.out.println(sender.getName() + "이(가) 보낸 메시지: " + message);
-                return message;
-            }
-        }
-
-        return messageList.stream().filter(msg->msg.getSender().equals(sender.getName())).findAny().orElse(null);
-
-//        System.out.println("보낸 메시지가 없습니다");
-//        return null;
+    public Message read(String sender){
+        return messageList.stream().filter(msg->msg.getSender().equals(sender)).findAny().orElse(null);
     }
     @Override
     public Message create(User sender, User reciever, String content, Channel channel){

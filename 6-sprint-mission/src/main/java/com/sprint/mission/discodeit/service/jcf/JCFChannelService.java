@@ -12,14 +12,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel read(String name){
-        for (Channel channel : channelList) {
-            if (channel.getName().equals(name)) {
-                System.out.println(name + " 채널이 존재합니다");
-                return channel;
-            }
-        }
-        System.out.println(name + " 채널이 없습니다");
-        return null;
+        return channelList.stream().filter(ch -> ch.getName().equals(name)).findAny().orElse(null);
     }
 
     @Override
