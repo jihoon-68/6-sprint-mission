@@ -46,34 +46,38 @@ public class JavaApplication {
                     break;
                 case 2:
 
-                    boolean run2 = true;
-                    while(run2){
-                        System.out.println("1. 유저 리스트");
-                        System.out.println("2. 유저 이름 수정");
-                        System.out.println("3. 유저 삭제");
-                        System.out.println("4. 메뉴 복귀");
-                        int n2_choice = sc.nextInt();
+                    boolean runU = true;
+                    while(runU){
+                        System.out.println("1. 유저 조회");
+                        System.out.println("2. 유저 리스트");
+                        System.out.println("3. 유저 이름 수정");
+                        System.out.println("4. 유저 삭제");
+                        System.out.println("5. 메뉴 복귀");
+                        int u_choice = sc.nextInt();
                         sc.nextLine();
 
-                        switch (n2_choice) {
+                        switch (u_choice) {
                             case 1:
+                                System.out.println("조회할 유저 이름: ");
+                                String readUser = sc.nextLine();
+                                userService.read(readUser);
+                                break;
+                            case 2:
 
                                 System.out.println("유저 리스트: " + userList.stream().collect(Collectors.toList()));
                                 break;
-                            case 2:
+                            case 3:
                                 System.out.println("수정할 유저 이름: ");
                                 String modifyUser = sc.nextLine();
-                                //수정할 유저 이름 없는 경우 예외 추가해야함
                                 userService.modify(modifyUser);
                                 break;
-                            case 3:
+                            case 4:
                                 System.out.println("삭제할 유저 이름: ");
                                 String deleteUser = sc.nextLine();
-                                //삭제할 유저 이름 없는 경우 예외 추가해야함
                                 userService.delete(deleteUser);
                                 break;
-                            case 4:
-                                run2 = false;
+                            case 5:
+                                runU = false;
                                 System.out.println("종료");
                                 break;
                             default:
@@ -83,7 +87,7 @@ public class JavaApplication {
                     }
                     break;
 
-                case 3:                                         // 수정해야함
+                case 3:
 
                     System.out.println("보내는 사람: ");
                     String send = sc.nextLine();
@@ -115,34 +119,39 @@ public class JavaApplication {
                     break;
                 case 4:
 
-                    boolean run3 = true;
-                    while(run3){
-                        System.out.println("1. 모든 메시지");
-                        System.out.println("2. 메시지 수정");
-                        System.out.println("3. 메시지 삭제");
-                        System.out.println("4. 메뉴 복귀");
-                        int n2_choice = sc.nextInt();
+                    boolean runMsg = true;
+                    while(runMsg){
+                        System.out.println("1. 메시지 조회");
+                        System.out.println("2. 모든 메시지");
+                        System.out.println("3. 메시지 수정");
+                        System.out.println("4. 메시지 삭제");
+                        System.out.println("5. 메뉴 복귀");
+                        int msg_choice = sc.nextInt();
                         sc.nextLine();
 
-                        switch (n2_choice) {
+                        switch (msg_choice) {
                             case 1:
+                                System.out.println("메시지를 보낸 유저 이름: ");
+                                String senderUser = sc.nextLine();
+                                User senderMsg = userList.stream().filter(user->user.getName().equals(senderUser)).findFirst().orElse(null);
+                                messageService.read(senderMsg);
+                                break;
+                            case 2:
 
                                 System.out.println("메시지 리스트: " + messageList.stream().collect(Collectors.toList()));
                                 break;
-                            case 2:
+                            case 3:
                                 System.out.println("수정할 메시지 내용: ");
                                 String modifyMessage = sc.nextLine();
-                                //수정할 메시지 내용 없는 경우 예외 추가해야함
                                 messageService.modify(modifyMessage);
                                 break;
-                            case 3:
+                            case 4:
                                 System.out.println("삭제할 메시지 내용: ");
                                 String deleteMessage = sc.nextLine();
-                                //삭제할 메시지 내용 없는 경우 예외 추가해야함
                                 messageService.delete(deleteMessage);
                                 break;
-                            case 4:
-                                run3 = false;
+                            case 5:
+                                runMsg = false;
                                 System.out.println("종료");
                                 break;
                             default:
@@ -157,34 +166,31 @@ public class JavaApplication {
                     channelService.create(channelName);
                     break;
                 case 6:
-                    boolean run4 = true;
-                    while(run4){
+                    boolean runCh = true;
+                    while(runCh){
                         System.out.println("1. 모든 채널");
                         System.out.println("2. 채널명 수정");
                         System.out.println("3. 채널 삭제");
                         System.out.println("4. 메뉴 복귀");
-                        int n2_choice = sc.nextInt();
+                        int ch_choice = sc.nextInt();
                         sc.nextLine();
 
-                        switch (n2_choice) {
+                        switch (ch_choice) {
                             case 1:
-
                                 System.out.println("채널 리스트: " + channelList.stream().collect(Collectors.toList()));
                                 break;
                             case 2:
                                 System.out.println("수정할 채널명: ");
                                 String modifyChannelName = sc.nextLine();
-                                //수정할 채널명 없는 경우 예외 추가해야함
                                 channelService.modify(modifyChannelName);
                                 break;
                             case 3:
                                 System.out.println("삭제할 채널명: ");
                                 String deleteChannelName = sc.nextLine();
-                                //삭제할 채널명 없는 경우 예외 추가해야함
                                 channelService.delete(deleteChannelName);
                                 break;
                             case 4:
-                                run4 = false;
+                                runCh = false;
                                 System.out.println("종료");
                                 break;
                             default:

@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.List;
-import java.util.UUID;
 
 public class Channel {
     private String name;
     private String manager;
     private List<User> userList;
-    private User user;
     private Common common;
 
     public Channel(String name) {

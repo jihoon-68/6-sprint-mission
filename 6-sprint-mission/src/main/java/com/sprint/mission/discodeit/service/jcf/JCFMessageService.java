@@ -20,8 +20,11 @@ public class JCFMessageService implements MessageService {
                 return message;
             }
         }
-        System.out.println("보낸 메시지가 없습니다");
-        return null;
+
+        return messageList.stream().filter(msg->msg.getSender().equals(sender.getName())).findAny().orElse(null);
+
+//        System.out.println("보낸 메시지가 없습니다");
+//        return null;
     }
     @Override
     public Message create(User sender, User reciever, String content, Channel channel){
@@ -40,10 +43,13 @@ public class JCFMessageService implements MessageService {
             if(message.getContent().equals(content)){
                 System.out.println("메시지 수정 입력: ");
                 String msg = sc.nextLine();
+                if(msg==null)    break;
                 message.setContent(msg);
-                System.out.println("채널명이 수정되었습니다: " + msg);
+                System.out.println("메시지가 수정되었습니다: " + msg);
+                break;
             }
         }
+        System.out.println("수정이 올바르지 않습니다");
     }
     @Override
     public void delete(String content){
@@ -53,5 +59,6 @@ public class JCFMessageService implements MessageService {
                 break;
             }
         }
+        System.out.println("삭제되지 않았습니다");
     }
 }

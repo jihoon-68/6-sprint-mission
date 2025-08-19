@@ -22,6 +22,7 @@ public class JCFUserService implements UserService {
         System.out.println("해당 유저가 없습니다. ");
         return null;
 
+
     }
 
     @Override
@@ -43,10 +44,13 @@ public class JCFUserService implements UserService {
             if (user.getName().equals(name)) {
                 System.out.println("어떤 이름으로 수정하겠습니까? ");
                 String modifyUserName = sc.nextLine();
+                if(modifyUserName==null)    break;
                 user.setName(modifyUserName);
+                System.out.println("이름이 수정되었습니다: " + modifyUserName);
                 break;
             }
         }
+        System.out.println("수정이 올바르지 않습니다");
     }
 
     @Override
@@ -57,5 +61,6 @@ public class JCFUserService implements UserService {
                 break;
             }
         }
+        System.out.println("삭제되지 않았습니다");
     }
 }

@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.List;
-import java.util.UUID;
-
 public class User {
     private String name;
     private String state;
