@@ -29,8 +29,28 @@
         -[ ] id: 객체를 식별하기 위한 id로 UUID 타입으로 선언합니다.
         -[ ] createdAt, updatedAt: 각각 객체의 생성, 수정 시간을 유닉스 타임스탬프로 나타내기 위한 필드로 Long 타입으로 선언합니다.
         -[ ] User
+            - id(UUID)
+            - 이름(String)
+            - 나이(int)
+            - 이메일
+            - 채널 목록(List<Channel>)
+            - 친구 목록(List<User>)
+            - 생성 일자(DATE)
+            - 수정 일자(DATE)
         -[ ] Channel
+            - id (UUID)
+            - 채널이름 (String)
+            - 방장 (User)
+            - User 목록 (List<User>)
+            - 메세지 목록 (List<Message>)
+            - 생성 일자 (DATE)
+            - 수정 일자 (DATE)
         -[ ] Message
+            - id (UUID)
+            - 보낸 User (User)
+            - 메세지 본문( String)
+            - 생성 일자 (DATE)
+            - 수정 일자 (DATE)
     -[ ] 생성자
       -[ ] id는 생성자에서 초기화하세요.
       -[ ] createdAt는 생성자에서 초기화하세요.
