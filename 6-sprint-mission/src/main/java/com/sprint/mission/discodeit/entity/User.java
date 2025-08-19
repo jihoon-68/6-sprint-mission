@@ -1,0 +1,42 @@
+package com.sprint.mission.discodeit.entity;
+
+import java.util.List;
+import java.util.UUID;
+
+public class User {
+    private String name;
+    private String state;
+    private Common common;
+
+    public User(String name) {
+        this.name = name;
+        this.state = "Online";
+        this.common = new Common();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", state='" + state + '\'' +
+                ", userId=" + common.getId() +
+                '}';
+    }
+}
