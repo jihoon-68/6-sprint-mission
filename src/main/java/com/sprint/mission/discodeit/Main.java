@@ -16,7 +16,7 @@ public class Main {
 
     private static void TestMessage()
     {
-        System.out.println("======Testing Channel======");
+        System.out.println("======Testing Messages======");
         JCFMessageService message = new JCFMessageService();
         User u1 = new User("park","park mail");
         User u2 = new User("kim","kim mail");
@@ -42,7 +42,7 @@ public class Main {
         System.out.println("\n delete and Select all messages ");
         message.getAllMessages().forEach(x -> System.out.println(x.toString()));
 
-        System.out.println("======Testing User Finished======");
+        System.out.println("======Testing Messages Finished======");
     }
 
     private static void TestChannel()
@@ -67,7 +67,7 @@ public class Main {
         channel.deleteChannel(temp);
         System.out.println("\n delete and select channels ");
         channel.getChannels().forEach(x-> System.out.println(x.toString()));
-        System.out.println("======Testing User Finished======");
+        System.out.println("======Testing Channel Finished======");
     }
 
     private static void TestUser()
