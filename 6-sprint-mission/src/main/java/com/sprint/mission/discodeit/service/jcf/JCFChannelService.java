@@ -8,46 +8,36 @@ import java.util.List;
 import java.util.Scanner;
 
 public class JCFChannelService implements ChannelService {
-    private final List<Channel> channelList = new ArrayList<>();
+    private final List<Channel> channelData;
 
-    @Override
-    public Channel read(String name){
-        return channelList.stream().filter(ch -> ch.getName().equals(name)).findAny().orElse(null);
+    public JCFChannelService() {
+        this.channelData = new ArrayList<>();
     }
 
     @Override
-    public Channel create(String name){
+    public Channel read(String name) {
+        return channelData.stream().filter(ch -> ch.getName().equals(name)).findAny().orElse(null);
+    }
+
+    @Override
+    public Channel create(String name) {
         Channel channel = new Channel(name);
-        channelList.add(channel);
+        channelData.add(channel);
         return channel;
     }
+
     @Override
-    public List<Channel> allRead(){
-        return channelList;
+    public List<Channel> allRead() {
+        return channelData;
     }
+
     @Override
-    public void modify(String name){
-        Scanner sc = new Scanner(System.in);
-        for (Channel channel : channelList) {
-            if(channel.getName().equals(name)){
-                System.out.println("채널명 수정 입력: ");
-                String msg = sc.nextLine();
-                if(msg==null)    break;
-                channel.setName(msg);
-                System.out.println("채널명이 수정되었습니다: " + msg);
-                break;
-            }
-        }
-        System.out.println("수정이 올바르지 않습니다");
+    public Channel modify(String name) {
+        return channelData.stream().filter(ch -> ch.getName().equals(name)).findAny().orElse(null);
     }
+
     @Override
-    public void delete(String name){
-        for (Channel channel : channelList) {
-            if (channel.getName().equals(name)) {
-                channelList.remove(channel);
-                break;
-            }
-        }
-        System.out.println("삭제되지 않았습니다");
+    public Channel delete(String name) {
+        return channelData.stream().filter(ch -> ch.getName().equals(name)).findAny().orElse(null);
     }
 }

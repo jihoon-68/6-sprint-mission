@@ -7,58 +7,36 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
-    private final List<User> userList = new ArrayList<>();
+    private final List<User> userData;
 
+    public JCFUserService() {
+        this.userData = new ArrayList<>();
+    }
 
     @Override
     public User read(String name) {
-        for (User user : userList) {
-            if (user.getName().equals(name)) {
-                System.out.println("유저 이름: " + user.getName());
-                System.out.println("유저 상태: " + user.getState());
-                return user;
-            }
-        }
-        System.out.println("해당 유저가 없습니다. ");
-        return null;
+        return userData.stream().filter(user->user.getName().equals(name)).findAny().orElse(null);
     }
 
     @Override
     public User create(String name) {
         User user = new User(name);
-        userList.add(user);
+        userData.add(user);
         return user;
     }
 
     @Override
     public List<User> allRead() {
-        return userList;
+        return userData;
     }
 
     @Override
-    public void modify(String name) {
-        Scanner sc = new Scanner(System.in);
-        for (User user : userList) {
-            if (user.getName().equals(name)) {
-                System.out.println("어떤 이름으로 수정하겠습니까? ");
-                String modifyUserName = sc.nextLine();
-                if(modifyUserName==null)    break;
-                user.setName(modifyUserName);
-                System.out.println("이름이 수정되었습니다: " + modifyUserName);
-                break;
-            }
-        }
-        System.out.println("수정이 올바르지 않습니다");
+    public User modify(String name) {
+        return userData.stream().filter(user->user.getName().equals(name)).findAny().orElse(null);
     }
 
     @Override
-    public void delete(String name) {
-        for (User user : userList) {
-            if (user.getName().equals(name)) {
-                userList.remove(user);
-                break;
-            }
-        }
-        System.out.println("삭제되지 않았습니다");
+    public User delete(UUID id) {
+        return userData.stream().filter(user->user.getCommon().getId().equals(id)).findAny().orElse(null);
     }
 }

@@ -10,6 +10,6 @@ public interface MessageService {
     Message read(String sender);
     Message create(User sender, User reciever, String content, Channel channel);
     List<Message> allRead();
-    void modify(String message);
-    void delete(String message);
+    Message modify(String message);
+    Message delete(String message);
 }

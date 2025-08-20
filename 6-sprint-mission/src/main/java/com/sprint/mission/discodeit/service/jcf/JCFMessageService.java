@@ -7,48 +7,34 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class JCFMessageService implements MessageService {
-    private final List<Message> messageList = new ArrayList<>();
+    private final List<Message> messageData;
+
+    public JCFMessageService() {
+        this.messageData = new ArrayList<>();
+    }
 
     @Override
     public Message read(String sender){
-        return messageList.stream().filter(msg->msg.getSender().equals(sender)).findAny().orElse(null);
+        return messageData.stream().filter(msg->msg.getSender().equals(sender)).findAny().orElse(null);
     }
     @Override
     public Message create(User sender, User reciever, String content, Channel channel){
         Message message = new Message(sender,reciever,content,channel);
-        messageList.add(message);
+        messageData.add(message);
         return message;
     }
     @Override
     public List<Message> allRead(){
-        return messageList;
+        return messageData;
     }
     @Override
-    public void modify(String content){
-        Scanner sc = new Scanner(System.in);
-        for (Message message : messageList) {
-            if(message.getContent().equals(content)){
-                System.out.println("메시지 수정 입력: ");
-                String msg = sc.nextLine();
-                if(msg==null)    break;
-                message.setContent(msg);
-                System.out.println("메시지가 수정되었습니다: " + msg);
-                break;
-            }
-        }
-        System.out.println("수정이 올바르지 않습니다");
+    public Message modify(String content){
+        return messageData.stream().filter(msg->msg.getContent().equals(content)).findAny().orElse(null);
     }
     @Override
-    public void delete(String content){
-        for (Message message : messageList) {
-            if(message.getContent().equals(content)){
-                messageList.remove(message);
-                break;
-            }
-        }
-        System.out.println("삭제되지 않았습니다");
+    public Message delete(String content){
+        return messageData.stream().filter(msg->msg.getContent().equals(content)).findAny().orElse(null);
     }
 }

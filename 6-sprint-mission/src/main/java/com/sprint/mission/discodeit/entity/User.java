@@ -27,6 +27,9 @@ public class User {
         this.state = state;
     }
 
+    public Common getCommon() {
+        return common;
+    }
 
     @Override
     public String toString() {
@@ -36,4 +39,6 @@ public class User {
                 ", userId=" + common.getId() +
                 '}';
     }
+
+
 }

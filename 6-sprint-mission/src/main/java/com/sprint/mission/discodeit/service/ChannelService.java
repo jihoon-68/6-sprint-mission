@@ -8,6 +8,6 @@ public interface ChannelService {
     Channel read(String name);
     Channel create(String name);
     List<Channel> allRead();
-    void modify(String name);
-    void delete(String name);
+    Channel modify(String name);
+    Channel delete(String name);
 }
