@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -11,6 +12,13 @@ import java.util.UUID;
 public class JCFChannel  implements ChannelService {
 
     private final List<Channel> channelData = new ArrayList<>();
+    private  final JCFUser jcfUser;
+    private  final JCFMessage jcfMessage;
+
+    public JCFChannel(JCFUser jcfUser,JCFMessage jcfMessage){
+        this.jcfUser = jcfUser;
+        this.jcfMessage = jcfMessage;
+    }
 
     public Channel createChannel(String name, String root) {
         Channel channel =new Channel(name, root);
@@ -50,6 +58,29 @@ public class JCFChannel  implements ChannelService {
         }
         channelData.remove(channel);
         System.out.println("체널을 삭제 했습니다");
+    };
+
+    //서버 유저 추가
+    public void addUserToChannel(Channel channel, User user){
+        channel.updateChanelUsers(user);
+        this.updateChannel(channel);
+    };
+
+    public void removeUserFromChannel(Channel channel, User user){
+        channel.getChannelUsers().remove(user);
+        this.updateChannel(channel);
+    };
+
+
+    //서버 메새지 추가
+    public void addMessageToChannel(Channel channel, Message message){
+        channel.updateChanelMessages(message);
+        this.updateChannel(channel);
+    };
+
+    public void removeMessageFromChannel(Channel channel, Message message){
+        channel.getChannelMessages().remove(message);
+        this.updateChannel(channel);
     };
 
 }
