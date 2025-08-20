@@ -11,9 +11,14 @@ import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     private final List<Message> messageData;
+    private static final JCFMessageService INSTANCE = new JCFMessageService();
 
-    public JCFMessageService() {
+    private JCFMessageService() {
         this.messageData = new ArrayList<>();
+    }
+
+    public static JCFMessageService getInstance(){
+        return INSTANCE;
     }
 
     @Override

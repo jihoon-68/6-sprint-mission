@@ -8,9 +8,14 @@ import java.util.*;
 public class JCFUserService implements UserService {
 
     private final List<User> userData;
+    private static final JCFUserService INSTANCE = new JCFUserService();
 
-    public JCFUserService() {
+    private JCFUserService() {
         this.userData = new ArrayList<>();
+    }
+
+    public static JCFUserService getInstance() {
+        return INSTANCE;
     }
 
     @Override

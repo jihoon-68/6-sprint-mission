@@ -9,9 +9,14 @@ import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
     private final List<Channel> channelData;
+    private static final JCFChannelService INSTANCE = new JCFChannelService();
 
-    public JCFChannelService() {
+    private JCFChannelService() {
         this.channelData = new ArrayList<>();
+    }
+
+    public static JCFChannelService getInstance(){
+        return INSTANCE;
     }
 
     @Override
