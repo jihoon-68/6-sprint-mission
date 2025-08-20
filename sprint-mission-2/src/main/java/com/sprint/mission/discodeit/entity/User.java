@@ -52,12 +52,12 @@ public class User {
     }
 
     //유져 본연에 속성이 변경 시에만 업데이트 갱신
-    public void updatedFriends(List<User> friends) {
-        this.friends = friends;
+    public void updatedFriends(User friend) {
+        this.friends.add(friend);
     }
 
-    public void updatedChannels(List<Channel> channels) {
-        this.channels = channels;
+    public void updatedChannels(Channel channel) {
+        this.channels.add(channel);
     }
 
     public String toString(){
