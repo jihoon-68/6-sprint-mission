@@ -10,9 +10,9 @@ import com.sprint.mission.discodeit.service.jcf.JCFUser;
 
 public class Main {
     public static void main(String[] args) {
-        JCFChannel jcfChannel = new JCFChannel();
-        JCFMessage jcfMessage = new JCFMessage();
         JCFUser jcfUser = new JCFUser();
+        JCFMessage jcfMessage = new JCFMessage();
+        JCFChannel jcfChannel = new JCFChannel(jcfUser,jcfMessage);
 
 
         //유저 등록
@@ -86,13 +86,18 @@ public class Main {
 
         System.out.println();
 
-
         System.out.println("================메시지 등록=================");
-        System.out.println(jcfMessage.createMessage(leeUser.getUsername(),"등록 테스트 케이스 01"));
-        System.out.println(jcfMessage.createMessage(parkUser.getUsername(),"등록 테스트 케이스 02"));
-        System.out.println(jcfMessage.createMessage(namgungUser.getUsername(),"등록 테스트 케이스 03"));
-        System.out.println(jcfMessage.createMessage(baeUser.getUsername(),"등록 테스트 케이스 04"));
-        System.out.println(jcfMessage.createMessage(leeUser.getUsername(),"등록 테스트 케이스 05"));
+        Message message01 = jcfMessage.createMessage(leeUser.getUsername(),"등록 테스트 케이스 01");
+        Message message02 = jcfMessage.createMessage(parkUser.getUsername(),"등록 테스트 케이스 02");
+        Message message03 = jcfMessage.createMessage(namgungUser.getUsername(),"등록 테스트 케이스 03");
+        Message message04 = jcfMessage.createMessage(baeUser.getUsername(),"등록 테스트 케이스 04");
+        Message message05 = jcfMessage.createMessage(leeUser.getUsername(),"등록 테스트 케이스 05");
+
+        System.out.println(message01);
+        System.out.println(message02);
+        System.out.println(message03);
+        System.out.println(message04);
+        System.out.println(message05);
 
 
         System.out.println("================메시지 조회(단건,다건)=================");
@@ -110,11 +115,44 @@ public class Main {
         System.out.println(jcfMessage.findAllMessages());
 
 
+        System.out.println("================도메인 의존성 주입=================");
+        System.out.println("================서버에서 유져 추가=================");
+        jcfChannel.addUserToChannel(channel1,leeUser);
+        jcfChannel.addUserToChannel(channel1,parkUser);
+        jcfChannel.addUserToChannel(channel1,namgungUser);
+        jcfChannel.addUserToChannel(channel2,baeUser);
+        jcfChannel.addUserToChannel(channel2,leeUser);
+        jcfChannel.addUserToChannel(channel2,namgungUser);
+
+        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelUsers());
+        System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelUsers());
+        System.out.println("==============================================");
 
 
+        System.out.println("================서버에서 유져 삭제=================");
+        jcfChannel.removeUserFromChannel(channel1,leeUser);
+        jcfChannel.removeUserFromChannel(channel2,namgungUser);
+        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelUsers());
+        System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelUsers());
+        System.out.println("==============================================");
 
+        System.out.println("=============서버별 서버 메세지 보내기==============");
+        jcfChannel.addMessageToChannel(channel1,message01);
+        jcfChannel.addMessageToChannel(channel1,message02);
+        jcfChannel.addMessageToChannel(channel1,message03);
+        jcfChannel.addMessageToChannel(channel2,message04);
+        jcfChannel.addMessageToChannel(channel2,message05);
+        jcfChannel.addMessageToChannel(channel2,newMessage);
 
+        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelMessages());
+        System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelMessages());
+        System.out.println("===============================================");
+
+        System.out.println("===============서버별 서버 메세지 삭제===============");
+        jcfChannel.removeMessageFromChannel(channel1,message01);
+        jcfChannel.removeMessageFromChannel(channel2,message04);
+        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelMessages());
+        System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelMessages());
+        System.out.println("================================================");
     }
-
-
 }
