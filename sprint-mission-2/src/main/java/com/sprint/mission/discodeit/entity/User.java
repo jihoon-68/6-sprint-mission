@@ -59,4 +59,15 @@ public class User {
     public void updatedChannels(List<Channel> channels) {
         this.channels = channels;
     }
+
+    public String toString(){
+        return "유저 정보: "+ "\n" +
+                "ID: " + this.id + "\n" +
+                "아름: " + this.username + "\n" +
+                "나이: " + this.age + "\n" +
+                "이메일: " + this.email + "\n" +
+                "계정 생성일: " + this.created + "\n" +
+                "친구: " + this.friends + "\n" +
+                "입장 채널: " + this.channels + "\n";
+    }
 }
