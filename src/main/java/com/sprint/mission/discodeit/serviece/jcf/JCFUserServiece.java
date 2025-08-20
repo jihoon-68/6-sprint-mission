@@ -15,6 +15,16 @@ public class JCFUserServiece implements UserServiece {
   }
 
   @Override
+  public User getUser(UUID userId) {
+    for(User user : users){
+      if(user.getUserId().equals(userId)){
+        return user;
+      }
+    }
+    return null;
+  }
+
+  @Override
   public void createUser(User user) {
     users.add(user);
   }

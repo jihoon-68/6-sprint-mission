@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.serviece.ChannelServiece;
 import com.sprint.mission.discodeit.serviece.jcf.JCFChannelServiece;
 import com.sprint.mission.discodeit.serviece.jcf.JCFMessageServiece;
 import com.sprint.mission.discodeit.serviece.jcf.JCFUserServiece;
@@ -13,50 +12,6 @@ import java.util.UUID;
 public class JavaApplication {
   public static void main(String[] args) {
 
-    /// 메시지
-    JCFMessageServiece messageServiece = new JCFMessageServiece();
-
-    ///  메시지 추가
-    Message message1 = new Message("Hello World");
-    Message message2 = new Message("GoodBye World");
-
-    messageServiece.createMessage(message1);
-    messageServiece.createMessage(message2);
-
-    System.out.println(" ====Create Message==== ");
-
-    System.out.println("====read all Massage====");
-    messageServiece.readAllMessage().forEach(m -> System.out.println(m));
-
-    System.out.println();
-
-    System.out.println(" ====read one Message==== ");
-    UUID messageId = message1.getMessageId();
-    Message foundMessage = messageServiece.readMessage(messageId);
-    System.out.println(foundMessage);
-
-    System.out.println();
-    /// 메시지 수정
-    System.out.println("====update Message====");
-
-    foundMessage.updateText("Hello World is different Hi word?");
-    messageServiece.updateMessage(foundMessage);
-
-    Message updatedMessage = messageServiece.readMessage(messageId);
-    System.out.println(updatedMessage);
-    System.out.println();
-
-    /// 메시지 삭제
-    System.out.println("====delete message=====");
-    messageServiece.deleteMessage(messageId);
-
-    /// 삭제 후 조회
-    Message deletedMessage = messageServiece.readMessage(messageId);
-    if(deletedMessage == null){
-      System.out.println("Message couldn't find(it may be deleted");
-    }
-    messageServiece.readAllMessage().forEach(m -> System.out.println(m));
-    System.out.println();
 
     /// User
     JCFUserServiece userServiece = new JCFUserServiece();
@@ -103,14 +58,15 @@ public class JavaApplication {
     System.out.println();
 
     /// 유저 삭제
-    System.out.println("====delete user====");
-    userServiece.deleteUser(userId);
+    /*System.out.println("====delete user====");
+    userServiece.deleteUser(userId);*/
     ////삭제 후 조회
-    User deletedUser = userServiece.readUser(userId);
+    /*User deletedUser = userServiece.readUser(userId);
     if(deletedUser == null){
       System.out.println("user has been deleted");
     }
-    userServiece.readAllInfo().forEach(u -> System.out.println(u));
+    userServiece.readAllInfo().forEach(u -> System.out.println(u));*/
+
 
     /// Channel
     JCFChannelServiece channelServiece = new JCFChannelServiece();
@@ -147,7 +103,7 @@ public class JavaApplication {
     System.out.println();
 
     /// 채널 삭제
-    System.out.println("====delete Channel====");
+   /* System.out.println("====delete Channel====");
 
     channelServiece.deleteChannel(channelId);
     Channel deletedChannel = channelServiece.readChannel(channelId);
@@ -155,6 +111,60 @@ public class JavaApplication {
       System.out.println("this channel has been deleted");
     }
     channelServiece.readAllInfo().forEach(ch-> System.out.println(ch));
+*/
+
+
+    /// 메시지
+    JCFMessageServiece messageServiece = new JCFMessageServiece(userServiece,channelServiece);
+
+    ///  메시지 추가
+    Message message1 = new Message("Hello World");
+    Message message2 = new Message("GoodBye World");
+
+    message1.setUser(user1);
+    message1.setChannel(channel1);
+
+    message2.setUser(user2);
+    message2.setChannel(channel2);
+
+    messageServiece.createMessage(message1,user1.getUserId(),channel1.getChannelId());
+    messageServiece.createMessage(message2,user2.getUserId(),channel2.getChannelId());
+
+    System.out.println(" ====Create Message==== ");
+
+    System.out.println("====read all Massage====");
+    messageServiece.readAllMessage().forEach(m -> System.out.println(m));
+
+    System.out.println();
+
+    System.out.println(" ====read one Message==== ");
+    UUID messageId = message1.getMessageId();
+    Message foundMessage = messageServiece.readMessage(messageId);
+    System.out.println(foundMessage);
+
+    System.out.println();
+    /// 메시지 수정
+    System.out.println("====update Message====");
+
+    foundMessage.updateText("Hello World is different Hi word?");
+    messageServiece.updateMessage(foundMessage);
+
+    Message updatedMessage = messageServiece.readMessage(messageId);
+    System.out.println(updatedMessage);
+    System.out.println();
+
+    /// 메시지 삭제
+    System.out.println("====delete message=====");
+    messageServiece.deleteMessage(messageId);
+
+    /// 삭제 후 조회
+    Message deletedMessage = messageServiece.readMessage(messageId);
+    if(deletedMessage == null){
+      System.out.println("Message couldn't find(it may be deleted");
+    }
+    messageServiece.readAllMessage().forEach(m -> System.out.println(m));
+    System.out.println();
+
 
   }
 }
