@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
     private final List<Channel> channelData;
@@ -32,12 +32,13 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel modify(String name) {
-        return channelData.stream().filter(ch -> ch.getName().equals(name)).findAny().orElse(null);
+    public Channel modify(UUID id) {
+        return channelData.stream().filter(ch -> ch.getCommon().getId().equals(id)).findAny().orElse(null);
     }
 
     @Override
-    public Channel delete(String name) {
-        return channelData.stream().filter(ch -> ch.getName().equals(name)).findAny().orElse(null);
+    public Channel delete(UUID id) {
+        return channelData.stream().filter(ch -> ch.getCommon().getId().equals(id)).findAny().orElse(null);
     }
+
 }

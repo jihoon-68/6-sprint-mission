@@ -76,15 +76,16 @@ public class JavaApplication {
                                 System.out.println("유저 리스트: " + userData.stream().collect(Collectors.toList()));
                                 break;
                             case 3:
-                                System.out.println("수정할 유저 이름: ");
-                                String originUserName = sc.nextLine();
+                                System.out.println("이름을 수정할 유저 id: ");
+                                String inputUserId = sc.nextLine();
                                 System.out.println("어떤 이름으로 수정하겠습니까? ");
                                 String modifyUserName = sc.nextLine();
-                                if(originUserName.isEmpty() || modifyUserName.isEmpty()){
+                                if(inputUserId.isEmpty() || modifyUserName.isEmpty()){
                                     System.out.println("입력이 비어있습니다 ");
                                     break;
                                 }
-                                User modifyUser = userService.modify(originUserName);
+                                UUID modifyUserId = UUID.fromString(inputUserId);
+                                User modifyUser = userService.modify(modifyUserId);
                                 if(modifyUser == null){
                                     System.out.println("수정할 유저가 존재하지 않습니다 ");
                                     break;
@@ -94,7 +95,7 @@ public class JavaApplication {
                                 break;
                             case 4:
                                 System.out.println("삭제할 유저의 id: ");
-                                String inputUserId = sc.nextLine();
+                                inputUserId = sc.nextLine();
                                 if(inputUserId.isEmpty()){
                                     System.out.println("입력이 비어있습니다 ");
                                     break;
@@ -149,7 +150,7 @@ public class JavaApplication {
                         System.out.println("해당 채널이 없습니다");
                         break;
                     }
-                    messageService.create(sender, reciever, content, messageInChannel);
+                    System.out.println(messageService.create(sender, reciever, content, messageInChannel));
                     break;
                 case 4:
 
@@ -179,15 +180,16 @@ public class JavaApplication {
                                 System.out.println("메시지 리스트: " + messageData.stream().collect(Collectors.toList()));
                                 break;
                             case 3:
-                                System.out.println("수정할 메시지 내용: ");
-                                String originMessage = sc.nextLine();
+                                System.out.println("내용을 수정할 메시지 id: ");
+                                String inputMessageId = sc.nextLine();
                                 System.out.println("메시지 수정 입력: ");
                                 String modifyMsg = sc.nextLine();
-                                if(originMessage.isEmpty() || modifyMsg.isEmpty()){
+                                if(inputMessageId.isEmpty() || modifyMsg.isEmpty()){
                                     System.out.println("입력이 비어있습니다 ");
                                     break;
                                 }
-                                Message modifiedMessage = messageService.modify(originMessage);
+                                UUID modifyMessageId = UUID.fromString(inputMessageId);
+                                Message modifiedMessage = messageService.modify(modifyMessageId);
                                 if (modifiedMessage == null){
                                     System.out.println("수정할 메시지가 존재하지 않습니다");
                                     break;
@@ -196,11 +198,16 @@ public class JavaApplication {
                                 System.out.println(modifiedMessage);
                                 break;
                             case 4:
-                                System.out.println("삭제할 메시지 내용: ");
-                                originMessage = sc.nextLine();
-                                Message deletedMessage = messageService.delete(originMessage);
-                                if(originMessage.isEmpty() || deletedMessage == null){
-                                    System.out.println("입력이 비어있거나 삭제할 메시지가 존재하지 않습니다 ");
+                                System.out.println("삭제할 메시지의 id: ");
+                                inputMessageId = sc.nextLine();
+                                if(inputMessageId.isEmpty()){
+                                    System.out.println("입력이 비어있습니다 ");
+                                    break;
+                                }
+                                UUID deleteMessageId = UUID.fromString(inputMessageId);
+                                Message deletedMessage = messageService.delete(deleteMessageId);
+                                if(deletedMessage == null){
+                                    System.out.println("id에 해당하는 메시지가 없습니다 ");
                                     break;
                                 }
                                 messageData.remove(deletedMessage);
@@ -218,7 +225,7 @@ public class JavaApplication {
                 case 5:
                     System.out.println("채널 이름 입력");
                     String channelName = sc.nextLine();
-                    channelService.create(channelName);
+                    System.out.println(channelService.create(channelName));
                     break;
                 case 6:
                     boolean runCh = true;
@@ -235,15 +242,16 @@ public class JavaApplication {
                                 System.out.println("채널 리스트: " + channelData.stream().collect(Collectors.toList()));
                                 break;
                             case 2:
-                                System.out.println("수정할 채널명: ");
-                                String modifyChannelName = sc.nextLine();
+                                System.out.println("이름을 수정할 채널 id: ");
+                                String inputChannelId = sc.nextLine();
                                 System.out.println("채널명 수정 입력: ");
                                 String msg = sc.nextLine();
-                                if (msg.isEmpty() || modifyChannelName.isEmpty()){
+                                if (msg.isEmpty() || inputChannelId.isEmpty()){
                                     System.out.println("입력이 비어있습니다 ");
                                     break;
                                 }
-                                Channel modifyChannel = channelService.modify(modifyChannelName);
+                                UUID modifyChannelId = UUID.fromString(inputChannelId);
+                                Channel modifyChannel = channelService.modify(modifyChannelId);
                                 if (modifyChannel == null){
                                     System.out.println("수정할 채널이 존재하지 않습니다");
                                     break;
@@ -251,11 +259,16 @@ public class JavaApplication {
                                 modifyChannel.setName(msg);
                                 break;
                             case 3:
-                                System.out.println("삭제할 채널명: ");
-                                String originChannelName = sc.nextLine();
-                                Channel deletedChannel = channelService.delete(originChannelName);
-                                if(originChannelName.isEmpty() || deletedChannel == null){
-                                    System.out.println("입력이 비어있거나 삭제할 채널이 존재하지 않습니다 ");
+                                System.out.println("삭제할 채널 id: ");
+                                inputChannelId = sc.nextLine();
+                                if(inputChannelId.isEmpty()){
+                                    System.out.println("입력이 비어있습니다 ");
+                                    break;
+                                }
+                                UUID deleteChannelId = UUID.fromString(inputChannelId);
+                                Channel deletedChannel = channelService.delete(deleteChannelId);
+                                if(deletedChannel == null){
+                                    System.out.println("id에 해당하는 채널이 없습니다 ");
                                     break;
                                 }
                                 channelData.remove(deletedChannel);

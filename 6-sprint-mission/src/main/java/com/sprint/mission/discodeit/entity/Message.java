@@ -46,6 +46,10 @@ public class Message {
         this.reciever = reciever;
     }
 
+    public Common getCommon() {
+        return common;
+    }
+
     @Override
     public String toString() {
         return "Message{" +

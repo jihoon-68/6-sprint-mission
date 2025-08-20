@@ -31,8 +31,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User modify(String name) {
-        return userData.stream().filter(user->user.getName().equals(name)).findAny().orElse(null);
+    public User modify(UUID id) {
+        return userData.stream().filter(user->user.getCommon().getId().equals(id)).findAny().orElse(null);
     }
 
     @Override

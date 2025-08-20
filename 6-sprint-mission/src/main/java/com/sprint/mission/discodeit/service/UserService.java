@@ -9,6 +9,6 @@ public interface UserService {
     User read(String name);
     User create(String name);
     List<User> allRead();
-    User modify(String name);
+    User modify(UUID id);
     User delete(UUID id);
 }
