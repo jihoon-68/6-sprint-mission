@@ -12,9 +12,10 @@ public class JCFMessage implements MessageService {
 
     private final List<Message> messageData = new ArrayList<>();
 
-    public void createMessage(User sender, String message) {
-        Message newmessage = new Message( sender, message);
+    public Message createMessage(String senderName, String message) {
+        Message newmessage = new Message( senderName, message);
         messageData.add(newmessage);
+        return newmessage;
     };
 
     public Message findMessageById(UUID id){
@@ -37,7 +38,7 @@ public class JCFMessage implements MessageService {
             System.out.println("메세지를 찾지 못했습니다");
             return null;
         }
-        messageData.add(message);
+        messageData.set(idx,message);
         return message;
     };
 
@@ -47,7 +48,7 @@ public class JCFMessage implements MessageService {
             System.out.println("메세지를 삭제 못 했습니다.");
             return;
         }
-        messageData.remove(findMessageById(id));
+        messageData.remove(message);
         System.out.println("메세지를 삭제 했습니다");
     }
 
