@@ -57,7 +57,7 @@ public class JCFUser implements UserService {
             System.out.println("유저를 삭제 못 했습니다.");
             return;
         }
-        userData.remove(findUserById(id));
+        userData.remove(user);
         System.out.println("유저를 삭제 했습니다");
     };
 }
