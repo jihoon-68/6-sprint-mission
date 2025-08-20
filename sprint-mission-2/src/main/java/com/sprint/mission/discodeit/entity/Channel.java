@@ -47,11 +47,11 @@ public class Channel {
     }
 
     //서버에 본연에 속성이 변경 시에만 업데이트 갱신
-    public void updateChanelUsers(List<User> users) {
-        this.users = users;
+    public void updateChanelUsers(User users) {
+        this.users.add(users);
     }
-    public void updateChanelMessages(List<Message> messages) {
-        this.messages = messages;
+    public void updateChanelMessages(Message messages) {
+        this.messages.add(messages);
     }
 
     public String toString(){
