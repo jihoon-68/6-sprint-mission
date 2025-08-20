@@ -5,12 +5,12 @@ import java.util.UUID;
 
 public class Message {
     private final UUID id;
-    private final User sender;
+    private final String sender;
     private String text;
     private final Long created;
     private Long updated;
 
-    public Message(User sender, String text) {
+    public Message(String sender, String text) {
         this.id = UUID.randomUUID();
         this.sender = sender;
         this.text = text;
@@ -18,13 +18,21 @@ public class Message {
     }
 
     public UUID getMessageId() {return this.id;}
-    public User getMessageSender() {return this.sender;}
+    public String getMessageSender() {return this.sender;}
     public String getMessageText() {return this.text;}
     public Long getMessageCreated() {return this.created;}
     public Long getMessageUpdated() {return this.updated;}
 
     public void updateMessage(String text) {
-        this.text = this.text;
+        this.text = text;
         this.updated = System.currentTimeMillis();
+    }
+
+    public String toString(){
+        return "메시지 정보" + "\n" +
+                "메시지 ID: " + this.id + "\n" +
+                "메시지 발신자: " + this.sender + "\n" +
+                "메시지 내용: " + this.text + "\n" +
+                "메시지 샹성일자: " + this.created + "\n";
     }
 }
