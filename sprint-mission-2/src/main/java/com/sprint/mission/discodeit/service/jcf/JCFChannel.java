@@ -12,7 +12,7 @@ public class JCFChannel  implements ChannelService {
 
     private final List<Channel> channelData = new ArrayList<>();
 
-    public Channel createChannel(String name, User root) {
+    public Channel createChannel(String name, String root) {
         Channel channel =new Channel(name, root);
         channelData.add(channel);
         return channel;
@@ -48,7 +48,7 @@ public class JCFChannel  implements ChannelService {
             System.out.println("채널을 찾을수 없습니다");
             return;
         }
-        channelData.remove(findChannelById(id));
+        channelData.remove(channel);
         System.out.println("체널을 삭제 했습니다");
     };
 
