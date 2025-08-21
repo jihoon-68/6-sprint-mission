@@ -10,6 +10,6 @@ public interface UserService {
     public User findUserById(UUID id);
     public User findUserByUserEmail(String userEmail);
     public List<User> findAllUsers();
-    public User updateUser(User user);
+    public void updateUser(User user);
     public void deleteUser(UUID id);
 }
