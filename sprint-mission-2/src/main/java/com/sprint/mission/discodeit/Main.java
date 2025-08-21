@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannel;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
@@ -158,7 +160,11 @@ public class Main {
         System.out.println("================================================");
          */
 
+
         FileUserService fileUserService = new FileUserService();
+        FileMessageService fileMessageService = new FileMessageService();
+        FileChannelService fileChannelService = new FileChannelService();
+
 
         System.out.println("================유저 등록=================");
         fileUserService.createUser("kim",20,"kim01@codeit.com");
@@ -173,5 +179,90 @@ public class Main {
         System.out.println("유저 등록: namgung,23,namgung04@codeit.com");
         System.out.println("유저 등록: bae,24,bae05@codeit.com");
 
+        //유저 조회(단건,다건)
+        System.out.println("================유저 조회(단건,다건)=================");
+        User kimUser = fileUserService.findUserByUserEmail("kim01@codeit.com");
+        System.out.println(kimUser);
+        System.out.println(fileUserService.findAllUsers());
+
+
+        //유저 수정
+        System.out.println("================유저 수정=================");
+        kimUser.updateEmail("kim011@codeit.com");
+        fileUserService.updateUser(kimUser);
+        System.out.println(fileUserService.findUserById(kimUser.getUserId()));
+
+        //유저 삭제
+        System.out.println("================유저 삭제=================");
+        User pakrUser = fileUserService.findUserByUserEmail("park03@codeit.com");
+        fileUserService.deleteUser(pakrUser.getUserId());
+        System.out.println(fileUserService.findAllUsers());
+
+        System.out.println();
+
+        //서버 생성을 위한 유저형의 유저변수 생성
+        User leeUser = fileUserService.findUserByUserEmail("lee02@codeit.com");
+        User namgungUser = fileUserService.findUserByUserEmail("namgung04@codeit.com");
+        User baeUser = fileUserService.findUserByUserEmail("bae05@codeit.com");
+
+        //서버 등록
+        System.out.println("================서버 등록=================");
+        Channel channel1 = fileChannelService.createChannel("1팀",leeUser.getUsername());
+        Channel channel2 =fileChannelService.createChannel("2팀",kimUser.getUsername());
+        Channel channel3 =fileChannelService.createChannel("3팀",namgungUser.getUsername());
+        Channel channel4 =fileChannelService.createChannel("4팀",baeUser.getUsername());
+
+        System.out.println("서버 등록: 1팀,lee");
+        System.out.println("서버 등록: 2팀,kim");
+        System.out.println("서버 등록: 3팀,namgung");
+        System.out.println("서버 등록: 4팀,bae");
+
+        //서버 조회(단건,다건)
+        System.out.println("================서버 조회(단건,다건)=================");
+        System.out.println(fileChannelService.findChannelById(channel1.getChannelId()));
+        System.out.println(fileChannelService.findAllChannels());
+
+        //서버 수정
+        System.out.println("================서버 수정=================");
+        channel1.updateChanelName("1조");
+        fileChannelService.updateChannel(channel1);
+        System.out.println(fileChannelService.findChannelById(channel1.getChannelId()));
+
+        //서버 삭제
+        System.out.println("================서버 삭제=================");
+        fileChannelService.deleteChannel(channel3.getChannelId());
+        System.out.println(fileChannelService.findAllChannels());
+
+        System.out.println();
+
+        System.out.println("================메시지 등록=================");
+        Message message01 = fileMessageService.createMessage(leeUser.getUsername(),"등록 테스트 케이스 01");
+        Message message02 = fileMessageService.createMessage(kimUser.getUsername(),"등록 테스트 케이스 02");
+        Message message03 = fileMessageService.createMessage(namgungUser.getUsername(),"등록 테스트 케이스 03");
+        Message message04 = fileMessageService.createMessage(baeUser.getUsername(),"등록 테스트 케이스 04");
+        Message message05 = fileMessageService.createMessage(leeUser.getUsername(),"등록 테스트 케이스 05");
+
+        System.out.println(message01);
+        System.out.println(message02);
+        System.out.println(message03);
+        System.out.println(message04);
+        System.out.println(message05);
+
+
+        System.out.println("================메시지 조회(단건,다건)=================");
+        Message newMessage = fileMessageService.createMessage(namgungUser.getUsername(),"등록 테스트 케이지06");
+        System.out.println(fileMessageService.findMessageById(newMessage.getMessageId()));
+        System.out.println(fileMessageService.findAllMessages());
+
+        System.out.println("================메시지 수정=================");
+        newMessage.updateMessage("수정 테스트 01");
+        fileMessageService.updateMessage(newMessage);
+        System.out.println(fileMessageService.findMessageById(newMessage.getMessageId()));
+
+        System.out.println("================메시지 삭제=================");
+        fileMessageService.deleteMessage(newMessage.getMessageId());
+        System.out.println(fileMessageService.findAllMessages());
+
     }
+
 }
