@@ -3,17 +3,20 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannel;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 import com.sprint.mission.discodeit.service.jcf.JCFUser;
 
 
+
 public class Main {
+
     public static void main(String[] args) {
+        /* JCF 저장형식 구현방식
         JCFUser jcfUser = new JCFUser();
         JCFMessage jcfMessage = new JCFMessage();
         JCFChannel jcfChannel = new JCFChannel(jcfUser,jcfMessage);
-
 
         //유저 등록
         System.out.println("================유저 등록=================");
@@ -54,7 +57,6 @@ public class Main {
         User parkUser = jcfUser.findUserByUserEmail("park03@codeit.com");
         User namgungUser = jcfUser.findUserByUserEmail("namgung04@codeit.com");
         User baeUser = jcfUser.findUserByUserEmail("bae05@codeit.com");
-
 
         //서버 등록
         System.out.println("================서버 등록=================");
@@ -154,5 +156,22 @@ public class Main {
         System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelMessages());
         System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelMessages());
         System.out.println("================================================");
+         */
+
+        FileUserService fileUserService = new FileUserService();
+
+        System.out.println("================유저 등록=================");
+        fileUserService.createUser("kim",20,"kim01@codeit.com");
+        fileUserService.createUser("lee",21,"lee02@codeit.com");
+        fileUserService.createUser("park",22,"park03@codeit.com");
+        fileUserService.createUser("namgung",23,"namgung04@codeit.com");
+        fileUserService.createUser("bae",24,"bae05@codeit.com");
+
+        System.out.println("유저 등록: kim,20,kim01@codeit.com");
+        System.out.println("유저 등록: lee,21,lee02@codeit.com");
+        System.out.println("유저 등록: park,22,kim01@codeit.com");
+        System.out.println("유저 등록: namgung,23,namgung04@codeit.com");
+        System.out.println("유저 등록: bae,24,bae05@codeit.com");
+
     }
 }
