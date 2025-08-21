@@ -10,7 +10,11 @@ import java.util.UUID;
 
 public class JCFMessage implements MessageService {
 
-    private final List<Message> messageData = new ArrayList<>();
+    private final List<Message> messageData;
+
+    public JCFMessage(){
+        messageData = new ArrayList<>();
+    }
 
     public Message createMessage(String senderName, String message) {
         Message newmessage = new Message( senderName, message);
