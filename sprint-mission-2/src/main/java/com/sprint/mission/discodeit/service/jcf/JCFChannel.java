@@ -11,11 +11,12 @@ import java.util.UUID;
 
 public class JCFChannel  implements ChannelService {
 
-    private final List<Channel> channelData = new ArrayList<>();
-    private  final JCFUser jcfUser;
-    private  final JCFMessage jcfMessage;
+    private final List<Channel> channelData;
+    private final JCFUser jcfUser;
+    private final JCFMessage jcfMessage;
 
     public JCFChannel(JCFUser jcfUser,JCFMessage jcfMessage){
+        this.channelData = new ArrayList<>();
         this.jcfUser = jcfUser;
         this.jcfMessage = jcfMessage;
     }
@@ -40,14 +41,13 @@ public class JCFChannel  implements ChannelService {
         return channelData;
     };
 
-    public Channel updateChannel(Channel channel){
+    public void updateChannel(Channel channel){
         int idx = channelData.indexOf(channel);
         if(idx == -1){
             System.out.println("채널을 찾을수 없습니다");
-            return null;
+            return;
         }
         channelData.set(idx, channel);
-        return channel;
     };
 
     public void deleteChannel(UUID id){
