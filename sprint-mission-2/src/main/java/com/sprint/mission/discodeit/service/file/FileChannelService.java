@@ -25,7 +25,7 @@ public class FileChannelService implements ChannelService {
 
     public Channel createChannel(String name, String root){
         Channel newChannel = new Channel(name, root);
-        instance.save(directory, newChannel);
+        instance.save(filePath(newChannel), newChannel);
         return newChannel;
     };
 
