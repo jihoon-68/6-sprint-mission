@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.*;
 import com.sprint.mission.discodeit.entity.*;
 
@@ -7,29 +10,37 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        //서비스 객체 생성
+        //서비스 객체 생성 (의존성 없는 서비스 부터 생성)
         JCFUserService jcfUserService = new JCFUserService();
         JCFChannelService jcfChannelService = new JCFChannelService();
-        JCFMessageService jcfMessageService = new JCFMessageService();
+
+        // 의존성 주입
+        JCFMessageService jcfMessageService = new JCFMessageService(jcfUserService, jcfChannelService);
 
         // 등록
 
         // 사용자 등록
         jcfUserService.createUser("KCH");
         jcfUserService.createUser("PJS");
+        // 생성된 사용자 객체 가져오기
+        User user1 = jcfUserService.getUsers().get(0);
+        User user2 = jcfUserService.getUsers().get(1);
+
 
         //채널 등록
         jcfChannelService.createChannel("codeIt");
         jcfChannelService.createChannel("discodeIt");
+        // 생성된 채널 객체 가져오기
+        Channel channel1 = jcfChannelService.getChannels().get(0);
+        Channel channel2 = jcfChannelService.getChannels().get(1);
 
         // 메시지 등록
-        jcfMessageService.createMessage("Hello World");
-        jcfMessageService.createMessage("This is a test message");
+        jcfMessageService.createMessage("Hello World", user1.getId(), channel1.getId());
+        jcfMessageService.createMessage("This is a test message", user2.getId(), channel2.getId());
 
         // 단건 조회
 
         // 사용자 조회
-        User user1 = jcfUserService.getUsers().get(0);
         System.out.println("등록된 사용자: " + user1.getName());
 
         // 메시지 조회
@@ -37,7 +48,6 @@ public class JavaApplication {
         System.out.println("등록된 메세지: " + message1.getMsg());
 
         // 채널 조회
-        Channel channel1 = jcfChannelService.getChannels().get(0);
         System.out.println("등록된 채널: " + channel1.getChName() + "\n");
 
         // 다건 조회
@@ -53,7 +63,9 @@ public class JavaApplication {
         //모든 메시지 조회
         System.out.println("모든 메시지 조회: ");
         for(Message message : jcfMessageService.getMessages()){
-            System.out.println(message.getMsg());
+            // 어떤 유저가 보냈는지 확인하는 로직 추가
+            User author = jcfUserService.getUser(message.getUserId());
+            System.out.println(author.getName() + ": " + message.getMsg());
         }
         System.out.println();
 

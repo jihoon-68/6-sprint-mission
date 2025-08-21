@@ -7,12 +7,16 @@ public class Message {
     private long createdAt;
     private long updatedAt;
     private String msg;
+    private UUID userId; // DI를 위한 필드 추가
+    private UUID channelId; // DI를 위한 필드 추가
 
-    public Message(String msg) {
+    public Message(String msg,  UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
         this.msg = msg;
+        this.userId = userId;
+        this.channelId = channelId;
     }
 
     public UUID getId() {
@@ -30,6 +34,10 @@ public class Message {
     public String getMsg() {
         return msg;
     }
+
+    public UUID getUserId() { return userId; }
+
+    public UUID getChannelId() { return channelId; }
 
     public void update(String newMsg) {
         this.msg = newMsg;
