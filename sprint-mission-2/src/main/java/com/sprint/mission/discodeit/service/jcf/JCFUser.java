@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFUser implements UserService {
-
-    private final List<User>userData = new ArrayList<>();
-
+    private final List<User>userData;
+    public JCFUser(){
+        userData = new ArrayList<>();
+    }
     public void createUser(String username, int age , String email) {
         User newUser =new User(username,age,email);
         userData.add(newUser);
@@ -41,14 +42,13 @@ public class JCFUser implements UserService {
         return userData;
     };
 
-    public User updateUser(User user){
+    public void updateUser(User user){
         int idx = userData.indexOf(user);
         if(idx == -1){
             System.out.println("사용자를 찾을수 없습니다.");
-            return null;
+            return;
         }
         userData.set(idx, user);
-        return user;
     };
 
     public void deleteUser(UUID id){
