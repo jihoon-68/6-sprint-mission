@@ -27,9 +27,10 @@ public class FileUserService implements UserService {
     //사용자 별로 다른 파일? 아니면 같은 파일?
     //일단은 같은 파일 진행
 
-    public void createUser(String username, int age , String email){
+    public User createUser(String username, int age , String email){
         User newUser = new User(username, age, email);
         instance.save(filePath(newUser),newUser);
+        return newUser;
     };
     public User findUserById(UUID id){
         List<User> users = instance.load(directory);
