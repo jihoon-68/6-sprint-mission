@@ -24,10 +24,9 @@ public class User implements Serializable {
         this.friends = new ArrayList<>();
         this.channels = new ArrayList<>();
         this.created = System.currentTimeMillis();
-        this.updated = System.currentTimeMillis();
     }
     //유저에 변경이 생기면 업데이트 시간 변경
-    public void updatedChannel() {
+    private void updatedChannel() {
         this.updated = System.currentTimeMillis();
     }
 
