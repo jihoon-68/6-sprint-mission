@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -17,7 +20,7 @@ public class Main {
     private static void TestMessage()
     {
         System.out.println("======Testing Messages======");
-        JCFMessageService message = new JCFMessageService();
+        JCFMessageService message = new JCFMessageService(new JCFMessageRepository());
         User u1 = new User("park","park mail");
         User u2 = new User("kim","kim mail");
         Channel channel = new Channel("TestChannel");
@@ -48,7 +51,7 @@ public class Main {
     private static void TestChannel()
     {
         System.out.println("======Testing Channel======");
-        JCFChannelService channel = new JCFChannelService();
+        JCFChannelService channel = new JCFChannelService(new JCFChannelRepository());
         channel.createChannel("aa");
         channel.createChannel("bb");
 
@@ -73,7 +76,7 @@ public class Main {
     private static void TestUser()
     {
         System.out.println("======Testing User======");
-        JCFUserService user = new JCFUserService();
+        JCFUserService user = new JCFUserService(new JCFUserRepository());
         user.createUser("park","test");
         user.createUser("kim","test11");
 

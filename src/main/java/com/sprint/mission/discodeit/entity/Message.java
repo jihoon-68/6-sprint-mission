@@ -1,15 +1,21 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class Message extends Common {
 
+    private UUID toUserId;
+    private UUID ownerUserId;
+    private UUID channelId;
+    private String message;
 
-    protected String message;
-
-    public Message(String message) {
+    public Message(String message, UUID ownerUserId, UUID toUserId, UUID channelId) {
         super();
         this.message = message;
+        this.ownerUserId = ownerUserId;
+        this.toUserId = toUserId;
+        this.channelId = channelId;
     }
 
     public String getMessage() {
@@ -18,6 +24,18 @@ public class Message extends Common {
 
     public void updateMessage(String message) {
         this.message = message;
+    }
+
+    public UUID getToUserId() {
+        return toUserId;
+    }
+
+    public UUID getOwnerUserId() {
+        return ownerUserId;
+    }
+
+    public UUID getChannelId() {
+        return channelId;
     }
 
     @Override
