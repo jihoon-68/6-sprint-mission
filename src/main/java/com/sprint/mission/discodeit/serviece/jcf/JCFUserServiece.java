@@ -15,7 +15,7 @@ public class JCFUserServiece implements UserServiece {
   }
 
   @Override
-  public void createUser(User user) {
+  public void addUser(User user) {
     users.add(user);
   }
 
@@ -47,7 +47,7 @@ public class JCFUserServiece implements UserServiece {
   }
 
   @Override
-  public List<User> readAllInfo() {
+  public List<User> readAllUser() {
     return new ArrayList<>(users);
   }
 }

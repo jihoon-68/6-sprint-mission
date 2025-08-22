@@ -37,7 +37,7 @@ public class FileUserService implements UserServiece{
 
 
     @Override
-    public void createUser(User user) {
+    public void addUser(User user) {
         users.put(user.getUserId(), user);
         saveUsers();
     }
@@ -67,7 +67,7 @@ public class FileUserService implements UserServiece{
     }
 
     @Override
-    public List<User> readAllInfo() {
+    public List<User> readAllUser() {
         loadUsers();
         return new ArrayList<>(users.values());
     }

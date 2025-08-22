@@ -32,7 +32,7 @@ public class FileChannelService implements ChannelServiece {
     }
 
     @Override
-    public void createChannel(Channel channel) {
+    public void addChannel(Channel channel) {
         channels.put(channel.getChannelId(), channel);
         saveChannels();
     }
@@ -62,7 +62,7 @@ public class FileChannelService implements ChannelServiece {
     }
 
     @Override
-    public List<Channel> readAllInfo() {
+    public List<Channel> readAllChannel() {
         loadChannels();
         return new ArrayList<>(channels.values());
     }

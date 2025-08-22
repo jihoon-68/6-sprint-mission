@@ -23,7 +23,7 @@ public class JCFMessageServiece implements MessageServiece {
   }
 
   @Override
-  public void createMessage(Message message, UUID userId,UUID channelId) {
+  public void addMessage(Message message, UUID userId,UUID channelId) {
     User user = userServiece.readUser(userId);
     Channel channel = channelServiece.readChannel(channelId);
     if(user == null){

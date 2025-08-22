@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserRepository {
-    void enroll(User user);
-    User findById(UUID userId);
-    void delete(UUID userId);
 
-    List<User> findAll();
+    void addUser(User user);
+    User readUser(UUID userId);
+    void deleteUser(UUID userId);
+    void updateUser(User user);
+    List<User> readAllUser();
 }

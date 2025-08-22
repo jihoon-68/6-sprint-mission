@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.serviece.file.FileChannelService;
 import com.sprint.mission.discodeit.serviece.file.FileMessageService;
 import com.sprint.mission.discodeit.serviece.file.FileUserService;
@@ -13,199 +16,204 @@ import com.sprint.mission.discodeit.serviece.jcf.JCFUserServiece;
 import java.util.UUID;
 
 public class JavaApplication {
-  public static void main(String[] args) {
 
-    /// User
-    /*JCFUserServiece userServiece = new JCFUserServiece();*/
-      FileUserService fileUserService = new FileUserService();
+    /// JCF
+    //private static final JCFUserServiece userService = new JCFUserServiece();
+    //private static final JCFChannelServiece channelServiece = new JCFChannelServiece();
+    //private static final JCFMessageServiece messageServiece = new JCFMessageServiece(userService,channelServiece);
+
+    ///  File
+    //private static final FileUserService fileUserService = new FileUserService();
+    //private static final FileChannelService fileChannelService = new FileChannelService();
+    //private static final FileMessageService fileMessageService = new FileMessageService(fileUserService,fileChannelService);
+
+    /// Repository
+    private static final JCFUserRepository jcfUserRepository = new JCFUserRepository();
+    private static final JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
+    private static final JCFMessageRepository jcfMessageRepository = new JCFMessageRepository(jcfUserRepository,jcfChannelRepository);
 
 
 
-    System.out.println("====add User====");
-    User user1 = new User("SeoGyeongwon", "WonGyeong", "1234567889a");
-    User user2 = new User("HueJackMan","JhonWuq","202402121");
+    public static void main(String[] args) {
 
-/*
-    userServiece.createUser(user1);
-    userServiece.createUser(user2);
-*/
+        /////////////////////////////////////////////////////////////////////////////////////
 
-      fileUserService.createUser(user1);
-      fileUserService.createUser(user2);
+        /// 사용자 기능 테스트
+        System.out.println("================Start User testing==============\n");
+        ///사용자 입력
+        User user1 = addUser("SeoGyeongwon", "WonGyeong", "1234567889a");
+        User user2 = addUser("HueJackMan", "JhonWuq", "202402121");
+        User user3 = addUser("discodeit", "OungwuYen", "20233333");
 
-    System.out.println();
+        /// 전체 사용자 조회
+        readAllUser();
 
-    System.out.println("====find all User====");
+        ///  특정 사용자 조회
+        readUser(user1.getUserId());
 
-    /*userServiece.readAllInfo().forEach(u -> System.out.println(u));*/
-      fileUserService.readAllInfo().forEach(System.out::println);
-    /// 하나의 유저만 조회
+        /// 특정 사용자 정보 수정 (user1)
+        updateUserPassword(user1, "20000601");
 
-    System.out.println();
+        ///  특정 사용자 조회
+        readUser(user1.getUserId());
 
-    System.out.println("====find one User====");
-    UUID userId = user1.getUserId();
-/*
-    User foundUser = userServiece.readUser(userId);
-*/
-      User foundUser = fileUserService.readUser(userId);
-    System.out.println(foundUser);
+        /// 특정 사용자 정보 수정 (user2)
+        updateUserNickName(user2, "SamSSong_SDS");
 
-    System.out.println();
-    //System.out.println("update user");
+        ///  특정 사용자 조회
+        readUser(user2.getUserId());
 
-    /// 닉네임 수정
-    System.out.println("===updated user====");
-    /*foundUser.updateNickName("Suwon-Bro");
-    userServiece.updateUser(foundUser);*/
+        ///  특성 사용자 삭제
+        deleteUser(user3.getUserId());
 
-    ///  비밀번호 수정
-    System.out.println("update pwd");
-    foundUser.updatePassWord("20000601");
-    /*userServiece.updateUser(foundUser);*/
-      fileUserService.updateUser(foundUser);
+        ///  사용자 삭제 후 전체 조회
+        readAllUser();
 
-/*
-    User updatedUser = userServiece.readUser(userId);
-*/
-      User updatedUser = fileUserService.readUser(userId);
+        //////////////////////////////////////////////////////////////////////
 
-    System.out.println(updatedUser);
+        /// Channel 기능 테스트
+        System.out.println("================Start Channel testing==============\n");
+        /// 채널 추가
+        Channel channel1 = addChannel("LA Hot men");
+        Channel channel2 = addChannel("go-to-home");
 
-    System.out.println();
+        ///  전체 채널 조회
+        readAllChannel();
 
-    /// 유저 삭제
-    /*System.out.println("====delete user====");
-    userServiece.deleteUser(userId);*/
-    ////삭제 후 조회
-    /*User deletedUser = userServiece.readUser(userId);
-    if(deletedUser == null){
-      System.out.println("user has been deleted");
+        /// 특정 채널 명 변경
+        updateChannelName(channel1, "day-month-year");
+
+        /// 특정 채널 조회
+        readChannel(channel1.getChannelId());
+
+        /// 채널 삭제
+        deleteChannel(channel2.getChannelId());
+
+        /// 채널 삭제 후 조회
+        readAllChannel();
+
+        /// /////////////////////////////////////////////////////////////////
+
+        /// 메시지 기능 테스트
+        System.out.println("================Start Message testing==============\n");
+        ///  메시지 추가
+        Message message1 = addMessage("Hello World", user1.getUserId(), channel1.getChannelId());
+        Message message2 = addMessage("GoodBye World", user2.getUserId(), channel1.getChannelId());
+
+        /// 전체 메시지 조회
+        readAllMessages();
+
+        /// 특정 메시지 수정
+        updateMessage(message2, "I'll be back");
+
+        ///  특정 메시지 조회
+        readMessage(message2.getMessageId());
+
+        ///  특정 메시지 삭제
+        deleteMessage(message1.getMessageId());
+
+        ///  메시지 삭제 후 조회
+        readAllMessages();
     }
-    userServiece.readAllInfo().forEach(u -> System.out.println(u));*/
-
-
-      /// Channel
-/*
-    JCFChannelServiece channelServiece = new JCFChannelServiece();
-*/
-      FileChannelService fileChannelService = new FileChannelService();
-    /// 채널 추가
-    System.out.println("====add Chanel====");
-
-    Channel channel1 = new Channel("LA Hot men");
-    Channel channel2 = new Channel("gotohome");
-
-    /*channelServiece.createChannel(channel1);
-    channelServiece.createChannel(channel2);*/
-      fileChannelService.createChannel(channel1);
-      fileChannelService.createChannel(channel2);
-
-    System.out.println();
-
-    ///채널 조회
-
-    System.out.println("====find all channel====");
-    /*channelServiece.readAllInfo().forEach(ch -> System.out.println(ch));*/
-      fileChannelService.readAllInfo().forEach(System.out::println);
-
-    System.out.println();
-
-    System.out.println("====find one Channel====");
-    UUID channelId = channel1.getChannelId();
-    /*Channel foundChannel = channelServiece.readChannel(channelId);*/
-      Channel foundChannel = fileChannelService.readChannel(channelId);
-    System.out.println(foundChannel);
-
-    /// 채널 수정
-    System.out.println("====update Chanel===="); ///업데이트 샤넬~
-    foundChannel.updateChannelName("Taecho Legacy");
-//    channelServiece.updateChannel(foundChannel);
-      fileChannelService.updateChannel(foundChannel);
-    System.out.println(foundChannel);
-
-    System.out.println();
-
-    /// 채널 삭제
-   /* System.out.println("====delete Channel====");
-
-    channelServiece.deleteChannel(channelId);
-    Channel deletedChannel = channelServiece.readChannel(channelId);
-    if(deletedChannel == null){
-      System.out.println("this channel has been deleted");
+    /// User 기능
+    private static User addUser(String userName, String nickName, String password){
+        System.out.println("Now doing add User----------------->");
+        User user = new User(userName, nickName,password);
+        jcfUserRepository.addUser(user);
+        return user;
     }
-    channelServiece.readAllInfo().forEach(ch-> System.out.println(ch));
-*/
 
-
-    /// 메시지
-/*
-    JCFMessageServiece messageServiece = new JCFMessageServiece(userService,channelServiece);
-*/
-
-      FileMessageService fileMessageService = new FileMessageService(fileUserService,fileChannelService);
-    ///  메시지 추가
-    Message message1 = new Message("Hello World");
-    Message message2 = new Message("GoodBye World");
-
-    message1.setUser(user1);
-    message1.setChannel(channel1);
-
-    message2.setUser(user2);
-    message2.setChannel(channel2);
-
-    /*messageServiece.createMessage(message2,user2.getUserId(),channel2.getChannelId());
-      messageServiece.createMessage(message1,user1.getUserId(),channel1.getChannelId());*/
-      fileMessageService.createMessage(message1,user1.getUserId(),channel1.getChannelId());
-      fileMessageService.createMessage(message2, user2.getUserId(),channel2.getChannelId());
-
-    System.out.println(" ====Create Message==== ");
-
-    System.out.println("====read all Massage====");
-/*
-    messageServiece.readAllMessage().forEach(m -> System.out.println(m));
-*/
-      fileMessageService.readAllMessage().forEach(System.out::println);
-    System.out.println();
-
-    System.out.println(" ====read one Message==== ");
-    UUID messageId = message1.getMessageId();
-/*
-    Message foundMessage = messageServiece.readMessage(messageId);
-*/
-      Message foundMessage = fileMessageService.readMessage(messageId);
-    System.out.println(foundMessage);
-
-    System.out.println();
-    /// 메시지 수정
-    System.out.println("====update Message====");
-
-    foundMessage.updateText("Hello World is different Hi word?");
-    /*messageServiece.updateMessage(foundMessage);*/
-      fileMessageService.updateMessage(foundMessage);
-
-    /*Message updatedMessage = messageServiece.readMessage(messageId);*/
-      Message updatedMessage = fileMessageService.readMessage(messageId);
-    System.out.println(updatedMessage);
-    System.out.println();
-
-    /// 메시지 삭제
-    System.out.println("====delete message=====");
-/*
-    messageServiece.deleteMessage(messageId);
-*/
-    fileMessageService.deleteMessage(messageId);
-
-    /// 삭제 후 조회
-    /*Message deletedMessage = messageServiece.readMessage(messageId);*/
-      Message deletedMessage = fileMessageService.readMessage(messageId);
-    if(deletedMessage == null){
-      System.out.println("Message couldn't find(it may be deleted");
+    private static void readUser(UUID userId){
+        User user = jcfUserRepository.readUser(userId);
+        System.out.println("+++++++++++++++Read Specific users+++++++++++++++");
+        System.out.println(user);;
+        System.out.println();
     }
-    /*messageServiece.readAllMessage().forEach(m -> System.out.println(m));*/
-      fileMessageService.readAllMessage().forEach(System.out::println);
-    System.out.println();
 
+    private static void readAllUser(){
+        System.out.println("+++++++++++++++Read all users+++++++++++++++");
+        jcfUserRepository.readAllUser().forEach(System.out::println);
+        System.out.println();
+    }
 
-  }
+    private static void updateUserPassword(User user,String newPassword){
+        System.out.println("Now doing update User password-------------->");
+        user.updatePassWord(newPassword);
+        jcfUserRepository.updateUser(user);
+    }
+
+    private static void updateUserNickName(User user,String newNickName){
+        System.out.println("Now doing update User nickName-------------->");
+        user.updateNickName(newNickName);
+        jcfUserRepository.addUser(user);
+    }
+
+    private static void deleteUser(UUID userId){
+        System.out.println("Now doing delete User--------------->");
+        jcfUserRepository.deleteUser(userId);
+    }
+
+    /// Channle 기능
+    private static Channel addChannel(String channelName){
+        System.out.println("Now doing add Channel--------------->");
+        Channel channel = new Channel(channelName);
+        jcfChannelRepository.addChannel(channel);
+        return channel;
+    }
+
+    private static void readChannel(UUID channelId){
+        Channel chanel = jcfChannelRepository.readChannel(channelId);
+        System.out.println("+++++++++++++++Read Specific Channel+++++++++++++++");
+        System.out.println(chanel);
+        System.out.println();
+    }
+
+    private static void readAllChannel(){
+        System.out.println("+++++++++++++++Read all channels+++++++++++++++");
+        jcfChannelRepository.readAllChannel().forEach(System.out::println);
+        System.out.println();
+    }
+
+    private static void updateChannelName(Channel channel,String newChannelName){
+        System.out.println("Now doing update ChannelName-------------->");
+       channel.updateChannelName(newChannelName);
+        jcfChannelRepository.updateChannel(channel);
+    }
+
+    private static void deleteChannel(UUID channelId){
+        System.out.println("Now doing delete Channel--------------->");
+        jcfChannelRepository.deleteChannel(channelId);
+    }
+
+    ///  Message 기능
+    private static Message addMessage(String text, UUID userId, UUID channelId){
+        System.out.println("Now doing add Message--------------->");
+        Message message = new Message(text);
+        jcfMessageRepository.addMessage(message,userId,channelId);
+        return message;
+    }
+
+    private static void readMessage(UUID messageId){
+        Message message = jcfMessageRepository.readMessage(messageId);
+        System.out.println("+++++++++++++++Read Specific massage!+++++++++++++++");
+        System.out.println(message);
+        System.out.println();
+    }
+
+    private static void readAllMessages(){
+        System.out.println("+++++++++++++++Read all massage~+++++++++++++++");
+        jcfMessageRepository.readAllMessage().forEach(System.out::println);
+        System.out.println();
+    }
+
+    private static void updateMessage(Message message, String newText){
+        System.out.println("Now doing update Message--------------->");
+        message.updateText(newText);
+        jcfMessageRepository.updateMessage(message);
+    }
+
+    private static void deleteMessage(UUID messageId){
+        System.out.println("Now doing delete Message--------------->");
+        jcfMessageRepository.deleteMessage(messageId);
+    }
 }

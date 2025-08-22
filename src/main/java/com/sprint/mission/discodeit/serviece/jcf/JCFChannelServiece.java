@@ -15,7 +15,7 @@ public class JCFChannelServiece implements ChannelServiece {
   }
 
   @Override
-  public void createChannel(Channel channel) {
+  public void addChannel(Channel channel) {
     channels.add(channel);
   }
 
@@ -43,7 +43,7 @@ public class JCFChannelServiece implements ChannelServiece {
   }
 
   @Override
-  public List<Channel> readAllInfo() {
+  public List<Channel> readAllChannel() {
     return new ArrayList<>(channels);
   }
 }

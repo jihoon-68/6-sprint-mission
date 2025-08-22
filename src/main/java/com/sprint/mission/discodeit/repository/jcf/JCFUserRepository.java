@@ -10,21 +10,33 @@ public class JCFUserRepository implements UserRepository {
 
 
     @Override
-    public void enroll(User user) {
+    public void addUser(User user) {
         users.put(user.getUserId(), user);
     }
 
     @Override
-    public User findById(UUID userId) {
+    public User readUser(UUID userId) {
         return users.get(userId);
     }
 
     @Override
-    public void delete(UUID id) {
+    public void deleteUser(UUID id) {
         users.remove(id);
     }
+
     @Override
-    public List<User> findAll(){
+    public void updateUser(User user) {
+        if(users.containsKey(user.getUserId())) {
+            users.put(user.getUserId(), user);
+        }
+        else{
+            throw new IllegalArgumentException("User does not exist");
+        }
+    }
+
+
+    @Override
+    public List<User> readAllUser(){
         return new ArrayList<>(users.values());
     }
 }
