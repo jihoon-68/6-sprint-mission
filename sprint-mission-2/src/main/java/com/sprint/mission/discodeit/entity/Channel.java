@@ -9,13 +9,13 @@ public class Channel  implements Serializable{
     private static final long serialVersionUID = 3L;
     private final UUID id;
     private String channelName;
-    private String root;
+    private User root;
     private List<User> users;
     private List<Message> messages;
     private final Long created;
     private Long updated;
 
-    public Channel(String channelName, String root) {
+    public Channel(String channelName, User root) {
         this.id = UUID.randomUUID();
         this.channelName = channelName;
         this.root = root;
@@ -32,7 +32,7 @@ public class Channel  implements Serializable{
     //Getter
     public UUID getChannelId() {return this.id;}
     public String getChannelName() {return this.channelName;}
-    public String getChannelRoot() {return this.root;}
+    public User getChannelRoot() {return this.root;}
     public List<User> getChannelUsers() {return this.users;}
     public List<Message> getChannelMessages() {return this.messages;}
     public Long getChannelCreated() {return this.created;}
@@ -43,7 +43,7 @@ public class Channel  implements Serializable{
         this.channelName = channelName;
         updatedChannel();
     }
-    public void updateChannelRoot(String root) {
+    public void updateChannelRoot(User root) {
         this.root = root;
         updatedChannel();
     }
@@ -58,12 +58,12 @@ public class Channel  implements Serializable{
 
     public String toString(){
         return "서버 정보: " + "\n" +
-                "서버 ID: " + this.getChannelId() + "\n" +
-                "서버 이름: " + this.getChannelName() + "\n" +
-                "서버 관리자: " + this.getChannelRoot() + "\n" +
-                "서버 인원: " + this.getChannelUsers() + "\n" +
-                "서버 메세지: " + this.getChannelMessages() + "\n"+
-                "서버 생성일: " + this.getChannelCreated() + "\n";
+                "서버 ID: " + this.id + "\n" +
+                "서버 이름: " + this.channelName + "\n" +
+                "서버 관리자: " + this.root.getUsername() + "\n" +
+                "서버 인원: " + this.users + "\n" +
+                "서버 메세지: " + this.messages + "\n"+
+                "서버 생성일: " + this.channelName + "\n";
 
     }
 
