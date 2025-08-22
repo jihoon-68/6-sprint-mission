@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
 
@@ -23,8 +24,8 @@ public class FileMessageService implements MessageService {
         instance.init(directory);
     }
 
-    public Message createMessage(String senderName, String message){
-        Message newMessage = new Message(senderName, message);
+    public Message createMessage(User sender, String message){
+        Message newMessage = new Message(sender, message);
         instance.save(filePaths(newMessage), newMessage);
         return newMessage;
     };
@@ -38,9 +39,8 @@ public class FileMessageService implements MessageService {
     public List<Message> findAllMessages(){
         return instance.load(directory);
     };
-    public Message updateMessage(Message message){
+    public void updateMessage(Message message){
         instance.save(filePaths(message), message);
-        return message;
     };
     public void deleteMessage(UUID id){
         Message message = this.findMessageById(id);
