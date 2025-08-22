@@ -6,27 +6,45 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<String, User> data = new HashMap<>();
+    private final List<User> data = new ArrayList<>();
 
-    @Override public User create(User user) {
-        data.put(user.getId(), user);
+    @Override
+    public User create(String name, String password, String nickname, String activeType, String description, List<String> badges) {
+        User user = new User(name, password, nickname, activeType, description, badges);
+
+        data.add(user);
         return user;
     }
-    @Override public User findById(String id) {
-        return data.get(id);
+
+    @Override
+    public User findById(UUID id) {
+        return data.stream()
+                .filter(u -> u.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override public List<User> findAll() {
-        return new ArrayList<>(data.values());
+        return data;
     }
 
-    @Override public User update(String id, String name, String nickname) {
-        User u = data.get(id);
-        if (u == null) throw new NoSuchElementException("User not found");
-        u.update(name, nickname);
-        return u;
+    @Override
+    public User update(UUID id, String name, String nickname) {
+        var user = findById(id);
+
+        if (user == null) throw new NoSuchElementException("Message not found: " + id);
+
+        user.update(name, nickname);
+
+        return user;
     }
-    @Override public boolean delete(String id) {
-        return data.remove(id) != null;
+
+    @Override
+    public boolean delete(UUID id) {
+        var user = findById(id);
+
+        if (user == null) throw new NoSuchElementException("Message not found: " + id);
+
+        return data.remove(user);
     }
 }

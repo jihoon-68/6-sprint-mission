@@ -4,19 +4,19 @@ import java.time.Instant;
 import java.util.UUID;
 
 public abstract class Common {
-    private String id;
+    private UUID id;
     protected Long createAt;
     protected Long updatedAt;
 
     public Common()
     {
-        id = UUID.randomUUID().toString();
+        id = UUID.randomUUID();
         long time =  Instant.now().getEpochSecond();
         createAt = time;
         updatedAt = time;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 

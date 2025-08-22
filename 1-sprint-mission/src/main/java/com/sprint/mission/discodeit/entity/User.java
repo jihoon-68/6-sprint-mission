@@ -1,21 +1,24 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.net.URL;
-import java.time.Instant;
-import java.util.UUID;
+import java.io.Serializable;
+import java.util.List;
 
-public class User extends Common {
-    private String activeType;
+public class User extends Common implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String name;
+    private transient String password;
     private String nickname = null;
     private String description;
-    private String[] badges;
+    private String activeType;
+    private List<String> badges;
 
-    public User(String activeType, String name, String nickname, String description, String[] badges) {
+    public User(String name, String password, String nickname, String description, String activeType, List<String> badges) {
         super();
         this.activeType = activeType;
         this.name = name;
-        this.nickname = nickname;
+        this.password = password;
+        this.nickname = (nickname == null) ? name : nickname;
         this.description = description;
         this.badges = badges;
     }
@@ -36,7 +39,11 @@ public class User extends Common {
         return nickname;
     }
 
-    public String[] getBadges() {
+    public String getPassword() {
+        return password;
+    }
+
+    public List<String> getBadges() {
         return badges;
     }
 

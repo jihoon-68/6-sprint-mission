@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Message extends Common {
+import java.io.Serializable;
+
+public class Message extends Common implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private User author;
     private String content;
     private Channel channel;
@@ -21,14 +25,6 @@ public class Message extends Common {
 
     public User getAuthor() {
         return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public void update(String content) {
