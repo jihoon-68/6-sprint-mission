@@ -16,8 +16,8 @@ public class JCFMessage implements MessageService {
         messageData = new ArrayList<>();
     }
 
-    public Message createMessage(String senderName, String message) {
-        Message newmessage = new Message( senderName, message);
+    public Message createMessage(User sender, String message) {
+        Message newmessage = new Message( sender, message);
         messageData.add(newmessage);
         return newmessage;
     };
@@ -36,14 +36,13 @@ public class JCFMessage implements MessageService {
         return messageData;
     };
 
-    public Message updateMessage(Message message){
+    public void updateMessage(Message message){
         int idx = messageData.indexOf(message);
         if(idx == -1){
             System.out.println("메세지를 찾지 못했습니다");
-            return null;
+            return;
         }
         messageData.set(idx,message);
-        return message;
     };
 
     public void deleteMessage(UUID id){

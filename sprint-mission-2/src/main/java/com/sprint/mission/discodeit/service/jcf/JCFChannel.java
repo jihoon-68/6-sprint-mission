@@ -21,7 +21,7 @@ public class JCFChannel  implements ChannelService {
         this.jcfMessage = jcfMessage;
     }
 
-    public Channel createChannel(String name, String root) {
+    public Channel createChannel(String name, User root) {
         Channel channel =new Channel(name, root);
         channelData.add(channel);
         return channel;

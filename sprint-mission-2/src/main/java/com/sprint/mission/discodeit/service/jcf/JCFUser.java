@@ -12,9 +12,10 @@ public class JCFUser implements UserService {
     public JCFUser(){
         userData = new ArrayList<>();
     }
-    public void createUser(String username, int age , String email) {
+    public User createUser(String username, int age , String email) {
         User newUser =new User(username,age,email);
         userData.add(newUser);
+        return newUser;
     };
     public User findUserByUserEmail(String userEmail) {
         User target = null;
