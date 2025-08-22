@@ -3,24 +3,35 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 public class Main {
     public static void main(String[] args) {
-        TestMessage();
-        TestUser();
-        TestChannel();
+        TestMessage(new FileMessageRepository());
+        TestUser(new FileUserRepository());
+        TestChannel(new FileChannelRepository());
+
+//        TestMessage(new JCFMessageRepository());
+//        TestUser(new JCFUserRepository());
+//        TestChannel(new JCFChannelRepository());
     }
 
-    private static void TestMessage()
+    private static void TestMessage(MessageRepository messageRepository)
     {
         System.out.println("======Testing Messages======");
-        JCFMessageService message = new JCFMessageService(new JCFMessageRepository());
+        JCFMessageService message = new JCFMessageService(messageRepository);
         User u1 = new User("park","park mail");
         User u2 = new User("kim","kim mail");
         Channel channel = new Channel("TestChannel");
@@ -46,12 +57,13 @@ public class Main {
         message.getAllMessages().forEach(x -> System.out.println(x.toString()));
 
         System.out.println("======Testing Messages Finished======");
+        message.deleteAll();
     }
 
-    private static void TestChannel()
+    private static void TestChannel(ChannelRepository channelRepository)
     {
         System.out.println("======Testing Channel======");
-        JCFChannelService channel = new JCFChannelService(new JCFChannelRepository());
+        JCFChannelService channel = new JCFChannelService(channelRepository);
         channel.createChannel("aa");
         channel.createChannel("bb");
 
@@ -71,12 +83,13 @@ public class Main {
         System.out.println("\n delete and select channels ");
         channel.getChannels().forEach(x-> System.out.println(x.toString()));
         System.out.println("======Testing Channel Finished======");
+        channel.deleteAll();
     }
 
-    private static void TestUser()
+    private static void TestUser(UserRepository userRepository)
     {
         System.out.println("======Testing User======");
-        JCFUserService user = new JCFUserService(new JCFUserRepository());
+        JCFUserService user = new JCFUserService(userRepository);
         user.createUser("park","test");
         user.createUser("kim","test11");
 
@@ -95,5 +108,6 @@ public class Main {
         System.out.println("\n delete and select users ");
         user.getUsers().forEach(x-> System.out.println(x.toString()));
         System.out.println("======Testing User Finished======");
+        user.deleteAll();
     }
 }

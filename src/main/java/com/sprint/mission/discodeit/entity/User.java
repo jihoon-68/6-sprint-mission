@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class User extends Common {
+public class User extends Common implements Serializable {
 
     private String userName;
     private String email;

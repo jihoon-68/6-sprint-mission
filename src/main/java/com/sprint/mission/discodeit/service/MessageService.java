@@ -20,4 +20,7 @@ public interface MessageService {
 
     public boolean updateMessage(Message message);
     public boolean deleteMessage(Message message);
+
+    public void deleteAll();
+
 }

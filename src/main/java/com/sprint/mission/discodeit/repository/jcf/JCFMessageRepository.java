@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messages;
@@ -21,7 +22,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Map<UUID, Message> getMessages() {
-        return new HashMap<>(messages);
+        return messages.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
@@ -49,5 +50,10 @@ public class JCFMessageRepository implements MessageRepository {
         temp.updateMessage(message.getMessage());
         messages.put(message.getId(),temp);
         return false;
+    }
+
+    @Override
+    public void deleteAll() {
+        messages.clear();
     }
 }

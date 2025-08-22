@@ -37,7 +37,7 @@ public class JCFChannelRepository implements ChannelRepository
 
     @Override
     public Map<UUID, Channel> getAllChannels() {
-        return new HashMap<>(channels);
+        return channels.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
@@ -65,4 +65,8 @@ public class JCFChannelRepository implements ChannelRepository
         return true;
     }
 
+    @Override
+    public void deleteAll() {
+        channels.clear();
+    }
 }

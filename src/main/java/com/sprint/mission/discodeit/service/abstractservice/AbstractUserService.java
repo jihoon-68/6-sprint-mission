@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class AbstractUserService implements  UserService {
@@ -53,7 +55,7 @@ public class AbstractUserService implements  UserService {
     @Override
     public List<User> getUsers() {
 
-        Map<String,User> users = userRepository.getAllUsers();
+        Map<UUID,User> users = userRepository.getAllUsers();
         if(users == null)
         {
             System.out.println("Users are null");
@@ -75,19 +77,29 @@ public class AbstractUserService implements  UserService {
             return null;
         }
 
-        Map<String,User> users = userRepository.getAllUsers();
+        Map<UUID,User> users = userRepository.getAllUsers();
         if(users == null)
         {
             System.out.println("Users are null");
             return null;
         }
 
-        if(users.containsKey(email) == false)
+        Optional<User> user = users.entrySet().stream().
+                        filter(x -> x.getValue().getEmail().equals(email))
+                        .map(x -> x.getValue()).
+                        findFirst();
+
+        if(user.isPresent() == false)
         {
             System.out.println("User does not exists");
             return null;
         }
 
-        return users.get(email);
+        return user.get();
+    }
+
+    @Override
+    public void deleteAll() {
+        userRepository.deleteAll();
     }
 }

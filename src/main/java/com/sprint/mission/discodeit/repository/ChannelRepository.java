@@ -10,4 +10,5 @@ public interface ChannelRepository {
     public Map<UUID, Channel> getAllChannels();
     public boolean delete(UUID channelId);
     public boolean update(Channel channel);
+    public void deleteAll();
 }

@@ -216,4 +216,9 @@ public class AbstractMessageService implements MessageService {
 
         return messageRepository.delete(message);
     }
+
+    @Override
+    public void deleteAll() {
+        messageRepository.deleteAll();
+    }
 }

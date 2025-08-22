@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-public abstract class Common {
+public abstract class Common implements Serializable {
     protected UUID id;
     protected Long createAt;
     protected Long updatedAt;

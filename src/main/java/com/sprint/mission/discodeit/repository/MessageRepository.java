@@ -10,4 +10,5 @@ public interface MessageRepository {
     public Map<UUID, Message> getMessages();
     public boolean delete(Message message);
     public boolean update(Message message);
+    public void deleteAll();
 }

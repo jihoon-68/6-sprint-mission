@@ -91,4 +91,9 @@ public class AbstractChannelService implements ChannelService {
 
         return channelRepository.delete(channel.getId());
     }
+
+    @Override
+    public void deleteAll() {
+        channelRepository.deleteAll();
+    }
 }
