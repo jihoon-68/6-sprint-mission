@@ -9,13 +9,15 @@ import java.util.UUID;
 public interface UserRepository {
 
     //기존 CRUD
-    public void createUser(String username, int age , String email);
+    public User createUser(String username, int age , String email);
     public User findUserById(UUID id);
     public User findUserByUserEmail(String userEmail);
     public List<User> findAllUsers();
     public void updateUser(User user);
     public void deleteUser(UUID id);
 
+    /*
+    //구현 순위 낮음
     //유저에 서버 추가
     public void addUserToChannel(Channel channel, User user);
     public void removeUserFromChannel(Channel channel, User user);
@@ -23,4 +25,5 @@ public interface UserRepository {
     //친구 추가
     public void addUserToFriend(User user, UUID id);
     public void removeUserFromFriend(User user, UUID id);
+     */
 }
