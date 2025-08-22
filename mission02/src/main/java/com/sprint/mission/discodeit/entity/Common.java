@@ -1,15 +1,19 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Common {
+public class Common implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final UUID uuid;
     private final Long createdAt;
     private Long updatedAt;
 
-    public Common(UUID uuid, Long createdAt) {
-        this.uuid = uuid;
-        this.createdAt = createdAt;
+    public Common() {
+        this.uuid = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
         updatedAt = createdAt;
     }
 
@@ -25,8 +29,5 @@ public class Common {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
 }

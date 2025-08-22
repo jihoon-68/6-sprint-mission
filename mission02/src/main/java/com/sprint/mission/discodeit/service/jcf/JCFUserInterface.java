@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFUserInterface implements UserService {
-    private List<User> users;
+    private final List<User> users;
 
     public JCFUserInterface() {this.users = new ArrayList<>();}
 

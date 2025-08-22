@@ -7,8 +7,8 @@ public class Message extends Common{
     private final UUID sender;
     private final UUID receiver;
 
-    public Message(UUID uuid, Long createdAt, String messageContext, UUID sender, UUID receiver) {
-        super(uuid, createdAt);
+    public Message(String messageContext, UUID sender, UUID receiver) {
+        super();
         this.messageContext = messageContext;
         this.sender = sender;
         this.receiver = receiver;

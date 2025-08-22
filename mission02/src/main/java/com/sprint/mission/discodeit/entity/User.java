@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
-
 public class User extends Common{
     private String userName;
 
-    public User(UUID userId, String userName, Long createdAt) {
-        super(userId, createdAt);
+    public User(String userName) {
+        super();
         this.userName = userName;
     }
 

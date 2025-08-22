@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
-
 public class Channel extends Common{
     private String channelName;
     private String channelDescription;
 
-    public Channel(UUID channelId, Long createdAt, String channelName, String channelDescription) {
-        super(channelId, createdAt);
+    public Channel(String channelName, String channelDescription) {
+        super();
         this.channelName = channelName;
         this.channelDescription = channelDescription;
     }

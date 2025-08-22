@@ -20,8 +20,8 @@ public interface ChannelService {
 
     Channel findChannelByName(String channelName) throws NotFoundException;
 
-    void updateChannel(UUID id, String newChannelName) throws NotFoundException, DuplicateException;
+    void updateChannel(String channelName, String newChannelName) throws NotFoundException, DuplicateException;
 
-    void updateChannelDescription(UUID id, String newChannelDescription) throws NotFoundException;
+    void updateChannelDescription(String channel, String newChannelDescription) throws NotFoundException;
 
 }

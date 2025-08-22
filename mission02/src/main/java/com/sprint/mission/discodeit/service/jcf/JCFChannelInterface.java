@@ -55,18 +55,18 @@ public class JCFChannelInterface implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID id, String newChannelName) throws NotFoundException, DuplicateException{
-        Channel channel = channels.stream().filter(channel1 -> channel1.getUuid().equals(id))
+    public void updateChannel(String channelName, String newChannelName) throws NotFoundException, DuplicateException{
+        Channel channel = channels.stream().filter(channel1 -> channel1.getChannelName().equals(channelName))
                 .findFirst().orElseThrow(()-> new NotFoundException("채널이 존재하지 않습니다."));
-        if (channels.stream().anyMatch(c -> c.getChannelName().equals(newChannelName) && !c.getUuid().equals(id))) {
+        if (channels.stream().anyMatch(c -> c.getChannelName().equals(newChannelName))) {
             throw new DuplicateException("채널이름: " + newChannelName + " 이(가) 이미 존재합니다.");
         }
         channel.setChannelName(newChannelName);
     }
 
     @Override
-    public void updateChannelDescription(UUID id, String newChannelDescription) throws NotFoundException {
-        Channel channel = channels.stream().filter(channel1 -> channel1.getUuid().equals(id))
+    public void updateChannelDescription(String channelName, String newChannelDescription) throws NotFoundException {
+        Channel channel = channels.stream().filter(channel1 -> channel1.getChannelName().equals(channelName))
                 .findFirst().orElseThrow(()-> new NotFoundException("채널이 존재하지 않습니다."));
         channel.setChannelDescription(newChannelDescription);
     }
