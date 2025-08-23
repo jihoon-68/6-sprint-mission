@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -22,16 +25,20 @@ public class JavaApplication {
     //private static final JCFChannelServiece channelServiece = new JCFChannelServiece();
     //private static final JCFMessageServiece messageServiece = new JCFMessageServiece(userService,channelServiece);
 
-    ///  File
+    ///  File Service
     //private static final FileUserService fileUserService = new FileUserService();
     //private static final FileChannelService fileChannelService = new FileChannelService();
     //private static final FileMessageService fileMessageService = new FileMessageService(fileUserService,fileChannelService);
 
     /// Repository
-    private static final JCFUserRepository jcfUserRepository = new JCFUserRepository();
-    private static final JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
-    private static final JCFMessageRepository jcfMessageRepository = new JCFMessageRepository(jcfUserRepository,jcfChannelRepository);
+    //private static final JCFUserRepository jcfUserRepository = new JCFUserRepository();
+    //private static final JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
+    //private static final JCFMessageRepository jcfMessageRepository = new JCFMessageRepository(jcfUserRepository,jcfChannelRepository);
 
+    /// File Repository
+    private static final FileUserRepository fileUserRepository = new FileUserRepository();
+    private static final FileChannelRepository fileChannelRepository = new FileChannelRepository();
+    private static final FileMessageRepository fileMessageRepository = new FileMessageRepository(fileUserRepository,fileChannelRepository);
 
 
     public static void main(String[] args) {
@@ -119,12 +126,12 @@ public class JavaApplication {
     private static User addUser(String userName, String nickName, String password){
         System.out.println("Now doing add User----------------->");
         User user = new User(userName, nickName,password);
-        jcfUserRepository.addUser(user);
+        fileUserRepository.addUser(user);
         return user;
     }
 
     private static void readUser(UUID userId){
-        User user = jcfUserRepository.readUser(userId);
+        User user = fileUserRepository.readUser(userId);
         System.out.println("+++++++++++++++Read Specific users+++++++++++++++");
         System.out.println(user);;
         System.out.println();
@@ -132,37 +139,37 @@ public class JavaApplication {
 
     private static void readAllUser(){
         System.out.println("+++++++++++++++Read all users+++++++++++++++");
-        jcfUserRepository.readAllUser().forEach(System.out::println);
+        fileUserRepository.readAllUser().forEach(System.out::println);
         System.out.println();
     }
 
     private static void updateUserPassword(User user,String newPassword){
         System.out.println("Now doing update User password-------------->");
         user.updatePassWord(newPassword);
-        jcfUserRepository.updateUser(user);
+        fileUserRepository.updateUser(user);
     }
 
     private static void updateUserNickName(User user,String newNickName){
         System.out.println("Now doing update User nickName-------------->");
         user.updateNickName(newNickName);
-        jcfUserRepository.addUser(user);
+        fileUserRepository.addUser(user);
     }
 
     private static void deleteUser(UUID userId){
         System.out.println("Now doing delete User--------------->");
-        jcfUserRepository.deleteUser(userId);
+        fileUserRepository.deleteUser(userId);
     }
 
     /// Channle 기능
     private static Channel addChannel(String channelName){
         System.out.println("Now doing add Channel--------------->");
         Channel channel = new Channel(channelName);
-        jcfChannelRepository.addChannel(channel);
+        fileChannelRepository.addChannel(channel);
         return channel;
     }
 
     private static void readChannel(UUID channelId){
-        Channel chanel = jcfChannelRepository.readChannel(channelId);
+        Channel chanel = fileChannelRepository.readChannel(channelId);
         System.out.println("+++++++++++++++Read Specific Channel+++++++++++++++");
         System.out.println(chanel);
         System.out.println();
@@ -170,31 +177,31 @@ public class JavaApplication {
 
     private static void readAllChannel(){
         System.out.println("+++++++++++++++Read all channels+++++++++++++++");
-        jcfChannelRepository.readAllChannel().forEach(System.out::println);
+        fileChannelRepository.readAllChannel().forEach(System.out::println);
         System.out.println();
     }
 
     private static void updateChannelName(Channel channel,String newChannelName){
         System.out.println("Now doing update ChannelName-------------->");
        channel.updateChannelName(newChannelName);
-        jcfChannelRepository.updateChannel(channel);
+        fileChannelRepository.updateChannel(channel);
     }
 
     private static void deleteChannel(UUID channelId){
         System.out.println("Now doing delete Channel--------------->");
-        jcfChannelRepository.deleteChannel(channelId);
+        fileChannelRepository.deleteChannel(channelId);
     }
 
     ///  Message 기능
     private static Message addMessage(String text, UUID userId, UUID channelId){
         System.out.println("Now doing add Message--------------->");
         Message message = new Message(text);
-        jcfMessageRepository.addMessage(message,userId,channelId);
+        fileMessageRepository.addMessage(message,userId,channelId);
         return message;
     }
 
     private static void readMessage(UUID messageId){
-        Message message = jcfMessageRepository.readMessage(messageId);
+        Message message = fileMessageRepository.readMessage(messageId);
         System.out.println("+++++++++++++++Read Specific massage!+++++++++++++++");
         System.out.println(message);
         System.out.println();
@@ -202,18 +209,18 @@ public class JavaApplication {
 
     private static void readAllMessages(){
         System.out.println("+++++++++++++++Read all massage~+++++++++++++++");
-        jcfMessageRepository.readAllMessage().forEach(System.out::println);
+        fileMessageRepository.readAllMessage().forEach(System.out::println);
         System.out.println();
     }
 
     private static void updateMessage(Message message, String newText){
         System.out.println("Now doing update Message--------------->");
         message.updateText(newText);
-        jcfMessageRepository.updateMessage(message);
+        fileMessageRepository.updateMessage(message);
     }
 
     private static void deleteMessage(UUID messageId){
         System.out.println("Now doing delete Message--------------->");
-        jcfMessageRepository.deleteMessage(messageId);
+        fileMessageRepository.deleteMessage(messageId);
     }
 }
