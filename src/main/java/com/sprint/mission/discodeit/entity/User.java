@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
     private UUID id;
     private Long updateAt;
     private Long createAt;
     private String email;
     private String username;
     private String password;
+    private static final long serializableId = 1L;
 
     public User(String email, String username, String password) {
         this.email = email;

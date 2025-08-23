@@ -3,9 +3,21 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -15,20 +27,22 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class JavaApplication {
-    private static final UserService userService = new JCFUserService();
-    private static final ChannelService channelService = new JCFChannelService();
-    private static final MessageService messageService = new JCFMessageService();
+    private static final UserService userService = new BasicUserService(new JCFUserRepository());
+    private static final ChannelService channelService = new BasicChannelService(new JCFChannelRepository());
+    private static final MessageService messageService = new BasicMessageService(new JCFMessageRepository());
+
     private static final Scanner in = new Scanner(System.in);
 
     private static User currentUser = null;
     private static Channel currentChannel = null;
 
     public static void main(String[] args) {
-        int mainMenu;
         boolean run = true;
 
         while (run) {
             if (currentUser == null) {
+                System.out.println("=== [Test] 전체 사용자 ===");
+                System.out.println(userService.findAllUsers().toString());
                 int menu;
                 System.out.println("=== 로그인 메뉴 ===");
                 System.out.println("1. 로그인");
@@ -46,6 +60,10 @@ public class JavaApplication {
                         String password = in.nextLine();
 
                         currentUser = userService.login(email, password);
+
+                        if (currentUser != null) {
+                            System.out.println("반갑습니다 " + currentUser.getUsername() + "님");
+                        }
                         break;
                     }
                     case 2: {
@@ -71,6 +89,10 @@ public class JavaApplication {
 
     private static void showMainMenu() {
         while (true) {
+            if (currentUser == null) {
+                return;
+            }
+
             System.out.println("=== 메인 메뉴 ===");
             System.out.println("1. 채널");
             System.out.println("2. 사용자");
@@ -111,9 +133,11 @@ public class JavaApplication {
                     userInfoManager();
                     break;
                 case 2:
+                    messageService.deleteMessageByAuthorId(currentUser.getId());
+                    channelService.deleteChannelByOwnerId(currentUser.getId());
                     userService.deleteUserById(currentUser.getId());
                     currentUser = null;
-                    break;
+                    return;
                 case 3:
                     System.out.println("----------------");
                     System.out.println(userService.findUserById(currentUser.getId()));
@@ -190,14 +214,14 @@ public class JavaApplication {
                     }
                     System.out.println("----------------");
 
-                        System.out.print("채널 번호 선택: ");
-                        int index = in.nextInt() - 1;
-                        in.nextLine();
+                    System.out.print("채널 번호 선택: ");
+                    int index = in.nextInt() - 1;
+                    in.nextLine();
 
-                        if (index < 0 || index >= channels.size()) {
-                            System.out.println("잘못된 번호입니다.");
-                            break;
-                        }
+                    if (index < 0 || index >= channels.size()) {
+                        System.out.println("잘못된 번호입니다.");
+                        break;
+                    }
 
 
                     currentChannel = channels.get(index);
@@ -242,7 +266,7 @@ public class JavaApplication {
                 case 2: {
                     List<Channel> myChannels = channelService.findChannelByOwnerId(currentUser.getId());
 
-                    if(myChannels.isEmpty()) {
+                    if (myChannels.isEmpty()) {
                         System.out.println("채널을 만들고 시작해주세요.");
                         break;
                     }
@@ -367,7 +391,7 @@ public class JavaApplication {
                         break;
                     }
 
-                    messageService.deleteMessage(messages.get(index).getId());
+                    messageService.deleteMessageById(messages.get(index).getId());
                     break;
                 }
                 case 4: {
@@ -379,8 +403,8 @@ public class JavaApplication {
                     }
 
                     System.out.println("----------------");
-                    for (Message m :  messages) {
-                        User user = userService.findUserById(m.getAutherId());
+                    for (Message m : messages) {
+                        User user = userService.findUserById(m.getAuthorId());
                         System.out.println(user.getUsername() + " : " + m.getContent());
                     }
                     System.out.println("----------------");
@@ -412,7 +436,7 @@ public class JavaApplication {
                     channelService.updateChannelName(currentChannel.getId(), channelName);
                     break;
                 case 2:
-                    channelService.deleteChannel(currentChannel.getId());
+                    channelService.deleteChannelById(currentChannel.getId());
 
                     currentChannel = null;
                     return;

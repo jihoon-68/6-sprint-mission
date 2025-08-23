@@ -1,19 +1,21 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
+import java.io.*;
 import java.util.List;
 import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
-    public JCFMessageService() {
-        this.messageRepository = new JCFMessageRepository();
+    public FileMessageService() {
+        this.messageRepository = new FileMessageRepository();
     }
+
 
     @Override
     public void createMessage(UUID authorId, UUID channelId, String content) {
@@ -65,9 +67,10 @@ public class JCFMessageService implements MessageService {
                 .map(m -> m.getId()).toList();
 
         for (UUID id : ids) {
-                messageRepository.deleteById(id);
+            messageRepository.deleteById(id);
         }
     }
+
 
     @Override
     public List<Message> findAllMessages() {

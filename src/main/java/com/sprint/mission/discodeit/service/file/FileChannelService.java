@@ -1,19 +1,19 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.ArrayList;
+import java.io.*;
 import java.util.List;
 import java.util.UUID;
 
-public class JCFChannelService implements ChannelService {
-    private final ChannelRepository channelRepository;
+public class FileChannelService implements ChannelService {
+    private final ChannelRepository  channelRepository;
 
-    public JCFChannelService() {
-        this.channelRepository = new JCFChannelRepository();
+    public FileChannelService() {
+        this.channelRepository = new FileChannelRepository();
     }
 
     @Override
@@ -36,9 +36,9 @@ public class JCFChannelService implements ChannelService {
         }
 
         if (channelRepository.existsById(id)) {
-            Channel updateChannel = channelRepository.findById(id);
-            updateChannel.updateChannelName(channelName);
-            channelRepository.save(updateChannel);
+            Channel channel = channelRepository.findById(id);
+            channel.updateChannelName(channelName);
+            channelRepository.save(channel);
 
             System.out.println("[Info} 채널명이 수정되었습니다.");
         } else {
