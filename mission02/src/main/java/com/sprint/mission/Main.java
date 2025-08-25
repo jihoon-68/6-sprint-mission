@@ -6,9 +6,12 @@ import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.ChannelInterface;
+import com.sprint.mission.discodeit.service.MessageInterface;
+import com.sprint.mission.discodeit.service.UserInterface;
 import com.sprint.mission.discodeit.service.file.FileChannelInterface;
 import com.sprint.mission.discodeit.service.file.FileMessageInterface;
 import com.sprint.mission.discodeit.service.file.FileUserInterface;
@@ -16,450 +19,152 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelInterface;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageInterface;
 import com.sprint.mission.discodeit.service.jcf.JCFUserInterface;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
-//        testCaseJCFUser();
-//        testCaseJCFChannel();
-//        testCaseJCFMessage();
-
-        testCaseFileUser();
-        testCaseFileChannel();
-        testCaseFileMessage();
-
-    }
-
-    private static void testCaseJCFUser() {
-        System.out.println("Testing User functionality...");
-        UserService userService = new JCFUserInterface();
-        User user = new User("testUser");
-        userService.addUser(user);
-        System.out.println("유저 추가: " + user.getUserName());
-        // 유저 추가 테스트
-        try {
-            User foundUser = userService.findUserByName("testUser");
-            System.out.println("유저 찾기: " + foundUser);
-        } catch (NotFoundException e) {
-            System.out.println("유저 찾기 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 유저 추가 예외 사항(중복된 유저 이름)
-        try {
-            userService.addUser(new User("testUser"));
-        } catch (DuplicateException e) {
-            System.out.println("유저 추가 중복 에러(사용자 이름 중복): " + e.getMessage());
-        }
-
-        // 유저 찾기 테스트
-        try {
-            User foundUserById = userService.findUserById(user.getUuid());
-            System.out.println("유저 ID로 찾기: " + foundUserById);
-        } catch (NotFoundException e) {
-            System.out.println("유저 ID로 찾기 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 모든 유저 찾기 테스트
-        try {
-            userService.addUser(new User("anotherUser"));
-            userService.addUser(new User("thirdUser"));
-            userService.addUser(new User("fourthUser"));
-            System.out.println("모든 유저 찾기:");
-            userService.findAllUsers().forEach(u -> System.out.println("유저: " + u));
-        } catch (NotFoundException e) {
-            System.out.println("모든 유저 찾기 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 유저 ID로 찾기 테스트
-        try {
-            User foundUserById = userService.findUserById(user.getUuid());
-            System.out.println("유저 ID로 찾기 성공: " + foundUserById);
-        } catch (NotFoundException e) {
-            System.out.println("유저 단일 조회 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 유저 이름으로 찾기 테스트
-        try {
-            User foundUserByName = userService.findUserByName("testUser");
-            System.out.println("유저 이름으로 찾기: " + foundUserByName);
-        } catch (NotFoundException e) {
-            System.out.println("유저 이름으로 찾기 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 유저 업데이트 테스트
-        try {
-            userService.updateUser("testUser", "updatedUser");
-            User updatedUser = userService.findUserByName("updatedUser");
-            System.out.println("유저 업데이트: " + updatedUser);
-        } catch (NotFoundException e) {
-            System.out.println("유저 업데이트 에러(사용자가 없음): " + e.getMessage());
-        } catch (DuplicateException e) {
-            System.out.println("유저 업데이트 에러(중복된 사용자 이름): " + e.getMessage());
-        }
-
-        // 유저 삭제 테스트
-        try {
-            userService.removeUser(user);
-            System.out.println("유저 삭제 성공: " + user);
-        } catch (NotFoundException e) {
-            System.out.println("유저 삭제 에러(사용자가 없음): " + e.getMessage());
-        }
+        UserInterface jcfUserInterface = new JCFUserInterface();
+        ChannelInterface jcfChannelInterface = new JCFChannelInterface();
+        MessageInterface jcfMessageInterface = new JCFMessageInterface();
+        UserInterface fileUserInterface = new FileUserInterface();
+        ChannelInterface fileChannelInterface = new FileChannelInterface();
+        MessageInterface fileMessageInterface = new FileMessageInterface();
+        System.out.println("JCF 테스트 시작");
+        testCreate(jcfMessageInterface, jcfUserInterface, jcfChannelInterface);
+        testRead(jcfMessageInterface, jcfUserInterface, jcfChannelInterface);
+        testUpdate(jcfMessageInterface, jcfUserInterface, jcfChannelInterface);
+        testDelete(jcfMessageInterface, jcfUserInterface, jcfChannelInterface);
+        System.out.println("JCF 테스트 종료");
+        System.out.println("File 테스트 시작");
+        testCreate(fileMessageInterface, fileUserInterface, fileChannelInterface);
+        testRead(fileMessageInterface, fileUserInterface, fileChannelInterface);
+        testUpdate(fileMessageInterface, fileUserInterface, fileChannelInterface);
+        testDelete(fileMessageInterface, fileUserInterface, fileChannelInterface);
+        System.out.println("File 테스트 종료");
 
     }
 
-    private static void testCaseJCFChannel() {
-        System.out.println("Testing Channel functionality...");
-        ChannelService channelService = new JCFChannelInterface();
-        UUID id = UUID.randomUUID();
-        Channel channel = new Channel("testChannel", "This is a test channel");
-        // 채널 추가 테스트
-        try {
-            channelService.addChannel(channel);
-            System.out.println("채널 추가 성공: " + channel);
+    private static void testCreate(MessageInterface messageInterface, UserInterface userInterface, ChannelInterface channelInterface) {
+        try{
+            channelInterface.create("테스트 채널", "테스트 채널입니다.");
+            channelInterface.create("테스트 채널2", "테스트 채널입니다.");
+            channelInterface.create("테스트 채널3", "테스트 채널입니다.");
+            List<Channel> channels = channelInterface.listAllChannels();
+            System.out.println("채널 목록: " + channels);
         } catch (DuplicateException e) {
-            System.out.println("채널 추가 에러(중복된 채널 이름): " + e.getMessage());
+            System.out.println("중복 채널 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
 
-        // 채널 추가 예외 사항(중복된 채널 이름)
         try {
-            channelService.addChannel(new Channel("testChannel", "This is a test channel"));
+            channelInterface.create("테스트 채널", "테스트 채널입니다.");
         } catch (DuplicateException e) {
-            System.out.println("채널 추가 중복 에러(채널 이름 중복): " + e.getMessage());
+            System.out.println("중복 채널 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        // 채널 이름으로 찾기 테스트
-        try {
-            Channel foundChannel = channelService.findChannelByName("testChannel");
-            System.out.println("채널 찾기 성공: " + foundChannel);
-        } catch (NotFoundException e) {
-            System.out.println("채널 찾기 에러(채널이 없음): " + e.getMessage());
-        }
-
-        // 채널 ID로 찾기 테스트
-        try {
-            Channel foundChannelById = channelService.findChannelById(id);
-            System.out.println("채널 ID로 찾기 성공: " + foundChannelById);
-        } catch (NotFoundException e) {
-            System.out.println("채널 ID로 찾기 에러(채널이 없음): " + e.getMessage());
-        }
-
-        // 모든 채널 찾기 테스트
-        try {
-            channelService.addChannel(new Channel("anotherChannel", "This is another channel"));
-            channelService.addChannel(new Channel("thirdChannel", "This is the third channel"));
-            System.out.println("모든 채널 찾기:");
-            channelService.findAllChannels().forEach(c -> System.out.println("채널: " + c));
-        } catch (NotFoundException e) {
-            System.out.println("모든 채널 찾기 에러(채널이 없음): " + e.getMessage());
-        }
-
-        // 채널 업데이트 테스트
-        try {
-            channelService.updateChannel(channel.getChannelName(), "updatedChannel");
-            Channel updatedChannel = channelService.findChannelByName("updatedChannel");
-            System.out.println("채널 업데이트 성공: " + updatedChannel);
-        } catch (NotFoundException e) {
-            System.out.println("채널 업데이트 에러(채널이 없음): " + e.getMessage());
+        try{
+            userInterface.create("테스트 유저");
+            userInterface.create("테스트 유저2");
+            userInterface.create("테스트 유저3");
+            List<User> users = userInterface.getUsers();
+            System.out.println("유저 목록: " + users);
         } catch (DuplicateException e) {
-            System.out.println("채널 업데이트 에러(중복된 채널 이름): " + e.getMessage());
+            System.out.println("중복 유저 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-        // 채널 설명 업데이트 테스트
+
         try {
-            channelService.updateChannelDescription(channel.getChannelName(), "This is an updated channel description");
-            Channel updatedChannel = channelService.findChannelById(id);
-            System.out.println("채널 설명 업데이트 성공: " + updatedChannel);
-        } catch (NotFoundException e) {
-            System.out.println("채널 설명 업데이트 에러(채널이 없음): " + e.getMessage());
+            userInterface.create("테스트 유저");
+        } catch (DuplicateException e) {
+            System.out.println("중복 유저 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-        // 채널 삭제 테스트
-        try {
-            channelService.removeChannel(channel);
-            System.out.println("채널 삭제 성공: " + channel);
+
+        try{
+            User user = userInterface.getUserByName("테스트 유저");
+            System.out.println("메세지 발신 유저: " + user);
+            userInterface.create("메세지 수신 유저");
+            User receiver = userInterface.getUserByName("메세지 수신 유저");
+            System.out.println("메세지 수신 유저: " + receiver);
+            Channel channel = channelInterface.getChannelByName("테스트 채널");
+            System.out.println("메세지 수신 채널: " + channel);
+            messageInterface.send("테스트 메세지", user.getUuid(), receiver.getUuid());
+            messageInterface.send("테스트 메세지2", user.getUuid(), channel.getUuid());
+            messageInterface.send("테스트 메세지3", user.getUuid(), channel.getUuid());
+            List<Message> messages = messageInterface.getMessagesByReceiver(receiver.getUuid());
+            List<Message> messages2 = messageInterface.getMessagesByReceiver(channel.getUuid());
+            System.out.println("개인 메세지함: " + messages);
+            System.out.println("채널 메세지함: " + messages2);
         } catch (NotFoundException e) {
-            System.out.println("채널 삭제 에러(채널이 없음): " + e.getMessage());
+            System.out.println("메세지 생성 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    private static void testCaseJCFMessage() {
-        System.out.println("Testing Message functionality...");
-        MessageService messageService = new JCFMessageInterface();
-
-        UUID senderId = UUID.randomUUID();
-        UUID receiverId = UUID.randomUUID();
-        String messageContent = "Hello, this is a test message!";
-        Message message = new Message(messageContent, senderId, receiverId);
-        // 메시지 추가 테스트
-        try {
-            messageService.addMessage(message);
-            System.out.println("메시지 추가 성공: " + message);
-        } catch (Exception e) {
-            System.out.println("메시지 추가 에러: " + e.getMessage());
-        }
-        // 메세지 전체 찾기 테스트
-        try {
-            messageService.addMessage(new Message("Another test message", senderId, receiverId));
-            messageService.addMessage(new Message("Third test message", senderId, receiverId));
-            System.out.println("모든 메시지 찾기:");
-            messageService.findAllMessages().forEach(m -> System.out.println("메시지: " + m));
+    private static void testRead(MessageInterface messageInterface, UserInterface userInterface, ChannelInterface channelInterface) {
+        try{
+            User receiver = userInterface.getUserByName("메세지 수신 유저");
+            Channel channel = channelInterface.getChannelByName("테스트 채널");
+            List<Message> messages = messageInterface.getMessagesByReceiver(receiver.getUuid());
+            List<Message> messages2 = messageInterface.getMessagesByReceiver(channel.getUuid());
+            System.out.println("개인 메세지함: " + messages);
+            System.out.println("채널 메세지함: " + messages2);
         } catch (NotFoundException e) {
-            System.out.println("모든 메시지 찾기 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 ID로 찾기 테스트
-        try {
-            Message foundMessage = messageService.findMessageById(message.getUuid());
-            System.out.println("메시지 ID로 찾기 성공: " + foundMessage);
-        } catch (NotFoundException e) {
-            System.out.println("메시지 ID로 찾기 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 보낸 사람으로 찾기 테스트
-        try {
-            messageService.addMessage(new Message("Message from sender", senderId, receiverId));
-            messageService.findMessagesBySender(senderId).forEach(m -> System.out.println("보낸 메시지: " + m));
-        } catch (NotFoundException e) {
-            System.out.println("보낸 메시지 찾기 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 받는 사람으로 찾기 테스트
-        try {
-            messageService.addMessage(new Message("Message to receiver", senderId, receiverId));
-            messageService.findMessagesByReceiver(receiverId).forEach(m -> System.out.println("받은 메시지: " + m));
-        } catch (NotFoundException e) {
-            System.out.println("받은 메시지 찾기 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 업데이트 테스트
-        try {
-            String newMessageContent = "This is an updated message content.";
-            messageService.updateMessage(message.getUuid(), newMessageContent);
-            Message updatedMessage = messageService.findMessageById(message.getUuid());
-            System.out.println("메시지 업데이트 성공: " + updatedMessage);
-        } catch (NotFoundException e) {
-            System.out.println("메시지 업데이트 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 삭제 테스트
-        try {
-            messageService.removeMessage(message);
-            System.out.println("메시지 삭제 성공: " + message);
-        } catch (NotFoundException e) {
-            System.out.println("메시지 삭제 에러(메시지가 없음): " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("메시지 삭제 에러: " + e.getMessage());
+            System.out.println("메세지 조회 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    private static void testCaseFileUser() {
-        System.out.println("Testing User functionality...");
-        UserService userService = new FileUserInterface();
-        User user = new User("testUser");
-        userService.addUser(user);
-        System.out.println("유저 추가: " + user.getUserName());
-        // 유저 추가 테스트
-        try {
-            User foundUser = userService.findUserByName("testUser");
-            System.out.println("유저 찾기: " + foundUser);
+    private static void testUpdate(MessageInterface messageInterface, UserInterface userInterface, ChannelInterface channelInterface) {
+        try{
+            User user = userInterface.getUserByName("테스트 유저2");
+            Channel channel = channelInterface.getChannelByName("테스트 채널2");
+            userInterface.rename(user.getUuid(), "테스트 유저22");
+            channelInterface.rename(channel.getUuid(), "테스트 채널22");
+            user = userInterface.getUserByName("테스트 유저22");
+            channel = channelInterface.getChannelByName("테스트 채널22");
+            System.out.println("유저 이름 변경: " + user);
+            System.out.println("채널 이름 변경: " + channel);
+            messageInterface.send("수정 테스트 메세지", user.getUuid(), channel.getUuid());
+            List<Message> messages = messageInterface.getMessagesByReceiver(channel.getUuid());
+            Message message = messages.get(0);
+            messageInterface.changeContext(message.getUuid(), "수정된 메세지 내용");
+            messageInterface.getMessageById(message.getUuid());
+            System.out.println("메세지 내용 변경: " + messageInterface.getMessageById(message.getUuid()));
         } catch (NotFoundException e) {
-            System.out.println("유저 찾기 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 유저 추가 예외 사항(중복된 유저 이름)
-        try {
-            userService.addUser(new User("testUser"));
-        } catch (DuplicateException e) {
-            System.out.println("유저 추가 중복 에러(사용자 이름 중복): " + e.getMessage());
-        }
-
-        // 유저 찾기 테스트
-        try {
-            User foundUserById = userService.findUserById(user.getUuid());
-            System.out.println("유저 ID로 찾기: " + foundUserById);
-        } catch (NotFoundException e) {
-            System.out.println("유저 ID로 찾기 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 모든 유저 찾기 테스트
-        try {
-            userService.addUser(new User("anotherUser"));
-            userService.addUser(new User("thirdUser"));
-            userService.addUser(new User("fourthUser"));
-            System.out.println("모든 유저 찾기:");
-            userService.findAllUsers().forEach(u -> System.out.println("유저: " + u));
-        } catch (NotFoundException e) {
-            System.out.println("모든 유저 찾기 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 유저 ID로 찾기 테스트
-        try {
-            User foundUserById = userService.findUserById(user.getUuid());
-            System.out.println("유저 ID로 찾기 성공: " + foundUserById);
-        } catch (NotFoundException e) {
-            System.out.println("유저 단일 조회 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 유저 이름으로 찾기 테스트
-        try {
-            User foundUserByName = userService.findUserByName("testUser");
-            System.out.println("유저 이름으로 찾기: " + foundUserByName);
-        } catch (NotFoundException e) {
-            System.out.println("유저 이름으로 찾기 에러(사용자가 없음): " + e.getMessage());
-        }
-
-        // 유저 업데이트 테스트
-        try {
-            userService.updateUser("testUser", "updatedUser");
-            User updatedUser = userService.findUserByName("updatedUser");
-            System.out.println("유저 업데이트: " + updatedUser);
-        } catch (NotFoundException e) {
-            System.out.println("유저 업데이트 에러(사용자가 없음): " + e.getMessage());
-        } catch (DuplicateException e) {
-            System.out.println("유저 업데이트 에러(중복된 사용자 이름): " + e.getMessage());
-        }
-
-        // 유저 삭제 테스트
-        try {
-            userService.removeUser(user);
-            System.out.println("유저 삭제 성공: " + user);
-        } catch (NotFoundException e) {
-            System.out.println("유저 삭제 에러(사용자가 없음): " + e.getMessage());
-        }
-
-    }
-
-    private static void testCaseFileChannel() {
-        System.out.println("Testing Channel functionality...");
-        ChannelService channelService = new FileChannelInterface();
-        UUID id = UUID.randomUUID();
-        Channel channel = new Channel("testChannel", "This is a test channel");
-        // 채널 추가 테스트
-        try {
-            channelService.addChannel(channel);
-            System.out.println("채널 추가 성공: " + channel);
-        } catch (DuplicateException e) {
-            System.out.println("채널 추가 에러(중복된 채널 이름): " + e.getMessage());
-        }
-
-        // 채널 추가 예외 사항(중복된 채널 이름)
-        try {
-            channelService.addChannel(new Channel("testChannel", "This is a test channel"));
-        } catch (DuplicateException e) {
-            System.out.println("채널 추가 중복 에러(채널 이름 중복): " + e.getMessage());
-        }
-
-        // 채널 이름으로 찾기 테스트
-        try {
-            Channel foundChannel = channelService.findChannelByName("testChannel");
-            System.out.println("채널 찾기 성공: " + foundChannel);
-        } catch (NotFoundException e) {
-            System.out.println("채널 찾기 에러(채널이 없음): " + e.getMessage());
-        }
-
-        // 모든 채널 찾기 테스트
-        try {
-            channelService.addChannel(new Channel("anotherChannel", "This is another channel"));
-            channelService.addChannel(new Channel("thirdChannel", "This is the third channel"));
-            System.out.println("모든 채널 찾기:");
-            channelService.findAllChannels().forEach(c -> System.out.println("채널: " + c));
-        } catch (NotFoundException e) {
-            System.out.println("모든 채널 찾기 에러(채널이 없음): " + e.getMessage());
-        }
-
-        // 채널 업데이트 테스트
-        try {
-            channelService.updateChannel(channel.getChannelName(), "updatedChannel");
-            Channel updatedChannel = channelService.findChannelByName("updatedChannel");
-            System.out.println("채널 업데이트 성공: " + updatedChannel);
-        } catch (NotFoundException e) {
-            System.out.println("채널 업데이트 에러(채널이 없음): " + e.getMessage());
-        } catch (DuplicateException e) {
-            System.out.println("채널 업데이트 에러(중복된 채널 이름): " + e.getMessage());
-        }
-
-        // 채널 설명 업데이트 테스트
-        try {
-            channelService.updateChannelDescription(channel.getChannelName(), "This is an updated channel description");
-            Channel updatedChannel = channelService.findChannelById(id);
-            System.out.println("채널 설명 업데이트 성공: " + updatedChannel);
-        } catch (NotFoundException e) {
-            System.out.println("채널 설명 업데이트 에러(채널이 없음): " + e.getMessage());
-        }
-        // 채널 삭제 테스트
-        try {
-            channelService.removeChannel(channel);
-            System.out.println("채널 삭제 성공: " + channel);
-        } catch (NotFoundException e) {
-            System.out.println("채널 삭제 에러(채널이 없음): " + e.getMessage());
+            System.out.println("메세지 수정 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    private static void testCaseFileMessage() {
-        System.out.println("Testing Message functionality...");
-        MessageService messageService = new FileMessageInterface();
-
-        UUID senderId = UUID.randomUUID();
-        UUID receiverId = UUID.randomUUID();
-        String messageContent = "Hello, this is a test message!";
-        Message message = new Message(messageContent, senderId, receiverId);
-        // 메시지 추가 테스트
-        try {
-            messageService.addMessage(message);
-            System.out.println("메시지 추가 성공: " + message);
-        } catch (Exception e) {
-            System.out.println("메시지 추가 에러: " + e.getMessage());
-        }
-        // 메세지 전체 찾기 테스트
-        try {
-            messageService.addMessage(new Message("Another test message", senderId, receiverId));
-            messageService.addMessage(new Message("Third test message", senderId, receiverId));
-            System.out.println("모든 메시지 찾기:");
-            messageService.findAllMessages().forEach(m -> System.out.println("메시지: " + m));
+    private static void testDelete(MessageInterface messageInterface, UserInterface userInterface, ChannelInterface channelInterface) {
+        try{
+            User user = userInterface.getUserByName("테스트 유저3");
+            Channel channel = channelInterface.getChannelByName("테스트 채널3");
+            userInterface.delete(user.getUuid());
+            channelInterface.delete(channel.getUuid());
+            System.out.println("유저 삭제 완료");
+            System.out.println("채널 삭제 완료");
+            messageInterface.send("삭제 테스트 메세지", user.getUuid(), channel.getUuid());
+            List<Message> messages = messageInterface.getMessagesByReceiver(channel.getUuid());
+            Message message = messages.get(0);
+            messageInterface.delete(message.getUuid());
+            System.out.println("메세지 삭제 완료");
+            List<Message> messageList = messageInterface.getMessagesByReceiver(channel.getUuid());
         } catch (NotFoundException e) {
-            System.out.println("모든 메시지 찾기 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 ID로 찾기 테스트
-        try {
-            Message foundMessage = messageService.findMessageById(message.getUuid());
-            System.out.println("메시지 ID로 찾기 성공: " + foundMessage);
-        } catch (NotFoundException e) {
-            System.out.println("메시지 ID로 찾기 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 보낸 사람으로 찾기 테스트
-        try {
-            messageService.addMessage(new Message("Message from sender", senderId, receiverId));
-            messageService.findMessagesBySender(senderId).forEach(m -> System.out.println("보낸 메시지: " + m));
-        } catch (NotFoundException e) {
-            System.out.println("보낸 메시지 찾기 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 받는 사람으로 찾기 테스트
-        try {
-            messageService.addMessage(new Message("Message to receiver", senderId, receiverId));
-            messageService.findMessagesByReceiver(receiverId).forEach(m -> System.out.println("받은 메시지: " + m));
-        } catch (NotFoundException e) {
-            System.out.println("받은 메시지 찾기 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 업데이트 테스트
-        try {
-            String newMessageContent = "This is an updated message content.";
-            messageService.updateMessage(message.getUuid(), newMessageContent);
-            Message updatedMessage = messageService.findMessageById(message.getUuid());
-            System.out.println("메시지 업데이트 성공: " + updatedMessage);
-        } catch (NotFoundException e) {
-            System.out.println("메시지 업데이트 에러(메시지가 없음): " + e.getMessage());
-        }
-
-        // 메시지 삭제 테스트
-        try {
-            messageService.removeMessage(message);
-            System.out.println("메시지 삭제 성공: " + message);
-        } catch (NotFoundException e) {
-            System.out.println("메시지 삭제 에러(메시지가 없음): " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("메시지 삭제 에러: " + e.getMessage());
+            System.out.println("메세지 삭제 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
+
+
 }

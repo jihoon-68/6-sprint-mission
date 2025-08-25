@@ -2,75 +2,61 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.service.MessageInterface;
 
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class JCFMessageInterface implements MessageService {
-    private final List<Message> messages;
-
-    public JCFMessageInterface() {messages = new ArrayList<>();}
+public class JCFMessageInterface implements MessageInterface {
+    private final MessageRepository messageRepository = new JCFMessageRepository();
 
     @Override
-    public void addMessage(Message message) {
-        messages.add(message);
+    public void send(String messageContext, UUID senderId, UUID receiverId) {
+        Message message = new Message(messageContext, senderId, receiverId);
+        messageRepository.save(message);
     }
 
     @Override
-    public void removeMessage(Message message) throws NotFoundException {
-        if(!messages.remove(message)) {
-            throw new NotFoundException("메시지가 존재하지 않습니다.");
+    public void changeContext(UUID messageId, String newMessageContext) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("메시지가 존재하지 않습니다."));
+        message.setMessageContext(newMessageContext);
+        messageRepository.save(message);
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("메시지가 존재하지 않습니다."));
+        messageRepository.remove(message);
+    }
+
+    @Override
+    public String getMessageById(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("메시지가 존재하지 않습니다."));
+        return message.getMessageContext();
+    }
+
+    @Override
+    public List<Message> getMessagesByReceiver(UUID receiverId) {
+        List<Message> messages = messageRepository.findByReceiverId(receiverId);
+        if(messages.isEmpty()) {
+            throw new NotFoundException("받는 사람 아이디에 해당하는 메시지가 존재하지 않습니다.");
         }
-        messages.remove(message);
-    }
-
-    @Override
-    public List<Message> findAllMessages() {
         return new ArrayList<>(messages);
     }
 
     @Override
-    public Message findMessageById(UUID id) throws NotFoundException {
-        return messages.stream()
-                .filter(message -> message.getUuid().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("메시지가 존재하지 않습니다."));
-    }
-
-    @Override
-    public List<Message> findMessagesBySender(UUID senderId) throws NotFoundException {
-        if(senderId == null) {
-            throw new IllegalArgumentException("보낸사람을 입력해주십시오");
+    public List<Message> getAllMessages() {
+        List<Message> messages = messageRepository.findAll();
+        if(messages.isEmpty()) {
+            throw new NotFoundException("메시지가 존재하지 않습니다.");
         }
-        List<Message> result = messages.stream().filter(message -> message.getSender().equals(senderId)).toList();
-        if(result.isEmpty()) {
-            throw new NotFoundException("보낸 메세지가 없습니다.");
-        }
-        return result;
+        return new ArrayList<>(messages);
     }
-
-    @Override
-    public List<Message> findMessagesByReceiver(UUID receiverId) throws  NotFoundException {
-        if(receiverId == null) {
-            throw new IllegalArgumentException("받는사람을 입력해주십시오");
-        }
-        List<Message> result = messages.stream().filter(message -> message.getReceiver().equals(receiverId)).toList();
-        if(result.isEmpty()) {
-            throw new NotFoundException("받은 메세지가 없습니다.");
-        }
-        return result;
-    }
-
-    @Override
-    public void updateMessage(UUID id, String newMessageContext) throws NotFoundException {
-        Message message = messages.stream()
-                .filter(msg -> msg.getUuid().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("메시지가 존재하지 않습니다."));
-        message.setMessageContext(newMessageContext);
-    }
-
 }
