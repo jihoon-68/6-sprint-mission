@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -16,7 +19,8 @@ import java.util.List;
 public class TestJavaApplication {
 
     public User testUserSenderTempRun() {
-        UserService userService = JCFUserService.getInstance();
+        UserService userService = new FileUserService();      //File*Service 테스트
+        //UserService userService = new JCFUserService();
         List<User> userData = userService.allRead();
 
         User user = userService.create("이호건");
@@ -36,7 +40,8 @@ public class TestJavaApplication {
     }
 
     public User testUserRecieverTempRun() {
-        UserService userService = JCFUserService.getInstance();
+        UserService userService = new FileUserService();      //File*Service 테스트
+        //UserService userService = new JCFUserService();
         List<User> userData = userService.allRead();
 
         User user = userService.create("코드잇");
@@ -52,7 +57,8 @@ public class TestJavaApplication {
     }
 
     public Channel testChannelTempRun(){
-        ChannelService channelService = JCFChannelService.getInstance();
+        ChannelService channelService = new FileChannelService();      //File*Service 테스트
+        //ChannelService channelService = new JCFChannelService();
         List<Channel> channelData = channelService.allRead();
 
         Channel channel = channelService.create("백엔드 6기");
@@ -68,9 +74,10 @@ public class TestJavaApplication {
     }
 
     public void testMessageTempRun(){
-        MessageService messageService = JCFMessageService.getInstance();
-        List<Message> messageData = messageService.allRead();
+        MessageService messageService = new FileMessageService();      //File*Service 테스트
+        //MessageService messageService = new JCFMessageService();
         TestJavaApplication testJavaApplication = new TestJavaApplication();
+        List<Message> messageData = messageService.allRead();
 
         Message message = messageService.create(testJavaApplication.testUserSenderTempRun(), testJavaApplication.testUserRecieverTempRun(),"안녕", testJavaApplication.testChannelTempRun());
         System.out.println("메시지 생성: " + message);

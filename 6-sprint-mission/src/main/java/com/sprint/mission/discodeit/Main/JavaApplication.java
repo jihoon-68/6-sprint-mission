@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance();
-        UserService userService = JCFUserService.getInstance();
+        ChannelService channelService = new JCFChannelService();
+        MessageService messageService = new JCFMessageService();
+        UserService userService = new JCFUserService();
 
         List<User> userData = userService.allRead();
         List<Message> messageData = messageService.allRead();

@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {
+public class Message implements Serializable {
     private String content;
     private String sender;
     private String reciever;
@@ -10,6 +12,8 @@ public class Message {
     private UUID channelId;
     private Common common;
     private Channel channel;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public Message(User sender, User reciever, String content, Channel channel) {
         this.sender = sender.getName();

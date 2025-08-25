@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    private final List<Channel> channelData;
+    /*
+
+  싱글톤 예시
+
     private static final JCFChannelService INSTANCE = new JCFChannelService();
 
     private JCFChannelService() {
@@ -17,6 +20,23 @@ public class JCFChannelService implements ChannelService {
 
     public static JCFChannelService getInstance(){
         return INSTANCE;
+    }
+
+ DI 예시
+
+    private final UserService userService;
+    private final MessageService messageService;
+
+    public JCFChannelService(UserService userService, MessageService messageService) {
+        this.userService = userService;
+        this.messageService = messageService;
+        this.channelData = new ArrayList<>();
+    }
+*/
+    private final List<Channel> channelData;
+
+    public JCFChannelService(){
+        this.channelData = new ArrayList<>();
     }
 
     @Override

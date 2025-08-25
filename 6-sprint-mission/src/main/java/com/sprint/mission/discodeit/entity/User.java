@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String name;
     private String state;
     private Common common;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     public User(String name) {
         this.name = name;
