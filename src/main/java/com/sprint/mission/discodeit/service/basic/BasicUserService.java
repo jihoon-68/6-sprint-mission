@@ -123,4 +123,118 @@ public class BasicUserService implements UserService {
     public void signup(String email, String password, String username) {
         createUser(email, password, username);
     }
+
+    @Override
+    public void sendFriendRequest(UUID userId, String email) {
+        User friendUser = userRepository.findByEmail(email);
+        User currentUser = userRepository.findById(userId);
+
+        if (friendUser == null) {
+            System.out.println("[Error] 유저를 찾을 수 없습니다.");
+            return;
+        }
+
+        if (email.equals(currentUser.getEmail())) {
+            System.out.println("[Error] 자기 자신은 추가 할 수 없습니다.");
+            return;
+        }
+
+        if (currentUser.getSentFriendRequests().contains(friendUser.getId())) {
+            System.out.println("[Error] 이미 처리중인 요청입니다.");
+            return;
+        }
+
+        if (currentUser.getFriendIds().contains(friendUser.getId())) {
+            System.out.println("[Error] 이미 추가가 완료되었습니다.");
+            return;
+        }
+
+        friendUser.getReceivedFriendRequests().add(userId);
+        currentUser.getSentFriendRequests().add(friendUser.getId());
+
+        userRepository.save(friendUser);
+        userRepository.save(currentUser);
+
+        System.out.println("[Info] 친구 요청을 보냈습니다.");
+    }
+
+    @Override
+    public void acceptFriendRequest(UUID userId, UUID friendId) {
+        User currentUser = userRepository.findById(userId);
+        User friendUser = userRepository.findById(friendId);
+
+        if (friendUser == null) {
+            currentUser.getReceivedFriendRequests().remove(friendId);
+            userRepository.save(currentUser);
+            return;
+        }
+
+        currentUser.getFriendIds().add(friendId);
+        currentUser.getReceivedFriendRequests().remove(friendId);
+
+
+        friendUser.getFriendIds().add(userId);
+        friendUser.getSentFriendRequests().remove(userId);
+
+        userRepository.save(currentUser);
+        userRepository.save(friendUser);
+
+        System.out.println("[Info] 친구 추가가 완료되었습니다.");
+    }
+
+    @Override
+    public void rejectFriendRequest(UUID userId, UUID friendId) {
+        User currentUser = userRepository.findById(userId);
+        User friendUser =  userRepository.findById(friendId);
+
+        if (friendUser == null) {
+            currentUser.getReceivedFriendRequests().remove(friendId);
+            userRepository.save(currentUser);
+            return;
+        }
+
+        currentUser.getReceivedFriendRequests().remove(friendId);
+        friendUser.getSentFriendRequests().remove(userId);
+
+        userRepository.save(currentUser);
+        userRepository.save(friendUser);
+    }
+
+    @Override
+    public void cancelSendFriendRequest(UUID userId, UUID friendId) {
+        User currentUser = userRepository.findById(userId);
+        User friendUser =  userRepository.findById(friendId);
+
+        if (friendUser == null) {
+            currentUser.getSentFriendRequests().remove(friendId);
+            userRepository.save(currentUser);
+            return;
+        }
+
+        currentUser.getSentFriendRequests().remove(friendId);
+        friendUser.getReceivedFriendRequests().remove(userId);
+
+        userRepository.save(currentUser);
+        userRepository.save(friendUser);
+    }
+
+    @Override
+    public void deleteFriend(UUID userId, UUID friendId) {
+        User currentUser = userRepository.findById(userId);
+        User friendUser =  userRepository.findById(friendId);
+
+        if (friendUser == null) {
+            currentUser.getFriendIds().remove(friendId);
+            userRepository.save(currentUser);
+            return;
+        }
+
+        currentUser.getFriendIds().remove(friendId);
+        friendUser.getFriendIds().remove(userId);
+
+        userRepository.save(currentUser);
+        userRepository.save(friendUser);
+
+        System.out.println("[Info] 친구 삭제가 완료되었습니다.");
+    }
 }

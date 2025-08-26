@@ -12,6 +12,9 @@ public class User implements Serializable {
     private String email;
     private String username;
     private String password;
+    private List<UUID> friendIds;
+    private List<UUID> sentFriendRequests;
+    private List<UUID> receivedFriendRequests;
     private static final long serializableId = 1L;
 
     public User(String email, String username, String password) {
@@ -20,6 +23,9 @@ public class User implements Serializable {
         this.password = password;
         this.id = UUID.randomUUID();
         this.createAt = System.currentTimeMillis();
+        this.friendIds = new ArrayList<>();
+        this.sentFriendRequests = new ArrayList<>();
+        this.receivedFriendRequests = new ArrayList<>();
     }
 
     public UUID getId() {
@@ -46,6 +52,18 @@ public class User implements Serializable {
         return password;
     }
 
+    public List<UUID> getFriendIds() {
+        return friendIds;
+    }
+
+    public List<UUID> getSentFriendRequests() {
+        return sentFriendRequests;
+    }
+
+    public List<UUID> getReceivedFriendRequests() {
+        return receivedFriendRequests;
+    }
+
     public void updatePassword(String password) {
         this.password = password;
         this.updateAt = System.currentTimeMillis();
@@ -61,6 +79,21 @@ public class User implements Serializable {
         this.updateAt = System.currentTimeMillis();
     }
 
+    public void updateReceivedFriendRequests(List<UUID> receivedFriendRequests) {
+        this.receivedFriendRequests = receivedFriendRequests;
+        this.updateAt = System.currentTimeMillis();
+    }
+
+    public void updateSentFriendRequests(List<UUID> sentFriendRequests) {
+        this.sentFriendRequests = sentFriendRequests;
+        this.updateAt = System.currentTimeMillis();
+    }
+
+    public void updateFriendIds(List<UUID> friendIds) {
+        this.friendIds = friendIds;
+        this.updateAt = System.currentTimeMillis();
+    }
+
     @Override
     public String toString() {
         return "id: " + id +
@@ -68,6 +101,7 @@ public class User implements Serializable {
                 "\ncreateAt: " + createAt +
                 "\nemail: '" + email + '\'' +
                 "\nusername: '" + username + '\'' +
-                "\npassword: '" + password + '\'';
+                "\npassword: '" + password + '\'' +
+                "\nfriendIds: " + friendIds;
     }
 }

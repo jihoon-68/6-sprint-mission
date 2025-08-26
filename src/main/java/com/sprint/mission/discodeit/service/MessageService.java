@@ -6,12 +6,17 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    public void createMessage(UUID authorId, UUID channelId, String content);
-    public void updateContent(String content, UUID id);
-    public void deleteMessageById(UUID id);
-    public List<Message> findAllMessages();
-    public Message findMessageById(UUID id);
-    public List<Message> findMessagesByAuthorIdAndChannelId(UUID authorId, UUID channelId);
-    public List<Message> findMessagesByChannelId(UUID channelId);
-    public void deleteMessageByAuthorId(UUID authorId);
+    void createMessage(UUID authorId, UUID channelId, UUID receiverId, String content);
+    void updateContent(String content, UUID id);
+    void deleteMessageById(UUID id);
+    List<Message> findAllMessages();
+    Message findMessageById(UUID id);
+    List<Message> findMessagesByAuthorIdAndChannelId(UUID authorId, UUID channelId);
+    List<Message> findMessagesByChannelId(UUID channelId);
+    void deleteMessageByAuthorId(UUID authorId);
+    List<Message> findFriendConversation(UUID userId, UUID friendId);
+    List<Message> findMyMessagesToFriend(UUID userId, UUID friendId);
+    void deleteMessageByChannelIds(List<UUID> channelIds);
+    void cleanupDM();
+    void anonymizeUserMessage(UUID userId);
 }

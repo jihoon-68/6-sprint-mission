@@ -40,6 +40,9 @@ public class FileUserRepository implements UserRepository {
             updateUser.updateUsername(user.getUsername());
             updateUser.updatePassword(user.getPassword());
             updateUser.updateEmail(user.getEmail());
+            updateUser.updateFriendIds(user.getFriendIds());
+            updateUser.updateSentFriendRequests(user.getSentFriendRequests());
+            updateUser.updateReceivedFriendRequests(user.getReceivedFriendRequests());
         } else {
             users.add(user);
         }

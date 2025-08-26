@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.io.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class FileMessageService implements MessageService {
@@ -18,13 +19,13 @@ public class FileMessageService implements MessageService {
 
 
     @Override
-    public void createMessage(UUID authorId, UUID channelId, String content) {
+    public void createMessage(UUID authorId, UUID channelId, UUID receiverId, String content) {
         if (content.trim().isEmpty()) {
             System.out.println("[Error] 메시지는 1글자 이상 입력해주세요.");
             return;
         }
 
-        Message message = new Message(authorId, channelId, content);
+        Message message = new Message(authorId, channelId, receiverId, content);
 
         messageRepository.save(message);
 
@@ -90,5 +91,53 @@ public class FileMessageService implements MessageService {
     @Override
     public List<Message> findMessagesByChannelId(UUID channelId) {
         return messageRepository.findByChannelId(channelId);
+    }
+
+    @Override
+    public List<Message> findFriendConversation(UUID userId, UUID friendId) {
+        List<Message> messages = messageRepository.findAll();
+
+        return messages.stream().filter(m -> (m.getAuthorId().equals(userId) && m.getReceiverId().equals(friendId))
+                || (m.getAuthorId().equals(friendId) && m.getReceiverId().equals(userId))).toList();
+    }
+
+    @Override
+    public List<Message> findMyMessagesToFriend(UUID userId, UUID friendId) {
+        List<Message> messages = messageRepository.findAll();
+
+        return messages.stream().filter(m -> m.getAuthorId().equals(userId) && m.getReceiverId().equals(friendId)).toList();
+    }
+
+    @Override
+    public void deleteMessageByChannelIds(List<UUID> channelIds) {
+        for (UUID id : channelIds) {
+            List<Message> messages = messageRepository.findByChannelId(id);
+            for (Message message : messages) {
+                messageRepository.deleteById(message.getId());
+            }
+        }
+    }
+
+    @Override
+    public void anonymizeUserMessage(UUID userId) {
+        List<Message> messages = messageRepository.findAll().stream().filter(m -> Objects.equals(m.getAuthorId(), userId) ||
+                Objects.equals(m.getReceiverId(), userId)).toList();
+
+        for (Message message : messages) {
+            if (Objects.equals(message.getAuthorId(), userId)) {
+                message.updateAuthorId(null);
+            } else {
+                message.updateReceiverId(null);
+            }
+            messageRepository.save(message);
+        }
+    }
+
+    @Override
+    public void cleanupDM() {
+        List<Message> messages = messageRepository.findAll().stream().filter(m -> (m.getAuthorId() == null && m.getReceiverId() == null)).toList();
+        for (Message message : messages) {
+            messageRepository.deleteById(message.getId());
+        }
     }
 }
