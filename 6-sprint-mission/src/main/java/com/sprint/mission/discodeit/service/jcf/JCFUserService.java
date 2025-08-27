@@ -31,12 +31,20 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User modify(UUID id) {
-        return userData.stream().filter(user->user.getCommon().getId().equals(id)).findAny().orElse(null);
+    public User modify(UUID id, String name) {
+        User user = userData.stream().filter(u->u.getCommon().getId().equals(id)).findAny().orElse(null);
+        if(user!=null){
+            user.setName(name);
+            return user;
+        } else{
+            System.out.println("해당 유저 없음");
+            return null;
+        }
     }
 
     @Override
-    public User delete(UUID id) {
-        return userData.stream().filter(user->user.getCommon().getId().equals(id)).findAny().orElse(null);
+    public void delete(UUID id) {
+        User user = userData.stream().filter(u->u.getCommon().getId().equals(id)).findAny().orElse(null);
+        userData.remove(user);
     }
 }

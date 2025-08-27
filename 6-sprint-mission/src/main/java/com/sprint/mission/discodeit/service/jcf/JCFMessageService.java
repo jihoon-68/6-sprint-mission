@@ -34,13 +34,21 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message modify(UUID id){
-        return messageData.stream().filter(msg->msg.getCommon().getId().equals(id)).findAny().orElse(null);
+    public Message modify(UUID id, String content){
+        Message message = messageData.stream().filter(msg->msg.getCommon().getId().equals(id)).findAny().orElse(null);
+        if(message!=null){
+            message.setContent(content);
+            return message;
+        } else{
+            System.out.println("해당 메시지 없음");
+            return null;
+        }
     }
 
     @Override
-    public Message delete(UUID id){
-        return messageData.stream().filter(msg->msg.getCommon().getId().equals(id)).findAny().orElse(null);
+    public void delete(UUID id){
+        Message message = messageData.stream().filter(msg->msg.getCommon().getId().equals(id)).findAny().orElse(null);
+        messageData.remove(message);
     }
 
 }

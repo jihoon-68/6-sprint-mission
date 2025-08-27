@@ -11,6 +11,6 @@ public interface MessageService {
     Message read(String sender);
     Message create(User sender, User reciever, String content, Channel channel);
     List<Message> allRead();
-    Message modify(UUID id);
-    Message delete(UUID id);
+    Message modify(UUID id, String content);
+    void delete(UUID id);
 }

@@ -57,13 +57,21 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel modify(UUID id) {
-        return channelData.stream().filter(ch -> ch.getCommon().getId().equals(id)).findAny().orElse(null);
+    public Channel modify(UUID id, String name) {
+        Channel channel =  channelData.stream().filter(ch -> ch.getCommon().getId().equals(id)).findAny().orElse(null);
+        if(channel!=null){
+            channel.setName(name);
+            return channel;
+        } else{
+            System.out.println("해당 메시지 없음");
+            return null;
+        }
     }
 
     @Override
-    public Channel delete(UUID id) {
-        return channelData.stream().filter(ch -> ch.getCommon().getId().equals(id)).findAny().orElse(null);
+    public void delete(UUID id) {
+        Channel channel = channelData.stream().filter(ch -> ch.getCommon().getId().equals(id)).findAny().orElse(null);
+        channelData.remove(channel);
     }
 
 }
