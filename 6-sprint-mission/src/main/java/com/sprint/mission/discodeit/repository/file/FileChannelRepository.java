@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -27,8 +28,8 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel save(Channel channel) {
         FileInitSaveLoad.init(directory);
 
-        Path filePath = directory.resolve(channel.getName().concat(".ser"));
-        FileInitSaveLoad.save(filePath, channel);
+        Path filePath = directory.resolve(channel.getCommon().getId()+".ser");
+        FileInitSaveLoad.<Channel>save(filePath, channel);
 
         return channel;
     }
@@ -40,7 +41,14 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(UUID id) {
-        findall().removeIf(ch -> ch.getCommon().getId().equals(id));
+        Channel channel = findall()
+                .stream().filter(ch -> ch.getCommon().getId().equals(id))
+                .findAny()
+                .orElse(null);
+        File file = new File("Channeldata/"+channel.getCommon().getId()+".ser");
+        if(file.delete()){
+            //System.out.println("---delete---");
+        }
     }
 
 }

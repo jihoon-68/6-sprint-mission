@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -28,8 +29,8 @@ public class FileUserRepository implements UserRepository {
     public User save(User user) {
         FileInitSaveLoad.init(directory);
 
-        Path filePath = directory.resolve(user.getName().concat(".ser"));
-        FileInitSaveLoad.save(filePath, user);
+        Path filePath = directory.resolve(user.getCommon().getId() +".ser");
+        FileInitSaveLoad.<User>save(filePath, user);
 
         return user;
     }
@@ -41,7 +42,15 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void delete(UUID id) {
-        findall().removeIf(user -> user.getCommon().getId().equals(id));
+        User user = findall()
+                .stream()
+                .filter(u -> u.getCommon().getId().equals(id))
+                .findAny()
+                .orElse(null);
+        File file = new File("Userdata/"+user.getCommon().getId()+".ser");
+        if(file.delete()){
+            //System.out.println("---delete---");
+        }
     }
 
 }
