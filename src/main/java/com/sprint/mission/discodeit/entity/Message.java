@@ -11,15 +11,19 @@ public class Message implements Serializable {
     private String content;
     private UUID channelId;
     private UUID receiverId;
+    private boolean isDrawnAuthor;
+    private boolean isDrawnReceiver;
     private static final long serializableId = 1L;
 
-    public Message(UUID authorId, UUID channelId, UUID receiverId, String content) {
+    public Message(UUID authorId, UUID channelId, UUID receiverId, String content, boolean isDrawnReceiver) {
         this.authorId = authorId;
         this.channelId = channelId;
         this.content = content;
         this.createAt = System.currentTimeMillis();
         this.id = UUID.randomUUID();
         this.receiverId = receiverId;
+        this.isDrawnAuthor = false;
+        this.isDrawnReceiver = isDrawnReceiver;
     }
 
     public UUID getId() {
@@ -48,6 +52,14 @@ public class Message implements Serializable {
 
     public UUID getReceiverId() {return receiverId;}
 
+    public boolean isDrawnAuthor() {
+        return isDrawnAuthor;
+    }
+
+    public boolean isDrawnReceiver() {
+        return isDrawnReceiver;
+    }
+
     public void updateContent(String content) {
         this.content = content;
         this.updateAt = System.currentTimeMillis();
@@ -63,16 +75,25 @@ public class Message implements Serializable {
         this.updateAt = System.currentTimeMillis();
     }
 
+    public void updateIsDrawnAuthor(boolean isDrawnAuthor) {
+        this.isDrawnAuthor = isDrawnAuthor;
+        this.updateAt = System.currentTimeMillis();
+    }
+
+    public void updateIsDrawnReceiver(boolean isDrawnReceiver) {
+        this.isDrawnReceiver = isDrawnReceiver;
+        this.updateAt = System.currentTimeMillis();
+    }
+
     @Override
     public String toString() {
         return "Message{" +
-                "id=" + id +
-                ", updateAt=" + updateAt +
-                ", createAt=" + createAt +
-                ", authorId=" + authorId +
-                ", content='" + content + '\'' +
-                ", channelId=" + channelId +
-                ", receiverId=" + receiverId +
-                '}';
+                "\nauthorId=" + authorId +
+                ",\ncontent='" + content + '\'' +
+                ",\nchannelId=" + channelId +
+                ",\nreceiverId=" + receiverId +
+                ",\nisDrawnAuthor=" + isDrawnAuthor +
+                ",\nisDrawnReceiver=" + isDrawnReceiver +
+                "\n}";
     }
 }

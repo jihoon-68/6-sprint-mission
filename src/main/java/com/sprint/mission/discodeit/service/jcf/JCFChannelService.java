@@ -12,8 +12,8 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    public JCFChannelService() {
-        this.channelRepository = new JCFChannelRepository();
+    public JCFChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
@@ -36,11 +36,11 @@ public class JCFChannelService implements ChannelService {
         }
 
         if (channelRepository.existsById(id)) {
-            Channel updateChannel = channelRepository.findById(id);
-            updateChannel.updateChannelName(channelName);
-            channelRepository.save(updateChannel);
+            Channel channel = channelRepository.findById(id);
+            channel.updateChannelName(channelName);
+            channelRepository.save(channel);
 
-            System.out.println("[Info} 채널명이 수정되었습니다.");
+            System.out.println("[Info] 채널명이 수정되었습니다.");
         } else {
             System.out.println("[Error] 존재하지 않는 채널입니다.");
         }

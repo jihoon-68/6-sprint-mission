@@ -12,8 +12,8 @@ import java.util.UUID;
 public class FileChannelService implements ChannelService {
     private final ChannelRepository  channelRepository;
 
-    public FileChannelService() {
-        this.channelRepository = new FileChannelRepository();
+    public FileChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class FileChannelService implements ChannelService {
             channel.updateChannelName(channelName);
             channelRepository.save(channel);
 
-            System.out.println("[Info} 채널명이 수정되었습니다.");
+            System.out.println("[Info] 채널명이 수정되었습니다.");
         } else {
             System.out.println("[Error] 존재하지 않는 채널입니다.");
         }

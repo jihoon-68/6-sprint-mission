@@ -22,10 +22,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class JavaApplication {
     private static final UserService userService = new BasicUserService(new FileUserRepository());
@@ -42,19 +39,19 @@ public class JavaApplication {
 
         while (run) {
             if (currentUser == null) {
-                System.out.println("=== [Test] 전체 사용자 ===");
-                System.out.println(userService.findAllUsers().toString());
-                int menu;
-                System.out.println("=== [Test] 메시지 ===");
-                List<Message> messages =  messageService.findAllMessages();
-                System.out.println(messages);
+//                System.out.println("=== [Test] 전체 사용자 ===");
+//                System.out.println(userService.findAllUsers().toString());
+//
+//                System.out.println("=== [Test] 메시지 ===");
+//                List<Message> messages =  messageService.findAllMessages();
+//                System.out.println(messages);
+
                 System.out.println("=== 로그인 메뉴 ===");
                 System.out.println("1. 로그인");
                 System.out.println("2. 회원가입");
                 System.out.println("0. 종료");
-                System.out.print("선택해주세요: ");
-                menu = in.nextInt();
-                in.nextLine();
+
+                int menu = selectMenu(2);
 
                 switch (menu) {
                     case 1: {
@@ -101,12 +98,10 @@ public class JavaApplication {
             System.out.println("1. 채널");
             System.out.println("2. 사용자");
             System.out.println("0. 로그아웃");
-            System.out.print("선택해주세요: ");
 
-            int choice = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(2);
 
-            switch (choice) {
+            switch (menu) {
                 case 1:
                     showChannelMenu();
                     break;
@@ -127,10 +122,8 @@ public class JavaApplication {
             System.out.println("2. 내 정보");
             System.out.println("3. 친구 관리");
             System.out.println("0. 뒤로가기");
-            System.out.print("선택해주세요: ");
 
-            int menu = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(3);
 
             switch (menu) {
                 case 1:
@@ -159,9 +152,8 @@ public class JavaApplication {
             System.out.println("4. 친구 삭제");
             System.out.println("5. 친구 목록");
             System.out.println("0. 뒤로 가기");
-            System.out.print("선택해주세요: ");
-            int menu = in.nextInt();
-            in.nextLine();
+
+            int menu = selectMenu(5);
 
             switch (menu) {
                 case 1: {
@@ -259,9 +251,7 @@ public class JavaApplication {
                     }
                     System.out.println("----------------");
 
-                    System.out.print("번호 선택: ");
-                    int index = in.nextInt() - 1;
-                    in.nextLine();
+                    int index = selectIndex(friendIds.size());
 
                     userService.deleteFriend(currentUser.getId(), friendIds.get(index));
 
@@ -313,15 +303,13 @@ public class JavaApplication {
             System.out.println("4. 메시지 목록");
             System.out.println("0. 뒤로 가기");
 
-            System.out.print("선택해주세요: ");
-            int menu = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(4);
 
             switch (menu) {
                 case 1:
                     System.out.print("내용: ");
                     String content = in.nextLine();
-                    messageService.createMessage(currentUser.getId(), null, friendId, content);
+                    messageService.createMessage(currentUser.getId(), null, friendId, content, userService.findUserById(friendId) == null);
                     break;
                 case 2: {
                     List<Message> myMessages = messageService.findMyMessagesToFriend(currentUser.getId(), friendId);
@@ -332,14 +320,7 @@ public class JavaApplication {
                     }
                     System.out.println("----------------");
 
-                    System.out.print("번호 선택: ");
-                    int index = in.nextInt() - 1;
-                    in.nextLine();
-
-                    if (index < 0 || index >= myMessages.size()) {
-                        System.out.println("잘못된 번호입니다.");
-                        break;
-                    }
+                    int index = selectIndex(myMessages.size());
 
                     System.out.print("내용: ");
                     String newContent = in.nextLine();
@@ -356,14 +337,7 @@ public class JavaApplication {
                     }
                     System.out.println("----------------");
 
-                    System.out.print("번호 선택: ");
-                    int index = in.nextInt() - 1;
-                    in.nextLine();
-
-                    if (index < 0 || index >= myMessages.size()) {
-                        System.out.println("잘못된 번호입니다.");
-                        break;
-                    }
+                    int index = selectIndex(myMessages.size());
 
                     messageService.deleteMessageById(myMessages.get(index).getId());
                     break;
@@ -375,7 +349,7 @@ public class JavaApplication {
                     for (Message message : conversation) {
                         UUID id = message.getAuthorId();
                         String authorName;
-                        if (id == null) {
+                        if (message.isDrawnAuthor()) {
                             authorName = "(알 수 없음)";
                         } else {
                             User user =  userService.findUserById(id);
@@ -412,9 +386,8 @@ public class JavaApplication {
             System.out.println((i + 1) + ". " + friendName);
         }
         System.out.println("----------------");
-        System.out.print("친구 번호 선택: ");
-        int index = in.nextInt() - 1;
-        in.nextLine();
+
+        int index = selectIndex(currentUser.getFriendIds().size());
 
         return currentUser.getFriendIds().get(index);
     }
@@ -429,9 +402,7 @@ public class JavaApplication {
             System.out.println("2. 회원 탈퇴");
             System.out.println("0. 뒤로가기");
 
-            System.out.print("선택해주세요: ");
-            int menu = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(2);
 
             switch (menu) {
                 case 1:
@@ -459,10 +430,8 @@ public class JavaApplication {
             System.out.println("2. 이름 변경");
             System.out.println("3. 비밀번호 변경");
             System.out.println("0. 뒤로가기");
-            System.out.print("선택해주세요: ");
 
-            int menu = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(3);
 
             switch (menu) {
                 case 1:
@@ -494,10 +463,8 @@ public class JavaApplication {
             System.out.println("2. 채널 참여");
             System.out.println("3. 채널 목록");
             System.out.println("0. 뒤로가기");
-            System.out.print("선택해주세요: ");
 
-            int menu = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(3);
 
             switch (menu) {
                 case 1:
@@ -514,19 +481,12 @@ public class JavaApplication {
                     System.out.println("----------------");
                     for (int i = 0; i < channels.size(); i++) {
                         User user = userService.findUserById(channels.get(i).getOwnerId());
+                        System.out.println(channels.get(i).getOwnerId());
                         System.out.println((i + 1) + ". 채널명: " + channels.get(i).getChannelName() + " / 소유자:  " + user.getUsername());
                     }
                     System.out.println("----------------");
 
-                    System.out.print("채널 번호 선택: ");
-                    int index = in.nextInt() - 1;
-                    in.nextLine();
-
-                    if (index < 0 || index >= channels.size()) {
-                        System.out.println("잘못된 번호입니다.");
-                        break;
-                    }
-
+                    int index = selectIndex(channels.size());
 
                     currentChannel = channels.get(index);
 
@@ -556,10 +516,8 @@ public class JavaApplication {
             System.out.println("2. 내 채널 관리");
             System.out.println("3. 내 채널 목록");
             System.out.println("0. 뒤로가기");
-            System.out.print("선택해주세요: ");
 
-            int menu = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(3);
 
             switch (menu) {
                 case 1:
@@ -581,14 +539,7 @@ public class JavaApplication {
                     }
                     System.out.println("----------------");
 
-                    System.out.print("채널 번호 선택: ");
-                    int index = in.nextInt() - 1;
-                    in.nextLine();
-
-                    if (index < 0 || index >= myChannels.size()) {
-                        System.out.println("잘못된 번호입니다.");
-                        break;
-                    }
+                    int index = selectIndex(myChannels.size());
 
                     currentChannel = myChannels.get(index);
 
@@ -624,17 +575,15 @@ public class JavaApplication {
             System.out.println("3. 메시지 삭제");
             System.out.println("4. 메시지 목록");
             System.out.println("0. 뒤로가기");
-            System.out.print("선택해주세요: ");
 
-            int menu = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(4);
 
             switch (menu) {
                 case 1:
                     System.out.print("내용: ");
                     String content = in.nextLine();
 
-                    messageService.createMessage(currentUser.getId(), currentChannel.getId(), null, content);
+                    messageService.createMessage(currentUser.getId(), currentChannel.getId(), null, content, false);
                     break;
                 case 2: {
                     List<Message> messages = messageService.findMessagesByAuthorIdAndChannelId(currentUser.getId(), currentChannel.getId());
@@ -650,14 +599,7 @@ public class JavaApplication {
                     }
                     System.out.println("----------------");
 
-                    System.out.print("번호 선택: ");
-                    int index = in.nextInt() - 1;
-                    in.nextLine();
-
-                    if (index < 0 || index >= messages.size()) {
-                        System.out.println("잘못된 번호입니다.");
-                        break;
-                    }
+                    int index = selectIndex(messages.size());
 
                     System.out.print("새로운 내용: ");
                     String newContent = in.nextLine();
@@ -693,14 +635,7 @@ public class JavaApplication {
                     }
                     System.out.println("----------------");
 
-                    System.out.print("번호 선택: ");
-                    int index = in.nextInt() - 1;
-                    in.nextLine();
-
-                    if (index < 0 || index >= messages.size()) {
-                        System.out.println("잘못된 번호입니다.");
-                        break;
-                    }
+                    int index = selectIndex(messages.size());
 
                     messageService.deleteMessageById(messages.get(index).getId());
                     break;
@@ -740,10 +675,8 @@ public class JavaApplication {
             System.out.println("1. 채널 이름 변경");
             System.out.println("2. 채널 삭제");
             System.out.println("0. 뒤로가기");
-            System.out.print("선택해주세요: ");
 
-            int menu = in.nextInt();
-            in.nextLine();
+            int menu = selectMenu(2);
 
             switch (menu) {
                 case 1:
@@ -753,6 +686,7 @@ public class JavaApplication {
                     channelService.updateChannelName(currentChannel.getId(), channelName);
                     break;
                 case 2:
+                    messageService.deleteMessageByChannelIds(List.of(currentChannel.getId()));
                     channelService.deleteChannelById(currentChannel.getId());
 
                     currentChannel = null;
@@ -760,6 +694,44 @@ public class JavaApplication {
                 default:
                     currentChannel = null;
                     return;
+            }
+        }
+    }
+
+    private static int selectMenu(int high) {
+        while(true) {
+            try {
+                System.out.print("선택해주세요: ");
+                int menu = in.nextInt();
+
+                if (menu > high || menu < 0) {
+                    throw new InputMismatchException();
+                }
+
+                in.nextLine();
+
+                return menu;
+            } catch (InputMismatchException e) {
+                in.nextLine();
+                System.out.println("잘못된 입력입니다.");
+            }
+        }
+    }
+
+    private static int selectIndex(int high) {
+        while(true) {
+            try {
+                System.out.print("번호 선택: ");
+                int index =  in.nextInt();
+                if (index > high || index < 1) {
+                    throw new InputMismatchException();
+                }
+
+                in.nextLine();
+                return index - 1;
+            } catch (InputMismatchException e) {
+                in.nextLine();
+                System.out.println("잘못된 입력입니다.");
             }
         }
     }

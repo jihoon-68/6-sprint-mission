@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.List;
@@ -12,18 +11,18 @@ import java.util.UUID;
 public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
-    public JCFMessageService() {
-        this.messageRepository = new JCFMessageRepository();
+    public JCFMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
     }
 
     @Override
-    public void createMessage(UUID authorId, UUID channelId, UUID receiverId, String content) {
+    public void createMessage(UUID authorId, UUID channelId, UUID receiverId, String content, boolean isDrawnReceiver) {
         if (content.trim().isEmpty()) {
             System.out.println("[Error] 메시지는 1글자 이상 입력해주세요.");
             return;
         }
 
-        Message message = new Message(authorId, channelId, receiverId, content);
+        Message message = new Message(authorId, channelId, receiverId, content, isDrawnReceiver);
 
         messageRepository.save(message);
 
@@ -94,15 +93,15 @@ public class JCFMessageService implements MessageService {
     public List<Message> findFriendConversation(UUID userId, UUID friendId) {
         List<Message> messages = messageRepository.findAll();
 
-        return messages.stream().filter(m -> (m.getAuthorId().equals(userId) && m.getReceiverId().equals(friendId))
-                || (m.getAuthorId().equals(friendId) && m.getReceiverId().equals(userId))).toList();
+        return messages.stream().filter(m -> (Objects.equals(m.getAuthorId(), userId) && Objects.equals(m.getReceiverId(), friendId))
+                || (Objects.equals(m.getAuthorId(), friendId) && Objects.equals(m.getReceiverId(), userId))).toList();
     }
 
     @Override
     public List<Message> findMyMessagesToFriend(UUID userId, UUID friendId) {
         List<Message> messages = messageRepository.findAll();
 
-        return messages.stream().filter(m -> m.getAuthorId().equals(userId) && m.getReceiverId().equals(friendId)).toList();
+        return messages.stream().filter(m -> Objects.equals(m.getAuthorId(), userId) && Objects.equals(m.getReceiverId(), friendId)).toList();
     }
 
     @Override
@@ -122,9 +121,9 @@ public class JCFMessageService implements MessageService {
 
         for (Message message : messages) {
             if (Objects.equals(message.getAuthorId(), userId)) {
-                message.updateAuthorId(null);
+                message.updateIsDrawnAuthor(true);
             } else {
-                message.updateReceiverId(null);
+                message.updateIsDrawnReceiver(true);
             }
             messageRepository.save(message);
         }
@@ -132,7 +131,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void cleanupDM() {
-        List<Message> messages = messageRepository.findAll().stream().filter(m -> (m.getAuthorId() == null && m.getReceiverId() == null)).toList();
+        List<Message> messages = messageRepository.findAll().stream().filter(m -> m.isDrawnAuthor() && m.isDrawnReceiver()).toList();
         for (Message message : messages) {
             messageRepository.deleteById(message.getId());
         }

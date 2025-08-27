@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
@@ -11,8 +10,8 @@ import java.util.UUID;
 public class JCFUserService implements UserService {
     private final UserRepository userRepository;
 
-    public JCFUserService() {
-        this.userRepository = new JCFUserRepository();
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -135,6 +134,21 @@ public class JCFUserService implements UserService {
             return;
         }
 
+        if (email.equals(currentUser.getEmail())) {
+            System.out.println("[Error] 자기 자신은 추가 할 수 없습니다.");
+            return;
+        }
+
+        if (currentUser.getSentFriendRequests().contains(friendUser.getId())) {
+            System.out.println("[Error] 이미 처리중인 요청입니다.");
+            return;
+        }
+
+        if (currentUser.getFriendIds().contains(friendUser.getId())) {
+            System.out.println("[Error] 이미 추가된 친구입니다.");
+            return;
+        }
+
         friendUser.getReceivedFriendRequests().add(userId);
         currentUser.getSentFriendRequests().add(friendUser.getId());
 
@@ -173,6 +187,12 @@ public class JCFUserService implements UserService {
         User currentUser = userRepository.findById(userId);
         User friendUser =  userRepository.findById(friendId);
 
+        if (friendUser == null) {
+            currentUser.getReceivedFriendRequests().remove(friendId);
+            userRepository.save(currentUser);
+            return;
+        }
+
         currentUser.getReceivedFriendRequests().remove(friendId);
         friendUser.getSentFriendRequests().remove(userId);
 
@@ -205,6 +225,7 @@ public class JCFUserService implements UserService {
 
         if (friendUser == null) {
             currentUser.getFriendIds().remove(friendId);
+            userRepository.save(currentUser);
             return;
         }
 
@@ -213,5 +234,7 @@ public class JCFUserService implements UserService {
 
         userRepository.save(currentUser);
         userRepository.save(friendUser);
+
+        System.out.println("[Info] 친구 삭제가 완료되었습니다.");
     }
 }

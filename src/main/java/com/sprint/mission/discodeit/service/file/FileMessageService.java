@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.io.*;
@@ -13,19 +12,18 @@ import java.util.UUID;
 public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
-    public FileMessageService() {
-        this.messageRepository = new FileMessageRepository();
+    public FileMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
     }
 
-
     @Override
-    public void createMessage(UUID authorId, UUID channelId, UUID receiverId, String content) {
+    public void createMessage(UUID authorId, UUID channelId, UUID receiverId, String content, boolean isDrawnReceiver) {
         if (content.trim().isEmpty()) {
             System.out.println("[Error] 메시지는 1글자 이상 입력해주세요.");
             return;
         }
 
-        Message message = new Message(authorId, channelId, receiverId, content);
+        Message message = new Message(authorId, channelId, receiverId, content, isDrawnReceiver);
 
         messageRepository.save(message);
 
@@ -72,7 +70,6 @@ public class FileMessageService implements MessageService {
         }
     }
 
-
     @Override
     public List<Message> findAllMessages() {
         return messageRepository.findAll();
@@ -85,7 +82,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Message> findMessagesByAuthorIdAndChannelId(UUID authorId, UUID channelId) {
-        return  messageRepository.findByAuthorIdAndChannelId(authorId, channelId);
+        return messageRepository.findByAuthorIdAndChannelId(authorId, channelId);
     }
 
     @Override
@@ -97,15 +94,15 @@ public class FileMessageService implements MessageService {
     public List<Message> findFriendConversation(UUID userId, UUID friendId) {
         List<Message> messages = messageRepository.findAll();
 
-        return messages.stream().filter(m -> (m.getAuthorId().equals(userId) && m.getReceiverId().equals(friendId))
-                || (m.getAuthorId().equals(friendId) && m.getReceiverId().equals(userId))).toList();
+        return messages.stream().filter(m -> (Objects.equals(m.getAuthorId(), userId) && Objects.equals(m.getReceiverId(), friendId))
+                || (Objects.equals(m.getAuthorId(), friendId) && Objects.equals(m.getReceiverId(), userId))).toList();
     }
 
     @Override
     public List<Message> findMyMessagesToFriend(UUID userId, UUID friendId) {
         List<Message> messages = messageRepository.findAll();
 
-        return messages.stream().filter(m -> m.getAuthorId().equals(userId) && m.getReceiverId().equals(friendId)).toList();
+        return messages.stream().filter(m -> Objects.equals(m.getAuthorId(), userId) && Objects.equals(m.getReceiverId(), friendId)).toList();
     }
 
     @Override
@@ -125,9 +122,9 @@ public class FileMessageService implements MessageService {
 
         for (Message message : messages) {
             if (Objects.equals(message.getAuthorId(), userId)) {
-                message.updateAuthorId(null);
+                message.updateIsDrawnAuthor(true);
             } else {
-                message.updateReceiverId(null);
+                message.updateIsDrawnReceiver(true);
             }
             messageRepository.save(message);
         }
@@ -135,7 +132,7 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void cleanupDM() {
-        List<Message> messages = messageRepository.findAll().stream().filter(m -> (m.getAuthorId() == null && m.getReceiverId() == null)).toList();
+        List<Message> messages = messageRepository.findAll().stream().filter(m -> m.isDrawnAuthor() && m.isDrawnReceiver()).toList();
         for (Message message : messages) {
             messageRepository.deleteById(message.getId());
         }

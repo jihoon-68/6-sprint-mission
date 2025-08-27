@@ -145,7 +145,7 @@ public class BasicUserService implements UserService {
         }
 
         if (currentUser.getFriendIds().contains(friendUser.getId())) {
-            System.out.println("[Error] 이미 추가가 완료되었습니다.");
+            System.out.println("[Error] 이미 추가된 친구입니다.");
             return;
         }
 

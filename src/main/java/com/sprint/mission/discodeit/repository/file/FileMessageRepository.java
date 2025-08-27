@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
@@ -57,7 +58,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findByAuthorIdAndChannelId(UUID authorId, UUID channelId) {
-        return messages.stream().filter(m -> m.getAuthorId().equals(authorId) && m.getChannelId().equals(channelId))
+        return messages.stream().filter(m ->Objects.equals(m.getAuthorId(), authorId) && Objects.equals(m.getChannelId(), channelId))
                 .toList();
     }
 
@@ -68,7 +69,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findByChannelId(UUID id) {
-        return messages.stream().filter(m -> m.getChannelId().equals(id)).toList();
+        return messages.stream().filter(m -> Objects.equals(m.getChannelId(), id)).toList();
     }
 
     @Override
