@@ -54,6 +54,14 @@ public class Message implements Serializable {
         return common;
     }
 
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
@@ -65,4 +73,6 @@ public class Message implements Serializable {
                 ", messageId=" + common.getId() +
                 '}';
     }
+
+
 }

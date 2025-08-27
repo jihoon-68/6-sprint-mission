@@ -9,9 +9,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
 
@@ -21,7 +18,6 @@ public class TestJavaApplication {
     public User testUserSenderTempRun() {
         UserService userService = new FileUserService();      //File*Service 테스트
         //UserService userService = new JCFUserService();
-        List<User> userData = userService.allRead();
 
         User user = userService.create("이호건");
         System.out.println("유저 생성: " + user);
@@ -29,12 +25,11 @@ public class TestJavaApplication {
         modifiedUserName.setName("이호건 이름 수정");
         System.out.println("유저 이름 수정: " + modifiedUserName);
         User deletedUser = userService.delete(user.getCommon().getId());
-        userData.remove(deletedUser);
-        System.out.println("이호건 유저 삭제 후 유저 조회: " + userData);
+        System.out.println("이호건 유저 삭제 후 유저 조회: " + userService.allRead());
 
         User user1 = userService.create("첫번째 유저");
         User user2 = userService.create("두번째 유저");
-        System.out.println("더미 유저 생성 후 모든 유저 조회: " + userData);
+        System.out.println("더미 유저 생성 후 모든 유저 조회: " + userService);
 
         return user;
     }
@@ -50,13 +45,13 @@ public class TestJavaApplication {
         modifiedUserName.setName("코드잇 이름 수정");
         System.out.println("유저 이름 수정: " + modifiedUserName);
         User deletedUser = userService.delete(user.getCommon().getId());
-        userData.remove(deletedUser);
+//        userData.remove(deletedUser);
         System.out.println("코드잇 유저 삭제 후 유저 조회: " + userData);
 
         return user;
     }
 
-    public Channel testChannelTempRun(){
+    public Channel testChannelTempRun() {
         ChannelService channelService = new FileChannelService();      //File*Service 테스트
         //ChannelService channelService = new JCFChannelService();
         List<Channel> channelData = channelService.allRead();
@@ -67,25 +62,25 @@ public class TestJavaApplication {
         modifiedChannelName.setName("백엔드 6기 채널명 수정");
         System.out.println("채널명 수정: " + modifiedChannelName);
         Channel deletedChannel = channelService.delete(channel.getCommon().getId());
-        channelData.remove(deletedChannel);
+//        channelData.remove(deletedChannel);
         System.out.println("삭제 후 채널명 조회: " + channelData);
 
         return channel;
     }
 
-    public void testMessageTempRun(){
+    public void testMessageTempRun() {
         MessageService messageService = new FileMessageService();      //File*Service 테스트
         //MessageService messageService = new JCFMessageService();
         TestJavaApplication testJavaApplication = new TestJavaApplication();
         List<Message> messageData = messageService.allRead();
 
-        Message message = messageService.create(testJavaApplication.testUserSenderTempRun(), testJavaApplication.testUserRecieverTempRun(),"안녕", testJavaApplication.testChannelTempRun());
+        Message message = messageService.create(testJavaApplication.testUserSenderTempRun(), testJavaApplication.testUserRecieverTempRun(), "안녕", testJavaApplication.testChannelTempRun());
         System.out.println("메시지 생성: " + message);
         Message modifiedMessage = messageService.modify(message.getCommon().getId());
         modifiedMessage.setContent("안녕하세요");
         System.out.println("메시지 내용 수정: " + modifiedMessage);
         Message deletedMessage = messageService.delete(message.getCommon().getId());
-        messageData.remove(deletedMessage);
+//        messageData.remove(deletedMessage);
         System.out.println("삭제 후 메시지 조회: " + messageData);
 
     }

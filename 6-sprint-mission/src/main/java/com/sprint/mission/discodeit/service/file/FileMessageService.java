@@ -16,42 +16,47 @@ public class FileMessageService implements MessageService {
 
     Path directory = Paths.get(System.getProperty("user.dir"), "MessageData");
 
-    public List<Message> messageData() {
-        return FileInitSaveLoad.load(directory)
-                .stream()
-                .map(obj -> (Message) obj) // Message로 형 변환
-                .collect(Collectors.toList()); // List로 다시 수집
-    }
-
     @Override
-    public Message create(User sender, User reciever, String content, Channel channel){
+    public Message create(User sender, User reciever, String content, Channel channel) {
         FileInitSaveLoad.init(directory);
 
-        Message message = new Message(sender,reciever,content,channel);
+        Message message = new Message(sender, reciever, content, channel);
 
         Path filePath = directory.resolve(message.getContent().concat(".ser"));
-        FileInitSaveLoad.save(filePath, message);
+        FileInitSaveLoad.<Message>save(filePath, message);
 
         return message;
     }
 
     @Override
-    public Message read(String sender){
-        return messageData().stream().filter(msg->msg.getSender().equals(sender)).findAny().orElse(null);
+    public Message read(String sender) {
+        return allRead()
+                .stream()
+                .filter(msg -> msg.getSender().equals(sender))
+                .findAny()
+                .orElse(null);
     }
 
     @Override
-    public List<Message> allRead(){
-        return messageData();
+    public List<Message> allRead() {
+        return FileInitSaveLoad.<Message>load(directory);
     }
 
     @Override
-    public Message modify(UUID id){
-        return messageData().stream().filter(msg->msg.getCommon().getId().equals(id)).findAny().orElse(null);
+    public Message modify(UUID id) {
+        return allRead()
+                .stream()
+                .filter(msg -> msg.getCommon().getId().equals(id))
+                .findAny()
+                .orElse(null);
     }
 
     @Override
-    public Message delete(UUID id){
-        return messageData().stream().filter(msg->msg.getCommon().getId().equals(id)).findAny().orElse(null);
+    public Message delete(UUID id) {
+        return allRead()
+                .stream()
+                .filter(msg -> msg.getCommon().getId().equals(id))
+                .findAny()
+                .orElse(null);
     }
 }
