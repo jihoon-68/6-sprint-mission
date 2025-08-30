@@ -8,8 +8,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 public class BasicMessageService {
-    private static MessageRepository messageRepository;
-    public static ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
+    public final  ChannelRepository channelRepository;
 
     public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository) {
         this.messageRepository = messageRepository;
@@ -17,8 +17,9 @@ public class BasicMessageService {
     }
 
     public Message create(Channel channel, User user, String content){
-        Message message = messageRepository.createMessage(user,content);
-        messageRepository.createMessage(user,content);
+        Message message = new Message(user,content);
+        messageRepository.createMessage(message);
+        channelRepository.addMessageToChannel(channel, message);
         return message;
     }
 }
