@@ -10,25 +10,23 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
-    private static List<Channel> channels;
+    private final List<Channel> channels;
 
     public JCFChannelRepository() {
 
         channels = new ArrayList<>();
     }
 
-    public Channel createChannel(String name, User root) {
-        Channel channel = new Channel(name, root);
+    public void createChannel(Channel channel) {
         channels.add(channel);
-        return channel;
     }
 
     public Channel findChannelById(UUID id) {
 
         return channels.stream()
                 .filter(channel -> channel.getChannelId().equals(id))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
     }
 
     public List<Channel> findAllChannels() {
