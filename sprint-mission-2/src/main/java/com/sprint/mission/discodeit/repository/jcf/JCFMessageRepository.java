@@ -9,24 +9,21 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
-    public static List<Message> MessageDate;
+    public final List<Message> MessageDate;
 
     public JCFMessageRepository() {
         MessageDate = new ArrayList<Message>();
     }
 
-    public Message createMessage(User sender, String message) {
-        Message newMessage = new Message(sender, message);
-        MessageDate.add(newMessage);
-        return newMessage;
+    public void createMessage(Message message) {
+        MessageDate.add(message);
     }
 
 
     public Message findMessageById(UUID id) {
         return MessageDate.stream()
                 .filter(message -> message.getMessageId().equals(id))
-                .toList()
-                .get(0);
+                .findAny().orElse(null);
     }
 
     public List<Message> findAllMessages() {
