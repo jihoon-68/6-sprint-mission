@@ -22,18 +22,15 @@ public class FileChannelRepository implements ChannelRepository {
         instance.init(directory);
     }
 
-    public Channel createChannel(String name, User root) {
-        Channel channel =new Channel(name, root);
+    public void createChannel(Channel channel) {
         instance.save(filePaths(channel), channel);
-        return channel;
     }
 
     public Channel findChannelById(UUID id) {
         List<Channel> channelList = instance.load(directory);
         return channelList.stream()
                 .filter(channel -> channel.getChannelId().equals(id))
-                .toList()
-                .get(0);
+                .findAny().orElse(null);
     }
 
     public List<Channel> findAllChannels() {
