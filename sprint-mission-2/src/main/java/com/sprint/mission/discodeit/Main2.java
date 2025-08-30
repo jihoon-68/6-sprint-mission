@@ -14,7 +14,7 @@ import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 
-public class Main1 {
+public class Main2 {
 
     static User setupUser(BasicUserService basicUserService) {
         return basicUserService.create("woody",20 ,"woody@codeit.com");
