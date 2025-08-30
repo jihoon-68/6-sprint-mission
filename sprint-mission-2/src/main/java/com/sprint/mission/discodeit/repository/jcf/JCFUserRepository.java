@@ -8,30 +8,28 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
-    private static List<User> userDeat;
+    private final List<User> userDeat;
 
     public  JCFUserRepository() {
         userDeat = new ArrayList<User>();
     }
 
-    public User createUser(String username, int age, String email) {
-        User user = new User(username, age, email);
+    public void createUser(User user) {
         userDeat.add(user);
-        return user;
     }
 
     public User findUserById(UUID id) {
         return userDeat.stream()
                 .filter(user-> user.getUserId().equals(id))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
     }
 
     public User findUserByUserEmail(String userEmail) {
         return userDeat.stream()
                 .filter(user -> user.getEmail().equals(userEmail))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
     }
 
     public List<User> findAllUsers() {
