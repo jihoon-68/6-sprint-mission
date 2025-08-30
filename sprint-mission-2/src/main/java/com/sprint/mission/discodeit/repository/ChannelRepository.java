@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    public Channel createChannel(String name, User root);
+    public void createChannel(Channel channel);
     public Channel findChannelById(UUID id);
     public List<Channel> findAllChannels();
     public void updateChannel(Channel channel);
