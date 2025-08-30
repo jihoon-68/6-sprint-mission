@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
-    private static final Path directory = Paths.get("/Users/mac/IdeaProjects/6-sprint-mission/sprint-mission-2/src/main/resources/ChannelDate");
+    private static final Path directory = Paths.get("/Users/mac/IdeaProjects/6-sprint-mission/sprint-mission-2/src/main/resources/MessagesDate");
     private static final FileEdit instance = new  FileEdit();
 
     private Path filePaths(Message message) {
@@ -21,18 +21,16 @@ public class FileMessageRepository implements MessageRepository {
         instance.init(directory);
     }
 
-    public Message createMessage(User sender, String message) {
-        Message newMessage = new Message(sender, message);
-        instance.save(filePaths(newMessage), newMessage);
-        return newMessage;
+    public void createMessage(Message message) {
+        instance.save(filePaths(message), message);
     }
 
     public Message findMessageById(UUID id) {
         List<Message> messageList = instance.load(directory);
         return messageList.stream()
                 .filter(message -> message.getMessageId().equals(id))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
     }
 
     public List<Message> findAllMessages() {
