@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface UserRepository {
 
     //기존 CRUD
-    public User createUser(String username, int age , String email);
+    public void createUser(User user);
     public User findUserById(UUID id);
     public User findUserByUserEmail(String userEmail);
     public List<User> findAllUsers();
