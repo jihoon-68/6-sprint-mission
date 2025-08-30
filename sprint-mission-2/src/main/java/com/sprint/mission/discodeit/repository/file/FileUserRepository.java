@@ -11,11 +11,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
-    private static final Path directory = Paths.get("/Users/mac/IdeaProjects/6-sprint-mission/sprint-mission-2/src/main/resources/ChannelDate");
+    private static final Path directory = Paths.get("/Users/mac/IdeaProjects/6-sprint-mission/sprint-mission-2/src/main/resources/UserDate");
     private static final FileEdit instance = new  FileEdit();
 
     private Path filePaths(User user) {
-
         return directory.resolve(user.getUserId().toString() + ".ser");
     }
 
@@ -23,11 +22,8 @@ public class FileUserRepository implements UserRepository {
         instance.init(directory);
     }
 
-    public User createUser(String username, int age, String email) {
-
-        User user = new User(username, age, email);
+    public void createUser(User user) {
         instance.save(filePaths(user),user);
-        return user;
     }
 
     public User findUserById(UUID id) {
@@ -35,16 +31,16 @@ public class FileUserRepository implements UserRepository {
         List<User> userList = instance.load(directory);
         return userList.stream()
                 .filter(user -> user.getUserId().equals(id))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
     }
 
     public User findUserByUserEmail(String userEmail) {
         List<User> userList = instance.load(directory);
         return userList.stream()
                 .filter(user -> user.getEmail().equals(userEmail))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
 
     }
 
