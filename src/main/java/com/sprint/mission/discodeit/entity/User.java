@@ -27,12 +27,6 @@ public class User extends Common {
     public String getPassword() { return password; }
     public UserStatus getStatus() { return status; }
 
-    // Setter
-    public void setUsername(String username) { this.username = username; }
-    public void setEmail(String email) { this.email = email; }
-    public void setPassword(String password) { this.password = password; }
-    public void setStatus(UserStatus status) { this.status = status; }
-
     // UserStatus Enum
     public enum UserStatus {
         ONLINE,
@@ -46,18 +40,6 @@ public class User extends Common {
         this.username = username != null ? username : this.username;
         this.email = email != null ? email : this.email;
         this.password = password != null ? password : this.password;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + getId() +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdatedAt() +
-                ", username=" + username +
-                ", email=" + email +
-                ", password=" + password +
-                ", status=" + status +
-                '}';
+        this.setUpdatedAt(System.currentTimeMillis());
     }
 }

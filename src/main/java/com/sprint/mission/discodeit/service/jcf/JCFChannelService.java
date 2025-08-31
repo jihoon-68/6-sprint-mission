@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data;
@@ -12,14 +11,7 @@ public class JCFChannelService implements ChannelService {
     private static JCFChannelService instance;
 
     private JCFChannelService() {
-        this.data = new ConcurrentHashMap<>();
-    }
-
-    public static synchronized JCFChannelService getInstance() {
-        if (instance == null) {
-            instance = new JCFChannelService();
-        }
-        return instance;
+        this.data = new HashMap<>();
     }
 
     @Override
@@ -30,35 +22,34 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<Channel> findById(UUID id) {
+    public Optional<Channel> readId(UUID id) {
         return Optional.ofNullable(data.get(id));
     }
 
     @Override
-    public Optional<Channel> findByTitle(String title) {
+    public List<Channel> readTitle(String title) {
         return data.values().stream()
-                .filter(channel -> channel.getTitle().equals(title))
-                .findFirst();
+                .filter(channel -> channel.getTitle().contains(title))
+                .toList();
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<Channel> readAll() {
         return new ArrayList<>(data.values());
     }
 
     @Override
-    public Optional<Channel> update(UUID id, String title, String description) {
+    public boolean update(UUID id, String title, String description) {
         Channel channel = data.get(id);
         if (channel == null) {
-            return Optional.empty();
+            return false;
         }
-
         channel.update(title, description);
-        return Optional.of(channel);
+        return true;
     }
 
     @Override
-    public void delete(UUID id) {
-        data.remove(id);
+    public boolean delete(UUID id) {
+        return data.remove(id) != null;
     }
 }

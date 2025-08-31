@@ -10,18 +10,12 @@ import java.util.UUID;
 
 
 public interface MessageService {
-    // Create
-    Message create(String content, User user, Channel channel, Message.MessageType type);
-
-    // Read (single)
-    Optional<Message> findById(UUID id);
-
-    // Read (multiple)
-    List<Message> findAll();
-
-    // Update
-    Optional<Message> update(UUID id, String content);
-
-    // Delete
-    void delete(UUID id);
+    Message create(String content, UUID user, UUID channel, Message.MessageType type);
+    Optional<Message> readId(UUID id);
+    List<Message> readUser(User user);
+    List<Message> readChannel(Channel channel);
+    List<Message> readContent(String content);
+    List<Message> readAll();
+    boolean update(UUID id, String content);
+    boolean delete(UUID id);
 }

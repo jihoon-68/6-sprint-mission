@@ -6,7 +6,7 @@ package com.sprint.mission.discodeit.entity;
  * description: String
  * type: ChannelType(TEXT, VOICE)
  */
-public class Channel extends Common{
+public class Channel extends Common {
     private String title;
     private String description;
     private ChannelType type;
@@ -24,11 +24,6 @@ public class Channel extends Common{
     public String getDescription() { return description; }
     public ChannelType getType() { return type; }
 
-    // Setter
-    public void setTitle(String title) { this.title = title; }
-    public void setDescription(String description) { this.description = description; }
-    public void setType(ChannelType type) { this.type = type; }
-
     // enum
     public enum ChannelType {
         TEXT,
@@ -39,17 +34,6 @@ public class Channel extends Common{
     public void update(String title, String description) {
         this.title = title != null ? title : this.title;
         this.description = description != null ? description : this.description;
-    }
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id=" + getId() +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdatedAt() +
-                ", title=" + title +
-                ", description=" + description +
-                ", type=" + type +
-                '}';
+        this.setUpdatedAt(System.currentTimeMillis());
     }
 }

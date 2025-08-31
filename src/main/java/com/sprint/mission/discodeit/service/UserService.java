@@ -7,20 +7,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    // Create
     User create(String username, String email, String password);
-
-    // Read (single)
-    Optional<User> findById(UUID id);
-    Optional<User> findByUsername(String username);
-    Optional<User> findByEmail(String email);
-
-    // Read (multiple)
-    List<User> findAll();
-
-    // Update
-    Optional<User> update(UUID id, String username, String email, String password);
-
-    // Delete
-    void delete(UUID id);
+    Optional<User> readId(UUID id);
+    Optional<User> readUsername(String username);
+    Optional<User> readEmail(String email);
+    List<User> readAll();
+    boolean update(UUID id, String username, String email, String password);
+    boolean delete(UUID id);
 }

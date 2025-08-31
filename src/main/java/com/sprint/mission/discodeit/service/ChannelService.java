@@ -7,19 +7,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
-    // Create
     Channel create(String title, String description, Channel.ChannelType type);
-
-    // Read (single)
-    Optional<Channel> findById(UUID id);
-    Optional<Channel> findByTitle(String title);
-
-    // Read (multiple)
-    List<Channel> findAll();
-
-    // Update
-    Optional<Channel> update(UUID id, String title, String description);
-
-    // Delete
-    void delete(UUID id);
+    Optional<Channel> readId(UUID id);
+    List<Channel> readTitle(String title);
+    List<Channel> readAll();
+    boolean update(UUID id, String title, String description);
+    boolean delete(UUID id);
 }
