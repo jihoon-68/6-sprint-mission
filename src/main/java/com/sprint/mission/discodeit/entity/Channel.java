@@ -1,38 +1,28 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Channel {
-    private UUID id;
-    private long createdAt;
-    private long updatedAt;
-    private String ChName;
+public class Channel extends BaseEntity {
+    private ChannelType type;
+    private String name;
+    private String description;
 
-    public Channel(String ChName) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
-        this.ChName = ChName;
+    public Channel(ChannelType type, String name, String description) {
+        super();
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
-    public UUID getId() {
-        return id;
-    }
+    public ChannelType getType() { return type; }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getChName() {
-        return ChName;
-    }
-
-    public void update(String newChName) {
-        this.ChName = newChName;
-        this.updatedAt = System.currentTimeMillis();
+    public void update(ChannelType type, String name, String description) {
+        this.type = type;
+        this.name = name;
+        this.description = description;
+        super.touch();
     }
 }

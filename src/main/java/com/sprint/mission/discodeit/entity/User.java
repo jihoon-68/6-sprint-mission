@@ -1,38 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class User {
-    private UUID id;
-    private long createdAt;
-    private long updatedAt;
-    private String name;
+public class User extends BaseEntity{
+    private String username;
+    private String email;
+    private String password;
 
-    public User(String name) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
-        this.name = name;
+
+    public User(String username, String email, String password) {
+        super();
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
+    public String getUsername() { return username; }
+    public String getEmail() { return email; }
+    public String getPassword() { return password; }
 
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
 
-    public String getName() {
-        return name;
-    }
-
-    public void update(String newName) {
-        this.name = newName;
-        this.updatedAt = System.currentTimeMillis();
+    public void update(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        super.touch();
     }
 }

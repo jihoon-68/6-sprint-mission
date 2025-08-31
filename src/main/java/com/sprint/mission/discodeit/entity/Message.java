@@ -2,45 +2,26 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class Message {
-    private UUID id;
-    private long createdAt;
-    private long updatedAt;
-    private String msg;
-    private UUID userId; // DI를 위한 필드 추가
-    private UUID channelId; // DI를 위한 필드 추가
+public class Message extends BaseEntity {
+    private String content;
+    private UUID channelId;
+    private UUID authorId;
 
-    public Message(String msg,  UUID userId, UUID channelId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
-        this.msg = msg;
-        this.userId = userId;
+    public Message(String content, UUID channelId, UUID authorId) {
+        super();
+        this.content = content;
         this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public UUID getUserId() { return userId; }
-
+    public String getContent() { return content; }
     public UUID getChannelId() { return channelId; }
+    public UUID getAuthorId() { return authorId; }
 
-    public void update(String newMsg) {
-        this.msg = newMsg;
-        this.updatedAt = System.currentTimeMillis();
+    public void update(String content, UUID channelId, UUID authorId) {
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
+        super.touch();
     }
 }

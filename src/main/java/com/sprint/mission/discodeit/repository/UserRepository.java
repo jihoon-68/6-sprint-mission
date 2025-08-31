@@ -1,0 +1,13 @@
+package com.sprint.mission.discodeit.repository;
+
+import com.sprint.mission.discodeit.entity.User;
+
+import java.util.*;
+import java.util.UUID;
+
+public interface UserRepository {
+    User save(User user);
+    Optional<User> findById(UUID id);
+    List<User> findAll();
+    boolean deleteById(UUID id);
+}
