@@ -1,8 +1,19 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannel;
+import com.sprint.mission.discodeit.service.jcf.JCFMessage;
+import com.sprint.mission.discodeit.service.jcf.JCFUser;
+
 public class Main1 {
-    public static void main(String[] args) {
-          /* JCF 저장형식 구현방식
+
+    public static void jcfMain(){
+        //JCF 저장형식 구현방식
         JCFUser jcfUser = new JCFUser();
         JCFMessage jcfMessage = new JCFMessage();
         JCFChannel jcfChannel = new JCFChannel(jcfUser,jcfMessage);
@@ -49,10 +60,10 @@ public class Main1 {
 
         //서버 등록
         System.out.println("================서버 등록=================");
-        Channel channel1 = jcfChannel.createChannel("1팀",leeUser.getUsername());
-        Channel channel2 =jcfChannel.createChannel("2팀",parkUser.getUsername());
-        Channel channel3 =jcfChannel.createChannel("3팀",namgungUser.getUsername());
-        Channel channel4 =jcfChannel.createChannel("4팀",baeUser.getUsername());
+        Channel channel1 = jcfChannel.createChannel("1팀",leeUser);
+        Channel channel2 =jcfChannel.createChannel("2팀",parkUser);
+        Channel channel3 =jcfChannel.createChannel("3팀",namgungUser);
+        Channel channel4 =jcfChannel.createChannel("4팀",baeUser);
 
         System.out.println("서버 등록: 1팀,lee");
         System.out.println("서버 등록: 2팀,park");
@@ -78,11 +89,11 @@ public class Main1 {
         System.out.println();
 
         System.out.println("================메시지 등록=================");
-        Message message01 = jcfMessage.createMessage(leeUser.getUsername(),"등록 테스트 케이스 01");
-        Message message02 = jcfMessage.createMessage(parkUser.getUsername(),"등록 테스트 케이스 02");
-        Message message03 = jcfMessage.createMessage(namgungUser.getUsername(),"등록 테스트 케이스 03");
-        Message message04 = jcfMessage.createMessage(baeUser.getUsername(),"등록 테스트 케이스 04");
-        Message message05 = jcfMessage.createMessage(leeUser.getUsername(),"등록 테스트 케이스 05");
+        Message message01 = jcfMessage.createMessage(leeUser,"등록 테스트 케이스 01");
+        Message message02 = jcfMessage.createMessage(parkUser,"등록 테스트 케이스 02");
+        Message message03 = jcfMessage.createMessage(namgungUser,"등록 테스트 케이스 03");
+        Message message04 = jcfMessage.createMessage(baeUser,"등록 테스트 케이스 04");
+        Message message05 = jcfMessage.createMessage(leeUser,"등록 테스트 케이스 05");
 
         System.out.println(message01);
         System.out.println(message02);
@@ -92,7 +103,7 @@ public class Main1 {
 
 
         System.out.println("================메시지 조회(단건,다건)=================");
-        Message newMessage = jcfMessage.createMessage(namgungUser.getUsername(),"등록 테스트 케이지06");
+        Message newMessage = jcfMessage.createMessage(namgungUser,"등록 테스트 케이지06");
         System.out.println(jcfMessage.findMessageById(newMessage.getMessageId()));
         System.out.println(jcfMessage.findAllMessages());
 
@@ -104,6 +115,7 @@ public class Main1 {
         System.out.println("================메시지 삭제=================");
         jcfMessage.deleteMessage(newMessage.getMessageId());
         System.out.println(jcfMessage.findAllMessages());
+
 
 
         System.out.println("================도메인 의존성 주입=================");
@@ -146,8 +158,8 @@ public class Main1 {
         System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelMessages());
         System.out.println("================================================");
 
-
-
+    }
+    public static void fileMain(){
         FileUserService fileUserService = new FileUserService();
         FileMessageService fileMessageService = new FileMessageService();
         FileChannelService fileChannelService = new FileChannelService();
@@ -194,10 +206,10 @@ public class Main1 {
 
         //서버 등록
         System.out.println("================서버 등록=================");
-        Channel channel1 = fileChannelService.createChannel("1팀",leeUser.getUsername());
-        Channel channel2 =fileChannelService.createChannel("2팀",kimUser.getUsername());
-        Channel channel3 =fileChannelService.createChannel("3팀",namgungUser.getUsername());
-        Channel channel4 =fileChannelService.createChannel("4팀",baeUser.getUsername());
+        Channel channel1 = fileChannelService.createChannel("1팀",leeUser);
+        Channel channel2 =fileChannelService.createChannel("2팀",kimUser);
+        Channel channel3 =fileChannelService.createChannel("3팀",namgungUser);
+        Channel channel4 =fileChannelService.createChannel("4팀",baeUser);
 
         System.out.println("서버 등록: 1팀,lee");
         System.out.println("서버 등록: 2팀,kim");
@@ -223,11 +235,11 @@ public class Main1 {
         System.out.println();
 
         System.out.println("================메시지 등록=================");
-        Message message01 = fileMessageService.createMessage(leeUser.getUsername(),"등록 테스트 케이스 01");
-        Message message02 = fileMessageService.createMessage(kimUser.getUsername(),"등록 테스트 케이스 02");
-        Message message03 = fileMessageService.createMessage(namgungUser.getUsername(),"등록 테스트 케이스 03");
-        Message message04 = fileMessageService.createMessage(baeUser.getUsername(),"등록 테스트 케이스 04");
-        Message message05 = fileMessageService.createMessage(leeUser.getUsername(),"등록 테스트 케이스 05");
+        Message message01 = fileMessageService.createMessage(leeUser,"등록 테스트 케이스 01");
+        Message message02 = fileMessageService.createMessage(kimUser,"등록 테스트 케이스 02");
+        Message message03 = fileMessageService.createMessage(namgungUser,"등록 테스트 케이스 03");
+        Message message04 = fileMessageService.createMessage(baeUser,"등록 테스트 케이스 04");
+        Message message05 = fileMessageService.createMessage(leeUser,"등록 테스트 케이스 05");
 
         System.out.println(message01);
         System.out.println(message02);
@@ -237,7 +249,7 @@ public class Main1 {
 
 
         System.out.println("================메시지 조회(단건,다건)=================");
-        Message newMessage = fileMessageService.createMessage(namgungUser.getUsername(),"등록 테스트 케이지06");
+        Message newMessage = fileMessageService.createMessage(namgungUser,"등록 테스트 케이지06");
         System.out.println(fileMessageService.findMessageById(newMessage.getMessageId()));
         System.out.println(fileMessageService.findAllMessages());
 
@@ -249,6 +261,12 @@ public class Main1 {
         System.out.println("================메시지 삭제=================");
         fileMessageService.deleteMessage(newMessage.getMessageId());
         System.out.println(fileMessageService.findAllMessages());
-        */
+    }
+
+    public static void main(String[] args) {
+        jcfMain();
+        fileMain();
+
+
     }
 }
