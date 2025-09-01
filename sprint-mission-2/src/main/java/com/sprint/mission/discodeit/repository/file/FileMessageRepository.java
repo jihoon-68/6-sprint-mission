@@ -42,6 +42,10 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     public void deleteMessage(UUID id) {
-        instance.delete(filePaths(findMessageById(id)));
+        Message message = this.findMessageById(id);
+        boolean isDelete = instance.delete(filePaths(message));
+        if(!isDelete){
+            throw new NullPointerException(message.getMessageId()+" 유저 삭제 실패");
+        }
     }
 }

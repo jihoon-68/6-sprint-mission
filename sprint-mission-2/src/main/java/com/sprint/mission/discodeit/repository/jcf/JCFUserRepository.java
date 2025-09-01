@@ -39,8 +39,7 @@ public class JCFUserRepository implements UserRepository {
     public void updateUser(User user) {
         int idx = userDeat.indexOf(user);
         if (idx == -1) {
-            System.out.println("해당 유저 없음");
-            return;
+            throw new NullPointerException("해당 유저 없음");
         }
         userDeat.set(idx, user);
     }
