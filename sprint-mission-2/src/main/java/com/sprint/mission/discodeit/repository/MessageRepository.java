@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageRepository {
-    public void createMessage(Message message);
-    public Message findMessageById(UUID id);
-    public List<Message> findAllMessages();
-    public void updateMessage(Message message);
-    public void deleteMessage(UUID id);
+    void createMessage(Message message);
+    Message findMessageById(UUID id);
+    List<Message> findAllMessages();
+    void updateMessage(Message message);
+    void deleteMessage(UUID id);
 
 }
