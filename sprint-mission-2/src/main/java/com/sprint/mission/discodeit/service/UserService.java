@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    public User createUser(String username, int age , String email);
-    public User findUserById(UUID id);
-    public User findUserByUserEmail(String userEmail);
-    public List<User> findAllUsers();
-    public void updateUser(User user);
-    public void deleteUser(UUID id);
+      User createUser(String username, int age , String email);
+      User findUserById(UUID id);
+      User findUserByUserEmail(String userEmail);
+      List<User> findAllUsers();
+      void updateUser(User user);
+      void deleteUser(UUID id);
 }
