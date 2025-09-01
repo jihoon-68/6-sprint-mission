@@ -53,6 +53,10 @@ public class FileUserRepository implements UserRepository {
     }
 
     public void deleteUser(UUID id) {
-        instance.delete(filePaths(findUserById(id)));
+        User user = findUserById(id);
+        boolean isDelete = instance.delete(filePaths(user));
+        if(!isDelete){
+            throw new NullPointerException(user.getEmail()+" 유저 삭제 실패");
+        }
     }
 }

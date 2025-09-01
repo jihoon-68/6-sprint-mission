@@ -42,7 +42,11 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     public void deleteChannel(UUID id) {
-        instance.delete(filePaths(findChannelById(id)));
+        Channel channel = findChannelById(id);
+        boolean isDelete = instance.delete(filePaths(channel));
+        if(!isDelete){
+            throw new NullPointerException(channel.getChannelId()+" 유저 삭제 완료");
+        }
     }
 
     public void addMessageToChannel(Channel channel, Message message) {

@@ -23,7 +23,8 @@ public class JCFMessageRepository implements MessageRepository {
     public Message findMessageById(UUID id) {
         return MessageDate.stream()
                 .filter(message -> message.getMessageId().equals(id))
-                .findAny().orElse(null);
+                .findAny()
+                .orElse(null);
     }
 
     public List<Message> findAllMessages() {
@@ -32,12 +33,13 @@ public class JCFMessageRepository implements MessageRepository {
 
 
     public void updateMessage(Message message) {
+
         int idx = MessageDate.indexOf(message);
         if (idx == -1) {
-            System.out.println("해당 메시지 없음");
-            return;
+            throw new NullPointerException("해당 메시지 없습니다.");
         }
         MessageDate.set(idx, message);
+
     }
 
     public void deleteMessage(UUID id) {
