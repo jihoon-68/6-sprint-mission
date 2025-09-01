@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Channel  implements Serializable{
+public class Channel extends BaseEntity implements Serializable{
     private static final long serialVersionUID = 3L;
     private final UUID id;
     private String channelName;
@@ -21,12 +21,7 @@ public class Channel  implements Serializable{
         this.root = root;
         this.users = new ArrayList<>();
         this.messages = new ArrayList<>();
-        this.created = System.currentTimeMillis();
-    }
-
-    //서버에 변경이 생기면 업데이트 시간 변경
-    public void updatedChannel() {
-        this.updated = System.currentTimeMillis();
+        this.created = setTime();
     }
 
     //Getter
@@ -41,11 +36,11 @@ public class Channel  implements Serializable{
     //update
     public void updateChanelName(String channelName) {
         this.channelName = channelName;
-        updatedChannel();
+        this.updated = setTime();
     }
     public void updateChannelRoot(User root) {
         this.root = root;
-        updatedChannel();
+        this.updated = setTime();
     }
 
     //서버에 본연에 속성이 변경 시에만 업데이트 갱신
@@ -63,7 +58,8 @@ public class Channel  implements Serializable{
                 "서버 관리자: " + this.root.getUsername() + "\n" +
                 "서버 인원: " + this.users + "\n" +
                 "서버 메세지: " + this.messages + "\n"+
-                "서버 생성일: " + this.channelName + "\n";
+                "서버 생성일자: " + this.channelName + "\n" +
+                "서버 수정일자: " + this.created + "\n";
 
     }
 
