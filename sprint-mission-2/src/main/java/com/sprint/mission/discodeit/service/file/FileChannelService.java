@@ -33,22 +33,25 @@ public class FileChannelService implements ChannelService {
         List<Channel> channels = instance.load(directory);
         return channels.stream()
                 .filter(ch -> ch.getChannelId().equals(id))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
     };
     public List<Channel> findAllChannels(){
+        List<Channel> channels = instance.load(directory);
+        if (channels.isEmpty()){
+            throw new NullPointerException("현재 채널없음");
+        }
         return instance.load(directory);
     };
     public void updateChannel(Channel channel){
+
         instance.save(filePath(channel), channel);
     };
     public void deleteChannel(UUID id){
         Channel channel = findChannelById(id);
         boolean isDelete = instance.delete(filePath(channel));
-        if(isDelete){
-            System.out.println(channel.getChannelId()+" 유저 삭제 완료");
-        }else {
-            System.out.println(channel.getChannelId()+" 유저 삭제 실패");
+        if(!isDelete){
+            throw new NullPointerException(channel.getChannelId()+" 유저 삭제 완료");
         }
     };
 

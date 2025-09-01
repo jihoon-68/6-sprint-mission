@@ -18,36 +18,32 @@ public class JCFUser implements UserService {
         return newUser;
     };
     public User findUserByUserEmail(String userEmail) {
-        User target = null;
-        for (User user : userData) {
-            if (user.getEmail().equals(userEmail)) {
-                target = user;
-                break;
-            }
-        }
-        return target;
+
+        return userData.stream()
+                .filter(user -> user.getEmail().equals(userEmail))
+                .findAny()
+                .orElse(null);
     }
 
     public User findUserById(UUID id){
-        User target = null;
-        for (User user : userData){
-            if(user.getUserId().equals(id)){
-                target = user;
-                break;
-            }
-        }
-        return target;
+
+        return userData.stream()
+                .filter(user -> user.getUserId().equals(id))
+                .findAny()
+                .orElse(null);
     };
 
     public List<User> findAllUsers(){
+        if(userData.isEmpty()){
+            throw new NullPointerException("현재 유저 없습니다.");
+        }
         return userData;
     };
 
     public void updateUser(User user){
         int idx = userData.indexOf(user);
         if(idx == -1){
-            System.out.println("사용자를 찾을수 없습니다.");
-            return;
+            throw new NullPointerException("해당 유저 없음");
         }
         userData.set(idx, user);
     };
@@ -55,10 +51,8 @@ public class JCFUser implements UserService {
     public void deleteUser(UUID id){
         User user = findUserById(id);
         if(user == null){
-            System.out.println("유저를 삭제 못 했습니다.");
-            return;
+            throw new NullPointerException("삭제 오류 발생");
         }
         userData.remove(user);
-        System.out.println("유저를 삭제 했습니다");
     };
 }
