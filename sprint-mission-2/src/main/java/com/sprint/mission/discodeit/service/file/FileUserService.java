@@ -36,18 +36,22 @@ public class FileUserService implements UserService {
         List<User> users = instance.load(directory);
         return users.stream()
                 .filter(user -> user.getUserId().equals(id))
-                .toList()
-                .get(0);
+                .findFirst()
+                .orElse(null);
     };
     public User findUserByUserEmail(String userEmail){
         List<User> users = instance.load(directory);
         return users.stream()
                 .filter(user -> user.getEmail().equals(userEmail))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
     };
     public List<User> findAllUsers(){
-        return instance.load(directory);
+        List<User> users = instance.load(directory);
+        if (users.isEmpty()){
+            throw new NullPointerException("현재 유저 없음");
+        }
+        return users;
     };
     public void updateUser(User user){
         instance.save(filePath(user),user);
@@ -55,10 +59,8 @@ public class FileUserService implements UserService {
     public void deleteUser(UUID id){
         User user = findUserById(id);
         boolean isDelete = instance.delete(filePath(user));
-        if(isDelete){
-            System.out.println(user.getEmail()+" 유저 삭제 완료");
-        }else {
-            System.out.println(user.getEmail()+" 유저 삭제 실패");
+        if(!isDelete){
+            throw new NullPointerException(user.getEmail()+" 유저 삭제 실패");
         }
     };
 

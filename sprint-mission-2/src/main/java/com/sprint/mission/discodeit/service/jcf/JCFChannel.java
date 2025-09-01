@@ -28,24 +28,24 @@ public class JCFChannel  implements ChannelService {
     };
 
     public Channel findChannelById(UUID id){
-        Channel target = null;
-        for (Channel channel : channelData){
-            if(channel.getChannelId().equals(id)){
-                target = channel;
-            }
-        }
-        return target;
+
+        return channelData.stream()
+                .filter(channel -> channel.getChannelId().equals(id))
+                .findFirst()
+                .orElse(null);
     };
 
     public List<Channel> findAllChannels(){
+        if(channelData.isEmpty()){
+            throw new NullPointerException("현재 채넗 없습니다.");
+        }
         return channelData;
     };
 
     public void updateChannel(Channel channel){
         int idx = channelData.indexOf(channel);
         if(idx == -1){
-            System.out.println("채널을 찾을수 없습니다");
-            return;
+            throw new NullPointerException("해당 채널을 없습니다");
         }
         channelData.set(idx, channel);
     };
@@ -53,11 +53,9 @@ public class JCFChannel  implements ChannelService {
     public void deleteChannel(UUID id){
         Channel channel = findChannelById(id);
         if(channel == null){
-            System.out.println("채널을 찾을수 없습니다");
-            return;
+            throw new NullPointerException("삭제 오류 발생");
         }
         channelData.remove(channel);
-        System.out.println("체널을 삭제 했습니다");
     };
 
     //서버 유저 추가
