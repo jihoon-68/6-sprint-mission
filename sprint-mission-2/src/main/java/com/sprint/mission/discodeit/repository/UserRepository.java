@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -11,7 +10,7 @@ public interface UserRepository {
     //기존 CRUD
     void createUser(User user);
     User findUserById(UUID id);
-    User findUserByUserEmail(String userEmail);
+    User findUserByEmail(String userEmail);
     List<User> findAllUsers();
     void updateUser(User user);
     void deleteUser(UUID id);
