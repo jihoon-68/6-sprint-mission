@@ -33,10 +33,14 @@ public class FileMessageService implements MessageService {
         List<Message> messagesList = instance.load(directory);
         return messagesList.stream()
                 .filter(message -> message.getMessageId().equals(id))
-                .toList()
-                .get(0);
+                .findAny()
+                .orElse(null);
     };
     public List<Message> findAllMessages(){
+        List<Message> messagesList = instance.load(directory);
+        if(messagesList.isEmpty()){
+            throw new NullPointerException("현재 메시지없음");
+        }
         return instance.load(directory);
     };
     public void updateMessage(Message message){
@@ -45,10 +49,8 @@ public class FileMessageService implements MessageService {
     public void deleteMessage(UUID id){
         Message message = this.findMessageById(id);
         boolean isDelete = instance.delete(filePaths(message));
-        if(isDelete){
-            System.out.println(message.getMessageId()+" 유저 삭제 완료");
-        }else {
-            System.out.println(message.getMessageId()+" 유저 삭제 실패");
+        if(!isDelete){
+            throw new NullPointerException(message.getMessageId()+" 유저 삭제 실패");
         }
 
     };

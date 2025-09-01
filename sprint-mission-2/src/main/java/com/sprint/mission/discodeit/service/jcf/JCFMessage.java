@@ -23,36 +23,36 @@ public class JCFMessage implements MessageService {
     };
 
     public Message findMessageById(UUID id){
-        Message target = null;
-        for(Message m : messageData){
-            if(m.getMessageId().equals(id)){
-                target = m;
-            }
-        }
-        return  target;
+
+        return  messageData.stream()
+                .filter(message -> message.getMessageId().equals(id))
+                .findAny()
+                .orElse(null);
     };
 
     public List<Message> findAllMessages(){
+
+        if(messageData.isEmpty()){
+            throw new NullPointerException("현재 메시지 없습니다.");
+        }
         return messageData;
     };
 
     public void updateMessage(Message message){
         int idx = messageData.indexOf(message);
         if(idx == -1){
-            System.out.println("메세지를 찾지 못했습니다");
-            return;
+            throw new NullPointerException("해당 메시지 없습니다.");
         }
         messageData.set(idx,message);
+
     };
 
     public void deleteMessage(UUID id){
         Message message = this.findMessageById(id);
         if(message == null){
-            System.out.println("메세지를 삭제 못 했습니다.");
-            return;
+            throw new NullPointerException("삭제 오류 발생");
         }
         messageData.remove(message);
-        System.out.println("메세지를 삭제 했습니다");
     }
 
 }
