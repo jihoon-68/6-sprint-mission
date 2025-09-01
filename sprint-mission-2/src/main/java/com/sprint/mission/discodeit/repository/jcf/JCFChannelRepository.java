@@ -36,10 +36,10 @@ public class JCFChannelRepository implements ChannelRepository {
     public void updateChannel(Channel channel) {
         int idx = channels.indexOf(channel);
         if (idx == -1) {
-            System.out.println("해당 유저 없음");
-            return;
+            throw new NullPointerException("해당 채널을 없습니다");
         }
         channels.set(idx, channel);
+
     }
 
     public void deleteChannel(UUID id) {
