@@ -35,7 +35,7 @@ public class Main1 {
 
         //유저 조회(단건,다건)
         System.out.println("================유저 조회(단건,다건)=================");
-        User kimUser = jcfUser.findUserByUserEmail("kim01@codeit.com");
+        User kimUser = jcfUser.findUserByEmail("kim01@codeit.com");
         System.out.println(kimUser);
         System.out.println(jcfUser.findAllUsers());
 
@@ -53,10 +53,10 @@ public class Main1 {
         System.out.println();
 
         //서버 생성을 위한 유저형의 유저변수 생성
-        User leeUser = jcfUser.findUserByUserEmail("lee02@codeit.com");
-        User parkUser = jcfUser.findUserByUserEmail("park03@codeit.com");
-        User namgungUser = jcfUser.findUserByUserEmail("namgung04@codeit.com");
-        User baeUser = jcfUser.findUserByUserEmail("bae05@codeit.com");
+        User leeUser = jcfUser.findUserByEmail("lee02@codeit.com");
+        User parkUser = jcfUser.findUserByEmail("park03@codeit.com");
+        User namgungUser = jcfUser.findUserByEmail("namgung04@codeit.com");
+        User baeUser = jcfUser.findUserByEmail("bae05@codeit.com");
 
         //서버 등록
         System.out.println("================서버 등록=================");
@@ -180,7 +180,7 @@ public class Main1 {
 
         //유저 조회(단건,다건)
         System.out.println("================유저 조회(단건,다건)=================");
-        User kimUser = fileUserService.findUserByUserEmail("kim01@codeit.com");
+        User kimUser = fileUserService.findUserByEmail("kim01@codeit.com");
         System.out.println(kimUser);
         System.out.println(fileUserService.findAllUsers());
 
@@ -193,16 +193,16 @@ public class Main1 {
 
         //유저 삭제
         System.out.println("================유저 삭제=================");
-        User pakrUser = fileUserService.findUserByUserEmail("park03@codeit.com");
+        User pakrUser = fileUserService.findUserByEmail("park03@codeit.com");
         fileUserService.deleteUser(pakrUser.getUserId());
         System.out.println(fileUserService.findAllUsers());
 
         System.out.println();
 
         //서버 생성을 위한 유저형의 유저변수 생성
-        User leeUser = fileUserService.findUserByUserEmail("lee02@codeit.com");
-        User namgungUser = fileUserService.findUserByUserEmail("namgung04@codeit.com");
-        User baeUser = fileUserService.findUserByUserEmail("bae05@codeit.com");
+        User leeUser = fileUserService.findUserByEmail("lee02@codeit.com");
+        User namgungUser = fileUserService.findUserByEmail("namgung04@codeit.com");
+        User baeUser = fileUserService.findUserByEmail("bae05@codeit.com");
 
         //서버 등록
         System.out.println("================서버 등록=================");

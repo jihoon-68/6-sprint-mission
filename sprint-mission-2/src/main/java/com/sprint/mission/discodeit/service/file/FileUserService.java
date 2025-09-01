@@ -3,12 +3,10 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class FileUserService implements UserService {
     private static final Path directory = Paths.get("/Users/mac/IdeaProjects/6-sprint-mission/sprint-mission-2/src/main/resources/UserDate/");
@@ -27,10 +25,9 @@ public class FileUserService implements UserService {
     //사용자 별로 다른 파일? 아니면 같은 파일?
     //일단은 같은 파일 진행
 
-    public User createUser(String username, int age , String email){
+    public void createUser(String username, int age , String email){
         User newUser = new User(username, age, email);
         instance.save(filePath(newUser),newUser);
-        return newUser;
     };
     public User findUserById(UUID id){
         List<User> users = instance.load(directory);
@@ -39,7 +36,7 @@ public class FileUserService implements UserService {
                 .findFirst()
                 .orElse(null);
     };
-    public User findUserByUserEmail(String userEmail){
+    public User findUserByEmail(String userEmail){
         List<User> users = instance.load(directory);
         return users.stream()
                 .filter(user -> user.getEmail().equals(userEmail))

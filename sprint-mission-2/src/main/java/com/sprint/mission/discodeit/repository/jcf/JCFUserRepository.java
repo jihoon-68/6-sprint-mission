@@ -25,7 +25,7 @@ public class JCFUserRepository implements UserRepository {
                 .orElse(null);
     }
 
-    public User findUserByUserEmail(String userEmail) {
+    public User findUserByEmail(String userEmail) {
         return userDeat.stream()
                 .filter(user -> user.getEmail().equals(userEmail))
                 .findAny()

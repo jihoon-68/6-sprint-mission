@@ -35,7 +35,7 @@ public class FileUserRepository implements UserRepository {
                 .orElse(null);
     }
 
-    public User findUserByUserEmail(String userEmail) {
+    public User findUserByEmail(String userEmail) {
         List<User> userList = instance.load(directory);
         return userList.stream()
                 .filter(user -> user.getEmail().equals(userEmail))
