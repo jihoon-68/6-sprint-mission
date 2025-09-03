@@ -1,49 +1,40 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private final List<User> users;
+    private final Map<UUID, User> data;
 
-    public JCFUserRepository() {users = new ArrayList<>();}
-
-    @Override
-    public void save(User user) {
-        users.add(user);
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public void remove(User user) {
-        users.remove(user);
+    public User save(User user) {
+        this.data.put(user.getId(), user);
+        return user;
     }
 
     @Override
-    public Optional<User> findByName(String userName) {
-        return users.stream().filter(u->u.getUserName().equals(userName)).findFirst();
-    }
-
-    @Override
-    public Optional<User> findById(UUID userId) {
-        return users.stream().filter(u->u.getUuid().equals(userId)).findFirst();
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        if(users.isEmpty()) {
-            return List.of();
-        }
-        return new ArrayList<>(users);
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public boolean existsByName(String userName) {
-        return users.stream().anyMatch(u->u.getUserName().equals(userName));
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }

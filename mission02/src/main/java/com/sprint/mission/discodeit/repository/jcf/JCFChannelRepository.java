@@ -3,47 +3,38 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
-    private final List<Channel> channels;
+    private final Map<UUID, Channel> data;
 
-    public JCFChannelRepository() {channels = new ArrayList<>();}
-
-
-    @Override
-    public void save(Channel channel) {
-        channels.add(channel);
+    public JCFChannelRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public void remove(Channel channelId) {
-        channels.remove(channelId);
-    }
-
-    @Override
-    public List<Channel> findAll() {
-        if(channels.isEmpty()) {
-            return List.of();
-        }
-        return new ArrayList<>(channels);
+    public Channel save(Channel channel) {
+        this.data.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
     public Optional<Channel> findById(UUID id) {
-        return channels.stream().filter(c -> c.getUuid().equals(id)).findFirst();
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public Optional<Channel> findByName(String channelName) {
-        return channels.stream().filter(c -> c.getChannelName().equals(channelName)).findFirst();
+    public List<Channel> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public boolean existsByName(String channelName) {
-        return channels.stream().anyMatch(c -> c.getChannelName().equals(channelName));
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }

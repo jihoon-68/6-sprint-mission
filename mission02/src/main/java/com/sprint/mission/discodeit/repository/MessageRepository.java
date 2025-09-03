@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -8,16 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository {
-
-    void save(Message message);
-
-    void remove(Message message);
-
+    Message save(Message message);
+    Optional<Message> findById(UUID id);
     List<Message> findAll();
-
-    List<Message> findByReceiverId(UUID receiverId);
-
-    Optional<Message> findById(UUID messageId) throws NotFoundException;
-
-    boolean existsById(UUID messageId);
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
 }

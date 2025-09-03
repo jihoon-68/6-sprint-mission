@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.Exception.NotFoundException;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,52 +11,90 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FileUserRepository extends SaveAndLoadCommon implements Serializable, UserRepository {
-    private final Path path = Paths.get(System.getProperty("user.dir"), "users");
+public class FileUserRepository implements UserRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public FileUserRepository() {init(path);}
-
-    @Override
-    public void save(User user) {
-        Path filePath = path.resolve(user.getUuid().toString().concat(".ser"));
-        save(filePath, user);
-    }
-
-    @Override
-    public void remove(User user) throws NotFoundException {
-        try{
-            Path filePath = path.resolve(user.getUuid().toString().concat(".ser"));
-            Files.deleteIfExists(filePath);
-        } catch (Exception e){
+    public FileUserRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    @Override
-    public Optional<User> findByName(String userName) throws NotFoundException {
-        List<User> users = load(path);
-        return users.stream()
-                .filter(user -> user.getUserName().equals(userName))
-                .findFirst();
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public Optional<User> findById(UUID userId) throws NotFoundException {
-        List<User> users = load(path);
-        return users.stream()
-                .filter(user -> user.getUuid().equals(userId))
-                .findFirst();
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(userNullable);
     }
 
     @Override
     public List<User> findAll() {
-        List<User> users = load(path);
-        return users == null ? List.of() : users;
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public boolean existsByName(String userName) {
-        List<User> users = load(path);
-        return users.stream()
-                .anyMatch(user -> user.getUserName().equals(userName));
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

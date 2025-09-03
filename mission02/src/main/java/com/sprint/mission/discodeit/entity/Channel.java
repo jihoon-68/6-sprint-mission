@@ -1,45 +1,65 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends Common{
-    private String channelName;
-    private String channelDescription;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-    public Channel(String channelName, String channelDescription) {
-        super();
-        if(channelName == null || channelName.trim().isEmpty()) {
-            throw new IllegalArgumentException("채널 이름은 비어 있을 수 없습니다.");
-        }
-        if(channelDescription == null) {
-            throw new IllegalArgumentException("채널 설명은 빈칸일 수 없습니다.");
-        }
-        this.channelName = channelName;
-        this.channelDescription = channelDescription;
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private ChannelType type;
+    private String name;
+    private String description;
+
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
-    public String getChannelName() {return channelName;}
-    public void setChannelName(String channelName) {
-        if(channelName == null || channelName.trim().isEmpty()) {
-            throw new IllegalArgumentException("채널 이름은 비어 있을 수 없습니다.");
-        }
-        this.channelName = channelName;
+    public UUID getId() {
+        return id;
     }
 
-    public String getChannelDescription() {return channelDescription;}
-    public void setChannelDescription(String channelDescription) {
-        if(channelDescription == null) {
-            throw new IllegalArgumentException("채널 설명은 빈칸일 수 없습니다.");
-        }
-        this.channelDescription = channelDescription;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "channelName='" + channelName + '\'' +
-                ", channelDescription='" + channelDescription + '\'' +
-                ", uuid=" + getUuid() +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdatedAt() +
-                '}';
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public ChannelType getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
