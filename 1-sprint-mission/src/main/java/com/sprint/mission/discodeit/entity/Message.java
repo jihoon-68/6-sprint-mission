@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -20,18 +19,6 @@ public class Message extends Common implements Serializable {
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
     }
 
     public void update(String newContent) {
