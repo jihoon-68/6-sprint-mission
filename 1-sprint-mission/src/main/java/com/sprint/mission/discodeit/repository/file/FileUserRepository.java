@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -13,6 +14,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file"
+)
 public class FileUserRepository implements UserRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
@@ -61,6 +67,39 @@ public class FileUserRepository implements UserRepository {
             }
         }
         return Optional.ofNullable(userNullable);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return findUser(username, null);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return findUser(null, email);
+    }
+
+    private Optional<User> findUser(String username, String email) {
+        boolean isEmail = false;
+
+        if(username == null || username.trim().isEmpty())
+            isEmail = true;
+
+        try {
+            List<User> users = findAll();
+            if(users == null || users.isEmpty()) {
+                return Optional.empty();
+            }
+
+            if(isEmail == false) {
+                return users.stream().filter(u -> u.getUsername().equals(username)).findFirst();
+            }
+
+            return users.stream().filter(u -> u.getEmail().equals(email)).findFirst();
+        }
+        catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override

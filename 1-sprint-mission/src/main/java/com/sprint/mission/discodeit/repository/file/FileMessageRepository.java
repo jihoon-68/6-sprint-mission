@@ -2,17 +2,21 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file"
+)
 public class FileMessageRepository implements MessageRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
@@ -97,6 +101,19 @@ public class FileMessageRepository implements MessageRepository {
             Files.delete(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<Message> messages = findAll();
+        if (messages.isEmpty()) {
+            throw new IllegalStateException("No messages found");
+        }
+
+        Message message = messages.stream().filter(m -> m.getChannelId().equals(channelId)).findFirst().orElse(null);
+        if (message != null) {
+            deleteById(message.getId());
         }
     }
 }
