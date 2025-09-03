@@ -64,6 +64,42 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+
+        return findUser(username, null);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return findUser(null, email);
+    }
+
+    private Optional<User> findUser(String username, String email) {
+        boolean isEmail = false;
+
+        if(username == null || username.trim().isEmpty())
+            isEmail = true;
+
+        try
+        {
+            List<User> users = findAll();
+            if(users == null || users.isEmpty())
+            {
+                return Optional.empty();
+            }
+
+            if(isEmail == false)
+                return users.stream().filter(u -> u.getUsername().equals(username)).findFirst();
+
+            return users.stream().filter(u -> u.getEmail().equals(email)).findFirst();
+        }
+        catch (Exception e)
+        {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public List<User> findAll() {
         try {
             return Files.list(DIRECTORY)
