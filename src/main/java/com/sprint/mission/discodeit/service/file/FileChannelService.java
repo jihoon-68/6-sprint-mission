@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
-    private static final Path directory = Paths.get("/Users/mac/IdeaProjects/6-sprint-mission/sprint-mission-2/src/main/resources/ChannelDate");
+    private static final Path directory = Paths.get("./src/main/resources/ChannelDate");
     private static final FileEdit instance = new FileEdit();;
 
     private Path filePath(Channel channel) {

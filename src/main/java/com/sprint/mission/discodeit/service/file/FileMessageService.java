@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileMessageService implements MessageService {
-    private static final Path directory = Paths.get("/Users/mac/IdeaProjects/6-sprint-mission/sprint-mission-2/src/main/resources/MessagesDate");
+    private static final Path directory = Paths.get("./src/main/resources/MessagesDate");
     private static final FileEdit instance = new FileEdit();;
 
     private Path filePaths(Message message) {

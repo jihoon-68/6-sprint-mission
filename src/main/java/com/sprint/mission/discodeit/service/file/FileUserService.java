@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
-    private static final Path directory = Paths.get("/Users/mac/IdeaProjects/6-sprint-mission/sprint-mission-2/src/main/resources/UserDate/");
+    private static final Path directory = Paths.get("./src/main/resources/UserDate/");
     private static final FileEdit instance = new FileEdit();;
 
     //클래스 외부에서 접근할 필용가 없는 메소드라서 플라이비 함
