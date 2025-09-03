@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserStatusRepository implements UserStatusRepository {
@@ -13,12 +15,12 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus find(UUID userId) {
-        return null;
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return Optional.empty();
     }
 
     @Override
-    public List<UserStatus> findAll() {
-        return List.of();
+    public Map<UUID, UserStatus> findAll() {
+        return null;
     }
 }

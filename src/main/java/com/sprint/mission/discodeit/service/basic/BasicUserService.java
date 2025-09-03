@@ -12,9 +12,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,16 +44,36 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User find(UUID userId) {
+    public UserDto find(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-
-        UserDto userDto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), );
+        UserStatus status = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("Userstatus with id " + userId + " not found"));
+        UserDto userDto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), status.isOnlineUser());
+        return userDto;
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDto> findAll() {
+
+        List<User> users = userRepository.findAll();
+        Map<UUID, UserStatus> userStatuses = userStatusRepository.findAll();
+        if(users == null)
+            return null;
+
+        List<UserDto> userDtos = new ArrayList<>();
+        for (User user : users) {
+
+            boolean isOnline = false;
+            if(userStatuses != null && userStatuses.isEmpty() == false && userStatuses.containsKey(user.getId())) {
+                isOnline = userStatuses.get(user.getId()).isOnlineUser();
+            }
+
+            UserDto temp = new UserDto(user.getId(), user.getUsername(), user.getEmail(), isOnline);
+            userDtos.add(temp);
+        }
+        
+        return userDtos;
     }
 
     @Override
