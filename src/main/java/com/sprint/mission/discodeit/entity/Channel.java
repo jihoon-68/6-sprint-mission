@@ -8,7 +8,8 @@ import java.util.UUID;
 public class Channel extends Common implements Serializable {
 
     private String channelName;
-
+    //버전관리를 통해 호환성 확보
+    private static final long serialVersionUID = 1L;
 
 
     public Channel(String channelName) {

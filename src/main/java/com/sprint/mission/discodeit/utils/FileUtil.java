@@ -20,7 +20,8 @@ public class FileUtil
     {
         Map<UUID,V> map = new HashMap<>();
         try (FileInputStream f = new FileInputStream(fileName);
-             ObjectInputStream o = new ObjectInputStream(f)
+             BufferedInputStream b = new BufferedInputStream(f);
+             ObjectInputStream o = new ObjectInputStream(b)
         ) {
             Object obj = o.readObject();
             Map<Object,Object> temp = (Map<Object, Object>) obj;
@@ -109,7 +110,8 @@ public class FileUtil
     private <UUID,V> boolean saveDataToFile(String fileName, Map<UUID,V> map)
     {
         try (FileOutputStream f = new FileOutputStream(fileName);
-             ObjectOutputStream o = new ObjectOutputStream(f);
+             BufferedOutputStream bos = new BufferedOutputStream(f);
+             ObjectOutputStream o = new ObjectOutputStream(bos);
         )
         {
             o.writeObject(map);

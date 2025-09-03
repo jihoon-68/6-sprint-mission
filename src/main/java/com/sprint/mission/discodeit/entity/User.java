@@ -7,6 +7,8 @@ public class User extends Common implements Serializable {
 
     private String userName;
     private String email;
+    //버전관리를 통해 호환성 확보
+    private static final long serialVersionUID = 1L;
 
     public User(String userName, String email) {
         super();

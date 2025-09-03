@@ -10,6 +10,8 @@ public class Message extends Common implements Serializable {
     private UUID ownerUserId;
     private UUID channelId;
     private String message;
+    //버전관리를 통해 호환성 확보
+    private static final long serialVersionUID = 1L;
 
     public Message(String message, UUID ownerUserId, UUID toUserId, UUID channelId) {
         super();
