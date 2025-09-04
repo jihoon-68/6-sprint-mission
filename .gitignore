@@ -10,6 +10,7 @@
 .idea/**/shelf
 .idea
 .gradle
+.gradle/**
 build/*
 
 # AWS User-specific
