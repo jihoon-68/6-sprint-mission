@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,6 +82,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public Map<UUID, ReadStatus> findAll() {
+        if(Files.exists(Path.of(filePath)) == false)
+            return null;
+
         try (FileInputStream f = new FileInputStream(filePath);
              BufferedInputStream b = new BufferedInputStream(f);
              ObjectInputStream o = new ObjectInputStream(b)
@@ -95,7 +100,8 @@ public class FileReadStatusRepository implements ReadStatusRepository {
             }
 
             return map;
-        } catch (IOException | ClassNotFoundException e) {
+        }
+        catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

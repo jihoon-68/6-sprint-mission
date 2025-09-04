@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 @Repository
@@ -18,7 +20,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
         Map<UUID, UserStatus> map = findAll();
         if(map == null){
-            map =  new HashMap<>();
+            map = new HashMap<>();
         }
 
         map.put(userStatus.getId(), userStatus);
@@ -66,6 +68,9 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Map<UUID, UserStatus> findAll() {
+        if(Files.exists(Path.of(filePath)) == false)
+            return null;
+
         try (FileInputStream f = new FileInputStream(filePath);
              BufferedInputStream b = new BufferedInputStream(f);
              ObjectInputStream o = new ObjectInputStream(b)
@@ -81,7 +86,9 @@ public class FileUserStatusRepository implements UserStatusRepository {
             }
 
             return map;
-        } catch (IOException | ClassNotFoundException e) {
+        }
+        catch (IOException | ClassNotFoundException e) {
+
             throw new RuntimeException(e);
         }
     }

@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 @Repository
@@ -60,6 +62,9 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public Map<UUID, BinaryContent> findAll() {
+        if(Files.exists(Path.of(filePath)) == false)
+            return null;
+
         try (FileInputStream f = new FileInputStream(filePath);
              BufferedInputStream b = new BufferedInputStream(f);
              ObjectInputStream o = new ObjectInputStream(b)
@@ -75,7 +80,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
             }
 
             return map;
-        } catch (IOException | ClassNotFoundException e) {
+        }catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
