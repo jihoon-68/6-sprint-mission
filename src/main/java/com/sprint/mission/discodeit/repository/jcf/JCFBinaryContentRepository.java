@@ -2,20 +2,36 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
+
+    private final Map<UUID, BinaryContent> map = new HashMap<>();
+
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        return null;
+        map.put(binaryContent.getId(), binaryContent);
+        return binaryContent;
+    }
+
+    @Override
+    public Optional<BinaryContent> find(UUID id) {
+        return Optional.ofNullable(map.get(id));
     }
 
     @Override
     public Optional<BinaryContent> findByUserId(UUID userId) {
-        return Optional.empty();
+        return map.entrySet()
+                .stream()
+                .filter(x -> x.getValue().getProfileId().equals(userId))
+                .map(Map.Entry::getValue)
+                .findFirst();
     }
 
     @Override
@@ -24,7 +40,17 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void deleteByUserId(UUID id) {
+    public void deleteByUserId(UUID userId) {
+        map.entrySet().removeIf(x -> x.getValue().getProfileId().equals(userId));
+    }
 
+    @Override
+    public void deleteByMessageId(UUID messageId) {
+        map.entrySet().removeIf(x -> x.getValue().getMessageId().equals(messageId));
+    }
+
+    @Override
+    public void delete(UUID id) {
+        map.remove(id);
     }
 }

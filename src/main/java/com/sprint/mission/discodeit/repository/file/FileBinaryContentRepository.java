@@ -26,6 +26,16 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         return binaryContent;
     }
 
+    @Override
+    public Optional<BinaryContent> find(UUID id) {
+        Map<UUID, BinaryContent> map = findAll();
+        if(map == null){
+            map =  new HashMap<>();
+        }
+
+        return Optional.ofNullable(map.get(id));
+    }
+
     private void saveAll(Map<UUID, BinaryContent> map) {
         try (
                 FileOutputStream fos = new FileOutputStream(filePath);
@@ -76,14 +86,26 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         if(map == null || map.isEmpty())
             return;
 
-        UUID id = map.entrySet().stream()
-                .filter(x -> x.getValue().getProfileId().equals(userId))
-                .map(x -> x.getValue().getId())
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("BinaryContent not found"));
+        map.entrySet().removeIf(entry -> entry.getValue().getProfileId().equals(userId));
+        saveAll(map);
+    }
 
-        if(map.containsKey(id) == false)
+    @Override
+    public void deleteByMessageId(UUID messageId) {
+        HashMap<UUID, BinaryContent> map = (HashMap<UUID, BinaryContent>) findAll();
+        if(map == null || map.isEmpty())
             return;
+
+        map.entrySet().removeIf(entry -> entry.getValue().getMessageId().equals(messageId));
+        saveAll(map);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        Map<UUID, BinaryContent> map = findAll();
+        if(map == null){
+            map =  new HashMap<>();
+        }
 
         map.remove(id);
         saveAll(map);

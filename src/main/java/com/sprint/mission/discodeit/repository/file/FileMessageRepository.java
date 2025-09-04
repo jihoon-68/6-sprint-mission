@@ -99,4 +99,17 @@ public class FileMessageRepository implements MessageRepository {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<Message> messages = findAll();
+        if(messages.isEmpty()) {
+            throw new IllegalStateException("No messages found");
+        }
+
+        Message message = messages.stream().filter(m -> m.getChannelId().equals(channelId)).findFirst().orElse(null);
+        if(message != null) {
+            deleteById(message.getId());
+        }
+    }
 }

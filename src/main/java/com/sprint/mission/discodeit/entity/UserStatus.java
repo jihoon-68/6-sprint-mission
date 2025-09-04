@@ -31,4 +31,9 @@ public class UserStatus {
 
         return false;
     }
+
+    public void update()
+    {
+        updatedAt = Instant.now();
+    }
 }

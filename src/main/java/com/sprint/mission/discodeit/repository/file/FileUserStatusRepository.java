@@ -55,6 +55,16 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public Optional<UserStatus> find(UUID id) {
+        Map<UUID, UserStatus> map = findAll();
+        if(map == null || map.isEmpty()){
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(map.get(id));
+    }
+
+    @Override
     public Map<UUID, UserStatus> findAll() {
         try (FileInputStream f = new FileInputStream(filePath);
              BufferedInputStream b = new BufferedInputStream(f);
@@ -87,6 +97,19 @@ public class FileUserStatusRepository implements UserStatusRepository {
                                 .map(x -> x.getValue().getId())
                                 .findFirst()
                                 .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
+
+        if(map.containsKey(id) == false)
+            return;
+
+        map.remove(id);
+        saveAll(map);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        HashMap<UUID, UserStatus> map = (HashMap<UUID, UserStatus>) findAll();
+        if(map == null || map.isEmpty())
+            return;
 
         if(map.containsKey(id) == false)
             return;

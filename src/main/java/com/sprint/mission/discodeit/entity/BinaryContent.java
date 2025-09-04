@@ -10,16 +10,16 @@ public class BinaryContent {
     private static final long serialVersionUID = 1L;
     private UUID id;
     private UUID profileId;
-    private UUID attatchmentId;
+    private UUID messageId;
     private Instant createdAt;
     private String attatchmentUrl;
 
-    public BinaryContent(UUID profileId, UUID attatchmentId, String attatchmentUrl)
+    public BinaryContent(UUID profileId, UUID messageId, String attatchmentUrl)
     {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.profileId = profileId;
-        this.attatchmentId = attatchmentId;
+        this.messageId = messageId;
         this.attatchmentUrl = attatchmentUrl;
     }
 
