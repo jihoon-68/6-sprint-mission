@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
