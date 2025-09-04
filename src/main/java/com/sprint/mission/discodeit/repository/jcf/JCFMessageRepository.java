@@ -22,7 +22,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     public Message findMessageById(UUID id) {
         return MessageDate.stream()
-                .filter(message -> message.getMessageId().equals(id))
+                .filter(message -> message.getId().equals(id))
                 .findAny()
                 .orElse(null);
     }

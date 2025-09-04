@@ -25,7 +25,7 @@ public class JCFMessage implements MessageService {
     public Message findMessageById(UUID id){
 
         return  messageData.stream()
-                .filter(message -> message.getMessageId().equals(id))
+                .filter(message -> message.getId().equals(id))
                 .findAny()
                 .orElse(null);
     };

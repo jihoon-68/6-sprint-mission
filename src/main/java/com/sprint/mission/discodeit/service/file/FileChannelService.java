@@ -16,7 +16,7 @@ public class FileChannelService implements ChannelService {
     private static final FileEdit instance = new FileEdit();;
 
     private Path filePath(Channel channel) {
-        return directory.resolve(channel.getChannelId().toString().concat(".ser"));
+        return directory.resolve(channel.getId().toString().concat(".ser"));
     }
 
     public FileChannelService() {

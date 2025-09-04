@@ -27,7 +27,7 @@ public class JCFUser implements UserService {
     public User findUserById(UUID id){
 
         return userData.stream()
-                .filter(user -> user.getUserId().equals(id))
+                .filter(user -> user.getId().equals(id))
                 .findAny()
                 .orElse(null);
     };

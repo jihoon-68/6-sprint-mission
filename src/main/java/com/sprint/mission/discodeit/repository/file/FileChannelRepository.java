@@ -16,7 +16,7 @@ public class FileChannelRepository implements ChannelRepository {
     private static final FileEdit instance = new  FileEdit();
 
     private Path filePaths(Channel channel) {
-        return directory.resolve(channel.getChannelId().toString() + ".ser");
+        return directory.resolve(channel.getId().toString() + ".ser");
     }
 
     public FileChannelRepository(){
@@ -30,7 +30,7 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel findChannelById(UUID id) {
         List<Channel> channelList = instance.load(directory);
         return channelList.stream()
-                .filter(channel -> channel.getChannelId().equals(id))
+                .filter(channel -> channel.getId().equals(id))
                 .findAny().orElse(null);
     }
 
@@ -46,7 +46,7 @@ public class FileChannelRepository implements ChannelRepository {
         Channel channel = findChannelById(id);
         boolean isDelete = instance.delete(filePaths(channel));
         if(!isDelete){
-            throw new NullPointerException(channel.getChannelId()+" 유저 삭제 완료");
+            throw new NullPointerException(channel.getId()+" 유저 삭제 완료");
         }
     }
 

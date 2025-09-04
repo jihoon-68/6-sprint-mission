@@ -16,7 +16,7 @@ public class FileUserRepository implements UserRepository {
     private static final FileEdit instance = new  FileEdit();
 
     private Path filePaths(User user) {
-        return directory.resolve(user.getUserId().toString() + ".ser");
+        return directory.resolve(user.getId().toString() + ".ser");
     }
 
     public FileUserRepository() {
@@ -31,7 +31,7 @@ public class FileUserRepository implements UserRepository {
 
         List<User> userList = instance.load(directory);
         return userList.stream()
-                .filter(user -> user.getUserId().equals(id))
+                .filter(user -> user.getId().equals(id))
                 .findAny()
                 .orElse(null);
     }

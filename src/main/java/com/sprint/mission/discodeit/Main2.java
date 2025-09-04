@@ -26,7 +26,7 @@ public class Main2 {
 
     static void messageCreateTest(BasicMessageService basicMessageService, Channel channel, User author) {
         Message message = basicMessageService.create(channel,author,"안녕하세요");
-        System.out.println("메시지 생성: " + message.getMessageId());
+        System.out.println("메시지 생성: " + message.getId());
     }
 
     public static void main(String[] args) {
