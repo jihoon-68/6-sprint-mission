@@ -3,13 +3,14 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
+@Repository
 public class FileUserRepository implements UserRepository {
     private static final Path directory = Paths.get("./src/main/resources/UserDate");
     private static final FileEdit instance = new  FileEdit();
