@@ -23,4 +23,10 @@ public class BinaryContent {
         this.attatchmentUrl = attatchmentUrl;
     }
 
+    public void changeProfileImage(String attatchmentUrl)
+    {
+        if (attatchmentUrl != null && !attatchmentUrl.equals(this.attatchmentUrl)) {
+            this.attatchmentUrl = attatchmentUrl;
+        }
+    }
 }

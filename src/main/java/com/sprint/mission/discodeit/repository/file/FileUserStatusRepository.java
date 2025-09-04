@@ -21,27 +21,37 @@ public class FileUserStatusRepository implements UserStatusRepository {
             map =  new HashMap<>();
         }
 
+        map.put(userStatus.getId(), userStatus);
+        saveAll(map);
+        return userStatus;
+    }
+
+    private void saveAll(Map<UUID, UserStatus> map) {
         try (
                 FileOutputStream fos = new FileOutputStream(filePath);
                 BufferedOutputStream b = new BufferedOutputStream(fos);
                 ObjectOutputStream oos = new ObjectOutputStream(b)
         ) {
-            map.put(userStatus.getId(), userStatus);
             oos.writeObject(map);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return userStatus;
     }
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
         Map<UUID, UserStatus> map = findAll();
-        if(map == null || map.isEmpty() || map.containsKey(userId) == false){
+        if(map == null || map.isEmpty()){
             return Optional.empty();
         }
 
-        return Optional.ofNullable(map.get(userId));
+        UserStatus status = map.entrySet().stream()
+                            .filter(x -> x.getValue().getUserId().equals(userId))
+                            .map(x -> x.getValue())
+                            .findFirst()
+                            .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
+
+        return Optional.ofNullable(status);
     }
 
     @Override
@@ -64,5 +74,24 @@ public class FileUserStatusRepository implements UserStatusRepository {
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        HashMap<UUID, UserStatus> map = (HashMap<UUID, UserStatus>) findAll();
+        if(map == null || map.isEmpty())
+            return;
+
+        UUID id = map.entrySet().stream()
+                                .filter(x -> x.getValue().getUserId().equals(userId))
+                                .map(x -> x.getValue().getId())
+                                .findFirst()
+                                .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
+
+        if(map.containsKey(id) == false)
+            return;
+
+        map.remove(id);
+        saveAll(map);
     }
 }

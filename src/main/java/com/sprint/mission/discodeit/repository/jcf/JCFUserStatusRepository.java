@@ -23,4 +23,9 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     public Map<UUID, UserStatus> findAll() {
         return null;
     }
+
+    @Override
+    public void deleteByUserId(UUID id) {
+
+    }
 }

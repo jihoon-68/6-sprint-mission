@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -31,8 +31,8 @@ public class DiscodeitApplication {
     }
 
     static User setupUser(UserService userService) {
-        UserCreateRequest userCreateRequest = new UserCreateRequest("woody", "woody@codeit.com", "woody1234","");
-        User user = userService.create(userCreateRequest);
+        UserRequest userRequest = new UserRequest(null,"woody", "woody@codeit.com", "woody1234","");
+        User user = userService.create(userRequest);
         return user;
     }
 

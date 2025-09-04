@@ -1,13 +1,91 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
+import java.io.*;
+import java.util.*;
+
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
+    private final String filePath = "binaryContent.ser";
+
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        return null;
+
+        Map<UUID, BinaryContent> map = findAll();
+        if(map == null){
+            map =  new HashMap<>();
+        }
+
+        map.put(binaryContent.getId(), binaryContent);
+        saveAll(map);
+
+        return binaryContent;
+    }
+
+    private void saveAll(Map<UUID, BinaryContent> map) {
+        try (
+                FileOutputStream fos = new FileOutputStream(filePath);
+                BufferedOutputStream b = new BufferedOutputStream(fos);
+                ObjectOutputStream oos = new ObjectOutputStream(b)
+        ) {
+            oos.writeObject(map);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<BinaryContent> findByUserId(UUID userId) {
+        Map<UUID, BinaryContent> map = findAll();
+        if(map == null || map.isEmpty() || map.containsKey(userId) == false){
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(map.get(userId));
+    }
+
+    @Override
+    public Map<UUID, BinaryContent> findAll() {
+        try (FileInputStream f = new FileInputStream(filePath);
+             BufferedInputStream b = new BufferedInputStream(f);
+             ObjectInputStream o = new ObjectInputStream(b)
+        ) {
+            Map<UUID, BinaryContent> map = new HashMap<>();
+
+            Object obj = o.readObject();
+            Map<Object,Object> temp = (Map<Object, Object>) obj;
+            for (Map.Entry<Object,Object> entry : temp.entrySet()) {
+                UUID key = (UUID) entry.getKey();
+                BinaryContent value = (BinaryContent) entry.getValue();
+                map.put(key, value);
+            }
+
+            return map;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        HashMap<UUID, BinaryContent> map = (HashMap<UUID, BinaryContent>) findAll();
+        if(map == null || map.isEmpty())
+            return;
+
+        UUID id = map.entrySet().stream()
+                .filter(x -> x.getValue().getProfileId().equals(userId))
+                .map(x -> x.getValue().getId())
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("BinaryContent not found"));
+
+        if(map.containsKey(id) == false)
+            return;
+
+        map.remove(id);
+        saveAll(map);
     }
 }

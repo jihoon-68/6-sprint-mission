@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -22,21 +22,21 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User create(UserCreateRequest userCreateRequest) {
+    public User create(UserRequest userRequest) {
 
-        User userEmail = userRepository.findByEmail(userCreateRequest.email()).orElse(null);
-        User userName = userRepository.findByEmail(userCreateRequest.username()).orElse(null);
+        User userEmail = userRepository.findByEmail(userRequest.email()).orElse(null);
+        User userName = userRepository.findByEmail(userRequest.username()).orElse(null);
 
         if(userEmail != null && userName != null){
-            throw new IllegalStateException("User already exists. Check if email or username exists. email : " + userCreateRequest.email() + " and username : " + userCreateRequest.username());
+            throw new IllegalStateException("User already exists. Check if email or username exists. email : " + userRequest.email() + " and username : " + userRequest.username());
         }
 
-        User user = new User(userCreateRequest.username(), userCreateRequest.email(), userCreateRequest.password());
+        User user = new User(userRequest.username(), userRequest.email(), userRequest.password());
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
 
-        if(userCreateRequest.attatchmentUrl() != null && !userCreateRequest.attatchmentUrl().trim().isEmpty() == false) {
-            BinaryContent binaryContent = new BinaryContent(user.getId(),null, userCreateRequest.attatchmentUrl());
+        if(userRequest.attatchmentUrl() != null && !userRequest.attatchmentUrl().trim().isEmpty() == false) {
+            BinaryContent binaryContent = new BinaryContent(user.getId(),null, userRequest.attatchmentUrl());
             binaryContentRepository.save(binaryContent);
         }
 
@@ -72,15 +72,21 @@ public class BasicUserService implements UserService {
             UserDto temp = new UserDto(user.getId(), user.getUsername(), user.getEmail(), isOnline);
             userDtos.add(temp);
         }
-        
+
         return userDtos;
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
+    public User update(UserRequest  userRequest) {
+        User user = userRepository.findById(userRequest.userId())
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userRequest.userId() + " not found"));
+        user.update(userRequest.username(), userRequest.email(), userRequest.password());
+
+        BinaryContent content = binaryContentRepository.findByUserId(userRequest.userId())
+                .orElseThrow(() -> new NoSuchElementException("BinaryContent with id " + userRequest.userId() + " not found"));
+
+        content.changeProfileImage(userRequest.attatchmentUrl());
+        binaryContentRepository.save(content);
         return userRepository.save(user);
     }
 
@@ -90,5 +96,7 @@ public class BasicUserService implements UserService {
             throw new NoSuchElementException("User with id " + userId + " not found");
         }
         userRepository.deleteById(userId);
+        binaryContentRepository.deleteByUserId(userId);
+        userStatusRepository.deleteByUserId(userId);
     }
 }
