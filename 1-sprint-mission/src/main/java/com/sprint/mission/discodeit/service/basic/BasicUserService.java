@@ -3,84 +3,62 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
+@Service
 public class BasicUserService implements UserService {
+    private final UserRepository userRepository;
 
-    private final UserRepository repository;
-
-    public BasicUserService(UserRepository repository) {
-        this.repository = Objects.requireNonNull(repository, "repository");
+    public BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
-    public User create(String name,
-                       String password,
-                       String nickname,
-                       String activeType,
-                       String description,
-                       List<String> badges) {
-
-        // === 비즈니스 검증 ===
-        requireNonBlank(name, "name");
-        requireNonBlank(password, "password");
-        if (password.length() < 6) {
-            throw new IllegalArgumentException("password must be at least 6 chars");
+    public User create(String username, String email, String password) {
+        if(isValidPassword(password)) {
+            User user = new User(username, email, password);
+            return userRepository.save(user);
         }
 
-        User user = new User(name, password, nickname, description, activeType, badges);
+        throw new IllegalArgumentException("비밀번호는 6자 이상이어야 합니다.");
+    }
 
-        return repository.save(user);
+    private boolean isValidPassword(String password) {
+        return password.length() >= 6;
     }
 
     @Override
-    public User findById(UUID id) {
-        User u = repository.findById(id);
-        if (u == null) {
-            throw new NoSuchElementException("User not found: " + id);
-        }
-        return u;
+    public User find(UUID userId) {
+        return getUserById(userId);
     }
 
     @Override
     public List<User> findAll() {
-        return repository.findAll();
+        return userRepository.findAll();
     }
 
     @Override
-    public User update(UUID id, String name, String nickname) {
-        User u = repository.findById(id);
-        if (u == null) {
-            throw new NoSuchElementException("User not found: " + id);
-        }
-
-        if (name != null && !name.isBlank()) {
-            u.update(name, nickname != null && !nickname.isBlank() ? nickname : u.getNickname());
-        } else if (nickname != null && !nickname.isBlank()) {
-            u.update(u.getName(), nickname);
-        } else {
-            return u;
-        }
-
-        return repository.save(u); // 최종 저장
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User user = getUserById(userId);
+        user.update(newUsername, newEmail, newPassword);
+        return userRepository.save(user);
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return repository.deleteById(id);
-    }
-
-    private void requireNonBlank(String v, String field) {
-        if (v == null || v.isBlank()) {
-            throw new IllegalArgumentException(field + " must not be blank");
+    public void delete(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
+        userRepository.deleteById(userId);
     }
 
-     private void validateActiveType(String activeType) {
-         Set<String> allowed = Set.of("online", "offline", "away");
-         if (activeType == null || !allowed.contains(activeType.toLowerCase())) {
-             throw new IllegalArgumentException("invalid activeType: " + activeType);
-         }
-     }
+    private User getUserById(UUID userId) {
+        return userRepository
+                .findById(userId).orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+    }
 }

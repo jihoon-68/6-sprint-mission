@@ -1,37 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Channel extends Common implements Serializable {
+@Getter
+public class Channel extends Common implements Serializable  {
     private static final long serialVersionUID = 1L;
-
-    private List<User> users = new ArrayList<>();
+    //
+    private ChannelType type;
     private String name;
-    private List<Message> messages = new ArrayList<>();
+    private String description;
 
-    public Channel(String name, List<User> users, List<Message> messages) {
+    public Channel(ChannelType type, String name, String description) {
         super();
-        this.users = users;
+        //
+        this.type = type;
         this.name = name;
-        this.messages = messages;
+        this.description = description;
     }
 
-    public List<Message> getMessages() {
-        return messages;
-    }
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void update(String name) {
-        if (name != null) this.name = name;
-        super.updatedAt();
+        if (anyValueUpdated) {
+            super.refreshUpdatedAt();
+        }
     }
 }

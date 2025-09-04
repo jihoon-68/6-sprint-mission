@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
-import java.util.*;
+
+import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
-    User create(String name, String password, String nickname, String activeType, String description, List<String> badges);
-    User findById(UUID id);
+    User create(String username, String email, String password);
+    User find(UUID userId);
     List<User> findAll();
-    User update(UUID id, String name, String nickname);
-    boolean delete(UUID id);
+    User update(UUID userId, String newUsername, String newEmail, String newPassword);
+    void delete(UUID userId);
 }
