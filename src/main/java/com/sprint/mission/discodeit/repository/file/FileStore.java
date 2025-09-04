@@ -17,7 +17,7 @@ public class FileStore<T> {
 
     @SuppressWarnings("unchecked")
     public Map<UUID, T> loadMapOrEmpty() {
-        if (!file.exists()) return new HashMap<>();
+        if (!file.exists()) { return new HashMap<>(); }
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             return (Map<UUID, T>) ois.readObject();
         } catch (Exception e) {

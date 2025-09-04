@@ -9,7 +9,7 @@ import java.util.UUID;
  * channel: Channel
  * type: MessageType(TEXT, VIDEO, IMAGE, FILE)
  */
-public class Message extends Common {
+public class Message extends AbstractEntity {
     private String content;
     private UUID userId;
     private UUID channelId;

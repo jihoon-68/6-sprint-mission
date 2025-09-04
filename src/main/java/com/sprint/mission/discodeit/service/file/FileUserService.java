@@ -69,9 +69,7 @@ public class FileUserService implements UserService {
     public boolean update(UUID id, String username, String email, String password) {
         Map<UUID, User> data = loadAll();
         User userToUpdate = data.get(id);
-        if (userToUpdate == null) {
-            return false;
-        }
+        if (userToUpdate == null) { return false; }
         userToUpdate.update(username, email, password);
         data.put(id, userToUpdate);
         saveAll(data);

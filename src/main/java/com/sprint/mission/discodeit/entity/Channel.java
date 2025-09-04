@@ -6,7 +6,7 @@ package com.sprint.mission.discodeit.entity;
  * description: String
  * type: ChannelType(TEXT, VOICE)
  */
-public class Channel extends Common {
+public class Channel extends AbstractEntity {
     private String title;
     private String description;
     private ChannelType type;
@@ -21,7 +21,7 @@ public class Channel extends Common {
 
     // Getter
     public String getTitle() { return title; }
-    public String getDescription() { return description; }
+    //public String getDescription() { return description; }
     public ChannelType getType() { return type; }
 
     // enum

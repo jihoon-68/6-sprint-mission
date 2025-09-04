@@ -61,9 +61,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public boolean update(UUID id, String content) {
         Message message = data.get(id);
-        if (message == null) {
-            return false;
-        }
+        if (message == null) { return false; }
         message.update(content);
         return true;
     }

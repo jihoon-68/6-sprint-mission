@@ -45,10 +45,7 @@ public class JCFUserService implements UserService {
     @Override
     public boolean update(UUID id, String username, String email, String password) {
         User user = data.get(id);
-        if (user == null) {
-            return false;
-        }
-
+        if (user == null) { return false; }
         user.update(username, email, password);
         return true;
     }

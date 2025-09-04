@@ -41,9 +41,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public boolean update(UUID id, String title, String description) {
         Channel channel = data.get(id);
-        if (channel == null) {
-            return false;
-        }
+        if (channel == null) { return false; }
         channel.update(title, description);
         return true;
     }

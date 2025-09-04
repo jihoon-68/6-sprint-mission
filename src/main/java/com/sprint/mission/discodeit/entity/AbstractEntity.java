@@ -4,19 +4,19 @@ import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * 추상 클래스 Common
+ * 추상 클래스 AbstractEntity
  * id : UUID
  * createdAt : Long (for Unix TimeStamp)
  * updatedAt : Long (for Unix TimeStamp)
  */
-public abstract class Common implements Serializable {
+public abstract class AbstractEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
     private Long createdAt;
     private Long updatedAt;
 
     // Constructor
-    protected Common() {
+    protected AbstractEntity() {
         this.id = UUID.randomUUID();
         long time = System.currentTimeMillis();
         this.createdAt = time;

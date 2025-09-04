@@ -73,9 +73,7 @@ public class FileMessageService implements MessageService {
     public boolean update(UUID id, String content) {
         Map<UUID, Message> data = loadAll();
         Message messageToUpdate = data.get(id);
-        if (messageToUpdate == null) {
-            return false;
-        }
+        if (messageToUpdate == null) { return false; }
         messageToUpdate.update(content);
         data.put(id, messageToUpdate);
         saveAll(data);

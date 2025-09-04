@@ -6,7 +6,7 @@ package com.sprint.mission.discodeit.entity;
  * email: String
  * status: UserStatus(ONLINE, OFFLINE, AWAY, DO_NOT_DISTURB)
  */
-public class User extends Common {
+public class User extends AbstractEntity {
     private String username;
     private String email;
     private String password;
@@ -24,8 +24,8 @@ public class User extends Common {
     // Getter
     public String getUsername() { return username; }
     public String getEmail() { return email; }
-    public String getPassword() { return password; }
-    public UserStatus getStatus() { return status; }
+    //public String getPassword() { return password; }
+    //public UserStatus getStatus() { return status; }
 
     // UserStatus Enum
     public enum UserStatus {

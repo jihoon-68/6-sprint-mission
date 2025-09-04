@@ -9,43 +9,43 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class BasicChannelService implements ChannelService {
-    private final ChannelRepository channels;
+    private final ChannelRepository channelRepository;
 
-    public BasicChannelService(ChannelRepository channels) {
-        this.channels = channels;
+    public BasicChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
     public Channel create(String title, String description, Channel.ChannelType type) {
-        return channels.save(new Channel(title, description, type));
+        return channelRepository.save(new Channel(title, description, type));
     }
 
     @Override
     public Optional<Channel> readId(UUID id) {
-        return channels.readId(id);
+        return channelRepository.readId(id);
     }
 
     @Override
     public List<Channel> readTitle(String title) {
-        return channels.readTitle(title);
+        return channelRepository.readTitle(title);
     }
 
     @Override
     public List<Channel> readAll() {
-        return channels.readAll();
+        return channelRepository.readAll();
     }
 
     @Override
     public boolean update(UUID id, String title, String description) {
-        Optional<Channel> channelToUpdate = channels.readId(id);
-        if (channelToUpdate.isEmpty()) return false;
+        Optional<Channel> channelToUpdate = channelRepository.readId(id);
+        if (channelToUpdate.isEmpty()) { return false; }
         channelToUpdate.get().update(title, description);
-        channels.save(channelToUpdate.get());
+        channelRepository.save(channelToUpdate.get());
         return true;
     }
 
     @Override
     public boolean delete(UUID id) {
-        return channels.delete(id);
+        return channelRepository.delete(id);
     }
 }

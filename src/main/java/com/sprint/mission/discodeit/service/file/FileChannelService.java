@@ -57,9 +57,7 @@ public class FileChannelService implements ChannelService {
     public boolean update(UUID id, String title, String description) {
         Map<UUID, Channel> data = loadAll();
         Channel channelToUpdate = data.get(id);
-        if (channelToUpdate == null) {
-            return false;
-        }
+        if (channelToUpdate == null) { return false; }
         channelToUpdate.update(title, description);
         data.put(id, channelToUpdate);
         saveAll(data);

@@ -9,48 +9,48 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
-    private final UserRepository users;
+    private final UserRepository userRepository;
 
-    public BasicUserService(UserRepository users) {
-        this.users = users;
+    public BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public User create(String username, String email, String password) {
-        return users.save(new User(username, email, password));
+        return userRepository.save(new User(username, email, password));
     }
 
     @Override
     public Optional<User> readId(UUID id) {
-        return users.readId(id);
+        return userRepository.readId(id);
     }
 
     @Override
     public Optional<User> readUsername(String username) {
-        return users.readUsername(username);
+        return userRepository.readUsername(username);
     }
 
     @Override
     public Optional<User> readEmail(String email) {
-        return users.readEmail(email);
+        return userRepository.readEmail(email);
     }
 
     @Override
     public List<User> readAll() {
-        return users.readAll();
+        return userRepository.readAll();
     }
 
     @Override
     public boolean update(UUID id, String username, String email, String password) {
-        Optional<User> user = users.readId(id);
-        if (user.isEmpty()) return false;
+        Optional<User> user = userRepository.readId(id);
+        if (user.isEmpty()) { return false; }
         user.get().update(username, email, password);
-        users.save(user.get());
+        userRepository.save(user.get());
         return true;
     }
 
     @Override
     public boolean delete(UUID id) {
-        return users.delete(id);
+        return userRepository.delete(id);
     }
 }
