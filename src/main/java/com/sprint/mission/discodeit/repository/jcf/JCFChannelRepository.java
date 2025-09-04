@@ -24,7 +24,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public Channel findChannelById(UUID id) {
 
         return channels.stream()
-                .filter(channel -> channel.getChannelId().equals(id))
+                .filter(channel -> channel.getId().equals(id))
                 .findAny()
                 .orElse(null);
     }

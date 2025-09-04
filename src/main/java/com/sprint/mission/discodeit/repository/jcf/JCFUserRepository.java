@@ -20,7 +20,7 @@ public class JCFUserRepository implements UserRepository {
 
     public User findUserById(UUID id) {
         return userDeat.stream()
-                .filter(user-> user.getUserId().equals(id))
+                .filter(user-> user.getId().equals(id))
                 .findAny()
                 .orElse(null);
     }

@@ -30,7 +30,7 @@ public class JCFChannel  implements ChannelService {
     public Channel findChannelById(UUID id){
 
         return channelData.stream()
-                .filter(channel -> channel.getChannelId().equals(id))
+                .filter(channel -> channel.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     };
@@ -65,7 +65,7 @@ public class JCFChannel  implements ChannelService {
     };
 
     public void removeUserFromChannel(Channel channel, User user){
-        channel.getChannelUsers().remove(user);
+        channel.getUsers().remove(user);
         this.updateChannel(channel);
     };
 
@@ -77,7 +77,7 @@ public class JCFChannel  implements ChannelService {
     };
 
     public void removeMessageFromChannel(Channel channel, Message message){
-        channel.getChannelMessages().remove(message);
+        channel.getMessages().remove(message);
         this.updateChannel(channel);
     };
 

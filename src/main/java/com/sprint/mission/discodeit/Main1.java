@@ -43,11 +43,11 @@ public class Main1 {
         System.out.println("================유저 수정=================");
         kimUser.updateEmail("kim011@codeit.com");
         jcfUser.updateUser(kimUser);
-        System.out.println(jcfUser.findUserById(kimUser.getUserId()));
+        System.out.println(jcfUser.findUserById(kimUser.getId()));
 
         //유저 삭제
         System.out.println("================유저 삭제=================");
-        jcfUser.deleteUser(kimUser.getUserId());
+        jcfUser.deleteUser(kimUser.getId());
         System.out.println(jcfUser.findAllUsers());
 
         System.out.println();
@@ -72,18 +72,18 @@ public class Main1 {
 
         //서버 조회(단건,다건)
         System.out.println("================서버 조회(단건,다건)=================");
-        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()));
+        System.out.println(jcfChannel.findChannelById(channel1.getId()));
         System.out.println(jcfChannel.findAllChannels());
 
         //서버 수정
         System.out.println("================서버 수정=================");
         channel1.updateChanelName("1조");
         jcfChannel.updateChannel(channel1);
-        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()));
+        System.out.println(jcfChannel.findChannelById(channel1.getId()));
 
         //서버 삭제
         System.out.println("================서버 삭제=================");
-        jcfChannel.deleteChannel(channel3.getChannelId());
+        jcfChannel.deleteChannel(channel3.getId());
         System.out.println(jcfChannel.findAllChannels());
 
         System.out.println();
@@ -104,16 +104,16 @@ public class Main1 {
 
         System.out.println("================메시지 조회(단건,다건)=================");
         Message newMessage = jcfMessage.createMessage(namgungUser,"등록 테스트 케이지06");
-        System.out.println(jcfMessage.findMessageById(newMessage.getMessageId()));
+        System.out.println(jcfMessage.findMessageById(newMessage.getId()));
         System.out.println(jcfMessage.findAllMessages());
 
         System.out.println("================메시지 수정=================");
         newMessage.updateMessage("수정 테스트 01");
         jcfMessage.updateMessage(newMessage);
-        System.out.println(jcfMessage.findMessageById(newMessage.getMessageId()));
+        System.out.println(jcfMessage.findMessageById(newMessage.getId()));
 
         System.out.println("================메시지 삭제=================");
-        jcfMessage.deleteMessage(newMessage.getMessageId());
+        jcfMessage.deleteMessage(newMessage.getId());
         System.out.println(jcfMessage.findAllMessages());
 
 
@@ -127,16 +127,16 @@ public class Main1 {
         jcfChannel.addUserToChannel(channel2,leeUser);
         jcfChannel.addUserToChannel(channel2,namgungUser);
 
-        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelUsers());
-        System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelUsers());
+        System.out.println(jcfChannel.findChannelById(channel1.getId()).getUsers());
+        System.out.println(jcfChannel.findChannelById(channel2.getId()).getUsers());
         System.out.println("==============================================");
 
 
         System.out.println("================서버에서 유져 삭제=================");
         jcfChannel.removeUserFromChannel(channel1,leeUser);
         jcfChannel.removeUserFromChannel(channel2,namgungUser);
-        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelUsers());
-        System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelUsers());
+        System.out.println(jcfChannel.findChannelById(channel1.getId()).getUsers());
+        System.out.println(jcfChannel.findChannelById(channel2.getId()).getUsers());
         System.out.println("==============================================");
 
         System.out.println("=============서버별 서버 메세지 보내기==============");
@@ -147,15 +147,15 @@ public class Main1 {
         jcfChannel.addMessageToChannel(channel2,message05);
         jcfChannel.addMessageToChannel(channel2,newMessage);
 
-        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelMessages());
-        System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelMessages());
+        System.out.println(jcfChannel.findChannelById(channel1.getId()).getMessages());
+        System.out.println(jcfChannel.findChannelById(channel2.getId()).getMessages());
         System.out.println("===============================================");
 
         System.out.println("===============서버별 서버 메세지 삭제===============");
         jcfChannel.removeMessageFromChannel(channel1,message01);
         jcfChannel.removeMessageFromChannel(channel2,message04);
-        System.out.println(jcfChannel.findChannelById(channel1.getChannelId()).getChannelMessages());
-        System.out.println(jcfChannel.findChannelById(channel2.getChannelId()).getChannelMessages());
+        System.out.println(jcfChannel.findChannelById(channel1.getId()).getMessages());
+        System.out.println(jcfChannel.findChannelById(channel2.getId()).getMessages());
         System.out.println("================================================");
 
     }
@@ -189,12 +189,12 @@ public class Main1 {
         System.out.println("================유저 수정=================");
         kimUser.updateEmail("kim011@codeit.com");
         fileUserService.updateUser(kimUser);
-        System.out.println(fileUserService.findUserById(kimUser.getUserId()));
+        System.out.println(fileUserService.findUserById(kimUser.getId()));
 
         //유저 삭제
         System.out.println("================유저 삭제=================");
         User pakrUser = fileUserService.findUserByEmail("park03@codeit.com");
-        fileUserService.deleteUser(pakrUser.getUserId());
+        fileUserService.deleteUser(pakrUser.getId());
         System.out.println(fileUserService.findAllUsers());
 
         System.out.println();
@@ -218,18 +218,18 @@ public class Main1 {
 
         //서버 조회(단건,다건)
         System.out.println("================서버 조회(단건,다건)=================");
-        System.out.println(fileChannelService.findChannelById(channel1.getChannelId()));
+        System.out.println(fileChannelService.findChannelById(channel1.getId()));
         System.out.println(fileChannelService.findAllChannels());
 
         //서버 수정
         System.out.println("================서버 수정=================");
         channel1.updateChanelName("1조");
         fileChannelService.updateChannel(channel1);
-        System.out.println(fileChannelService.findChannelById(channel1.getChannelId()));
+        System.out.println(fileChannelService.findChannelById(channel1.getId()));
 
         //서버 삭제
         System.out.println("================서버 삭제=================");
-        fileChannelService.deleteChannel(channel3.getChannelId());
+        fileChannelService.deleteChannel(channel3.getId());
         System.out.println(fileChannelService.findAllChannels());
 
         System.out.println();
@@ -250,16 +250,16 @@ public class Main1 {
 
         System.out.println("================메시지 조회(단건,다건)=================");
         Message newMessage = fileMessageService.createMessage(namgungUser,"등록 테스트 케이지06");
-        System.out.println(fileMessageService.findMessageById(newMessage.getMessageId()));
+        System.out.println(fileMessageService.findMessageById(newMessage.getId()));
         System.out.println(fileMessageService.findAllMessages());
 
         System.out.println("================메시지 수정=================");
         newMessage.updateMessage("수정 테스트 01");
         fileMessageService.updateMessage(newMessage);
-        System.out.println(fileMessageService.findMessageById(newMessage.getMessageId()));
+        System.out.println(fileMessageService.findMessageById(newMessage.getId()));
 
         System.out.println("================메시지 삭제=================");
-        fileMessageService.deleteMessage(newMessage.getMessageId());
+        fileMessageService.deleteMessage(newMessage.getId());
         System.out.println(fileMessageService.findAllMessages());
     }
 

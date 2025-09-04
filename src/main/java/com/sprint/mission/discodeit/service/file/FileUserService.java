@@ -15,7 +15,7 @@ public class FileUserService implements UserService {
     //클래스 외부에서 접근할 필용가 없는 메소드라서 플라이비 함
     //객체 UUID를 파일 이름으로 정함
     private Path filePath(User user){
-        return directory.resolve(user.getUserId().toString().concat(".ser"));
+        return directory.resolve(user.getId().toString().concat(".ser"));
     };
 
     public FileUserService() {
@@ -32,7 +32,7 @@ public class FileUserService implements UserService {
     public User findUserById(UUID id){
         List<User> users = instance.load(directory);
         return users.stream()
-                .filter(user -> user.getUserId().equals(id))
+                .filter(user -> user.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     };

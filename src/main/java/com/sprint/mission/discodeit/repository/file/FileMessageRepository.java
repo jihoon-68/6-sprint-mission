@@ -16,7 +16,7 @@ public class FileMessageRepository implements MessageRepository {
 
     private Path filePaths(Message message) {
 
-        return directory.resolve(message.getMessageId().toString() + ".ser");
+        return directory.resolve(message.getId().toString() + ".ser");
     }
     public FileMessageRepository() {
         instance.init(directory);
@@ -29,7 +29,7 @@ public class FileMessageRepository implements MessageRepository {
     public Message findMessageById(UUID id) {
         List<Message> messageList = instance.load(directory);
         return messageList.stream()
-                .filter(message -> message.getMessageId().equals(id))
+                .filter(message -> message.getId().equals(id))
                 .findAny()
                 .orElse(null);
     }
@@ -46,7 +46,7 @@ public class FileMessageRepository implements MessageRepository {
         Message message = this.findMessageById(id);
         boolean isDelete = instance.delete(filePaths(message));
         if(!isDelete){
-            throw new NullPointerException(message.getMessageId()+" 유저 삭제 실패");
+            throw new NullPointerException(message.getId()+" 유저 삭제 실패");
         }
     }
 }

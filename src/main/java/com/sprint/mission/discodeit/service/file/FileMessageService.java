@@ -17,7 +17,7 @@ public class FileMessageService implements MessageService {
     private static final FileEdit instance = new FileEdit();;
 
     private Path filePaths(Message message) {
-        return directory.resolve(message.getMessageId().toString() + ".ser");
+        return directory.resolve(message.getId().toString() + ".ser");
     }
 
     public FileMessageService() {
@@ -32,7 +32,7 @@ public class FileMessageService implements MessageService {
     public Message findMessageById(UUID id){
         List<Message> messagesList = instance.load(directory);
         return messagesList.stream()
-                .filter(message -> message.getMessageId().equals(id))
+                .filter(message -> message.getId().equals(id))
                 .findAny()
                 .orElse(null);
     };
@@ -50,7 +50,7 @@ public class FileMessageService implements MessageService {
         Message message = this.findMessageById(id);
         boolean isDelete = instance.delete(filePaths(message));
         if(!isDelete){
-            throw new NullPointerException(message.getMessageId()+" 유저 삭제 실패");
+            throw new NullPointerException(message.getId()+" 유저 삭제 실패");
         }
 
     };
