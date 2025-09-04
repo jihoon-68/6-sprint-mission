@@ -1,4 +1,11 @@
 package com.sprint.mission.discodeit.DTOs.BinaryContent;
 
-public record CreateBinaryContentDTO() {
+import java.time.Instant;
+import java.util.UUID;
+
+public record CreateBinaryContentDTO(
+        UUID profileId,
+        UUID messageId,
+        String attatchmentUrl
+) {
 }
