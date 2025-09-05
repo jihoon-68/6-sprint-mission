@@ -9,55 +9,45 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 @Repository
 public class FileUserRepository implements UserRepository {
     private static final Path directory = Paths.get("./src/main/resources/UserDate");
     private static final FileEdit instance = new  FileEdit();
 
-    private Path filePaths(User user) {
-        return directory.resolve(user.getId().toString() + ".ser");
+    private Path filePaths(UUID id) {
+        return directory.resolve( id + ".ser");
     }
 
     public FileUserRepository() {
         instance.init(directory);
     }
 
-    public void createUser(User user) {
-        instance.save(filePaths(user),user);
+    @Override
+    public User save(User user) {
+        instance.save(filePaths(user.getId()),user);
+        return user;
     }
 
-    public User findUserById(UUID id) {
+    @Override
+    public Optional<User> findById(UUID id) {return instance.load(filePaths(id));}
 
-        List<User> userList = instance.load(directory);
-        return userList.stream()
-                .filter(user -> user.getId().equals(id))
-                .findAny()
-                .orElse(null);
+    @Override
+    public List<User> findAll() {
+        return instance.loadAll(directory);
     }
 
-    public User findUserByEmail(String userEmail) {
-        List<User> userList = instance.load(directory);
-        return userList.stream()
-                .filter(user -> user.getEmail().equals(userEmail))
-                .findAny()
-                .orElse(null);
-
+    @Override
+    public boolean existsById(UUID id) {
+        return findById(id).isPresent();
     }
 
-    public List<User> findAllUsers() {
-        return instance.load(directory);
-    }
-
-    public void updateUser(User user) {
-        instance.save(filePaths(user),user);
-    }
-
-    public void deleteUser(UUID id) {
-        User user = findUserById(id);
-        boolean isDelete = instance.delete(filePaths(user));
+    @Override
+    public void deleteById(UUID id) {
+        boolean isDelete = instance.delete(filePaths(id));
         if(!isDelete){
-            throw new NullPointerException(user.getEmail()+" 유저 삭제 실패");
+            throw new NullPointerException(" 유저 삭제 실패");
         }
     }
 }

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
@@ -18,18 +19,16 @@ public class JCFUserRepository implements UserRepository {
         userDeat.add(user);
     }
 
-    public User findUserById(UUID id) {
+    public Optional<User> findUserById(UUID id) {
         return userDeat.stream()
                 .filter(user-> user.getId().equals(id))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
-    public User findUserByEmail(String userEmail) {
+    public Optional<User> findUserByEmail(String userEmail) {
         return userDeat.stream()
                 .filter(user -> user.getEmail().equals(userEmail))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public List<User> findAllUsers() {
