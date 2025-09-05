@@ -9,52 +9,46 @@ import org.springframework.stereotype.Repository;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 @Repository
 public class FileChannelRepository implements ChannelRepository {
-    private static final Path directory = Paths.get("./src/main/resources/ChannelDate");
-    private static final FileEdit instance = new  FileEdit();
+    private final Path directory = Paths.get("./src/main/resources/ChannelDate");
+    private final FileEdit instance = new  FileEdit();
 
-    private Path filePaths(Channel channel) {
-        return directory.resolve(channel.getId().toString() + ".ser");
+    private Path filePaths(UUID id) {
+        return directory.resolve( id + ".ser");
     }
 
     public FileChannelRepository(){
         instance.init(directory);
     }
 
-    public void createChannel(Channel channel) {
-        instance.save(filePaths(channel), channel);
+    @Override
+    public Channel save(Channel channel) {
+        instance.save(filePaths(channel.getId()), channel);
+        return channel;
     }
 
-    public Channel findChannelById(UUID id) {
-        List<Channel> channelList = instance.load(directory);
-        return channelList.stream()
-                .filter(channel -> channel.getId().equals(id))
-                .findAny().orElse(null);
+    @Override
+    public Optional<Channel> findById(UUID id) {return instance.load(filePaths(id));}
+
+    @Override
+    public List<Channel> findAll() {
+        return instance.loadAll(directory);
     }
 
-    public List<Channel> findAllChannels() {
-        return instance.load(directory);
+    @Override
+    public boolean existsById(UUID id) {
+        return findById(id).isPresent();
     }
 
-    public void updateChannel(Channel channel) {
-        instance.save(filePaths(channel), channel);
-    }
-
-    public void deleteChannel(UUID id) {
-        Channel channel = findChannelById(id);
-        boolean isDelete = instance.delete(filePaths(channel));
+    @Override
+    public void deleteById(UUID id) {
+        boolean isDelete = instance.delete(filePaths(id));
         if(!isDelete){
-            throw new NullPointerException(channel.getId()+" 유저 삭제 완료");
+            throw new NullPointerException(" 유저 삭제 실패");
         }
     }
 
-    public void addMessageToChannel(Channel channel, Message message) {
-
-    }
-
-    public void removeMessageFromChannel(Channel channel, Message message) {
-
-    }
 }

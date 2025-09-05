@@ -5,9 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class FileEdit {
-
+    // 싱글 톤이면 한곳에 몰리수 있어어 인스턴스로 생성 생각중
     public void init(Path directory){
         //저장할 경로의 파일 초기화
         if(!Files.exists(directory)){
@@ -29,7 +30,23 @@ public class FileEdit {
         }
     };
 
-    public <T> List<T> load(Path directory){
+    public <T> Optional<T> load(Path filePath){
+        Optional<T> date = Optional.empty();
+        if(!Files.exists(filePath)){
+            try(
+                    FileInputStream fis = new FileInputStream(filePath.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis);
+            ) {
+                date = (Optional<T>) ois.readObject();
+
+            }catch (IOException | ClassNotFoundException e){
+                throw new RuntimeException(e);
+            }
+        }
+        return date;
+    }
+
+    public <T> List<T> loadAll(Path directory){
         if(Files.exists(directory)){
             try{
                 List<T> list = Files.list(directory)

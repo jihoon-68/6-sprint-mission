@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
@@ -21,12 +22,11 @@ public class JCFChannelRepository implements ChannelRepository {
         channels.add(channel);
     }
 
-    public Channel findChannelById(UUID id) {
+    public Optional<Channel> findChannelById(UUID id) {
 
         return channels.stream()
                 .filter(channel -> channel.getId().equals(id))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public List<Channel> findAllChannels() {

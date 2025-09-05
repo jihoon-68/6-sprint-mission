@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
@@ -20,11 +21,10 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
 
-    public Message findMessageById(UUID id) {
+    public Optional<Message> findMessageById(UUID id) {
         return MessageDate.stream()
                 .filter(message -> message.getId().equals(id))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     public List<Message> findAllMessages() {
