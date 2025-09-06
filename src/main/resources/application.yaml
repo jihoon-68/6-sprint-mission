@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: discodeit
+  threads:
+    virtual:
+      enabled: true
+
+logging:
+  level:
+    com.sprint.mission.discodeit: DEBUG
+
+discodeit:
+  repository:
+    type: jcf   # jcf | file
+    file-directory: ${DISCODEIT_DATA_DIR:.discodeit}
