@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.Enum.ChannelType;
 
 import java.util.List;
 import java.util.UUID;
