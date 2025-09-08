@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.DTO.User.CreateUserDTO;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,42 +14,53 @@ public class User extends BaseEntity implements Serializable {
     private final Instant created;
     private final int age;
 
+    private UUID profileId;
     private Instant updated;
     private String password;
     private String username;
     private String email;
 
-    public User(String username, int age, String email) {
+    public User(CreateUserDTO createUserDTO) {
         this.id = UUID.randomUUID();
+        this.profileId = createUserDTO.profileId() == null ? UUID.randomUUID() : profileId;
         this.created = setTime();
-
-        this.username = username;
-        this.age = age;
-        this.email = email;
+        this.username = createUserDTO.userName();
+        this.age = createUserDTO.age();
+        this.email = createUserDTO.email();
+        this.password = createUserDTO.password();
     }
 
 
-    public void update(String newUsername, String newEmail, String newPassword) {
+    public void update(CreateUserDTO createUserDTO) {
         boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
+        if (createUserDTO.userName() != null && !createUserDTO.userName().equals(this.username)) {
+            this.username = createUserDTO.userName();
             anyValueUpdated = true;
         }
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
+
+        if (createUserDTO.email() != null && !createUserDTO.email().equals(this.email)) {
+            this.email = createUserDTO.email();
             anyValueUpdated = true;
         }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
+
+        if (createUserDTO.password() != null && !createUserDTO.password().equals(this.password)) {
+            this.password = createUserDTO.password();
+            anyValueUpdated = true;
+        }
+
+        if (createUserDTO.profileId()!= null && !createUserDTO.profileId().equals(this.profileId)) {
+            this.profileId = createUserDTO.profileId();
             anyValueUpdated = true;
         }
 
         if (anyValueUpdated) {
-            this.updated = Instant.now();
+            this.updated = setTime();
         }
     }
 
+
     //유져 본연에 속성이 변경 시에만 업데이트 갱신
+    @Override
     public String toString(){
         return "유저 정보: "+ "\n" +
                 "ID: " + this.id + "\n" +
