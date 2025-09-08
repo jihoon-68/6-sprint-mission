@@ -1,4 +1,10 @@
 package com.sprint.mission.discodeit.DTOs.ReadStatus;
 
-public record UpdateReadStatusDTO() {
+import java.util.UUID;
+
+public record UpdateReadStatusDTO(
+        UUID id,
+        UUID userId,
+        UUID channelId
+) {
 }
