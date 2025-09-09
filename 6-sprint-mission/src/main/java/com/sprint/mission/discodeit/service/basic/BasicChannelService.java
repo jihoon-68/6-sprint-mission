@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelDto.CreateChannelDto;
-import com.sprint.mission.discodeit.dto.ChannelDto.FindAllChannelDto;
-import com.sprint.mission.discodeit.dto.ChannelDto.FindChannelDto;
-import com.sprint.mission.discodeit.dto.ChannelDto.UpdateChannelDto;
+import com.sprint.mission.discodeit.dto.channeldto.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channeldto.FindAllChannelDto;
+import com.sprint.mission.discodeit.dto.channeldto.FindChannelDto;
+import com.sprint.mission.discodeit.dto.channeldto.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -40,7 +40,7 @@ public class BasicChannelService implements ChannelService {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("유저 없음: " + userId));
                 channel.addUser(user);
-                readStatusRepository.save(new ReadStatus(user, channel));
+                readStatusRepository.save(new ReadStatus(userId, channel.getId()));
             }
         }
         return channelRepository.save(channel);

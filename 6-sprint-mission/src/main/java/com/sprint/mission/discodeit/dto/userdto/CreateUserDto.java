@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.UserDto;
+package com.sprint.mission.discodeit.dto.userdto;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import jakarta.validation.constraints.Email;

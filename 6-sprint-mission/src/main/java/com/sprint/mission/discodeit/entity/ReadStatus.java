@@ -14,11 +14,11 @@ public class ReadStatus {
     private Channel channel;
     private Instant lastReadAt;
 
-    public ReadStatus(User user, Channel channel) {
+    public ReadStatus(UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
-        this.userId = user.getId();
-        this.channelId = channel.getId();
-        this.lastReadAt = Instant.EPOCH;
+        this.userId = userId;
+        this.channelId = channelId;
+        this.lastReadAt = Instant.EPOCH;    //  초기화
     }
 
     public boolean lastReadMessageTime(Instant latestMessageTime){
