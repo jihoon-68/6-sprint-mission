@@ -1,69 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
-  private UUID messageId;
-  private Long createdAt;
-  private Long updatedAt;
-  String text;
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
 
-  /// 서비스간 의존성 주입
-  private User user; //메시지 생성 사용자 정보
-  private Channel channel; // 메시지 속하는 채널 정보
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
+    }
 
-  public Message(String text) {
-    this.messageId = UUID.randomUUID();
-    this.createdAt = System.currentTimeMillis();
-    this.updatedAt = System.currentTimeMillis();
+    public UUID getId() {
+        return id;
+    }
 
-    this.text = text;
-  }
+    public Long getCreatedAt() {
+        return createdAt;
+    }
 
-  public UUID getMessageId() {
-    return messageId;
-  }
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
 
-  public Long getCreatedAt() {
-    return createdAt;
-  }
+    public String getContent() {
+        return content;
+    }
 
-  public Long getUpdatedAt() {
-    return updatedAt;
-  }
+    public UUID getChannelId() {
+        return channelId;
+    }
 
-  public String getText() {
-    return text;
-  }
+    public UUID getAuthorId() {
+        return authorId;
+    }
 
-  public void setText(String text) {
-    this.text = text;
-  }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-  public void updateText(String newText) {
-    this.text = newText;
-    this.updatedAt = System.currentTimeMillis();
-  }
-
-  @Override
-  public String toString() {
-    return "Message{" +
-        "messageId=" + messageId +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        ", text='" + text + '\'' +
-        ", user=" + user +
-        ", channel=" + channel +
-        '}';
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
-  public void setChannel(Channel channel) {
-    this.channel = channel;
-  }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 }

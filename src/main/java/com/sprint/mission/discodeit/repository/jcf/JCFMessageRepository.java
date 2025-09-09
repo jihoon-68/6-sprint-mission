@@ -1,59 +1,40 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
-    Map<UUID, Message> messages = new HashMap<>();
-    private ChannelRepository channelRepository;
-    private UserRepository userRepository;
+    private final Map<UUID, Message> data;
 
-    public JCFMessageRepository(JCFUserRepository jcfUserRepository, JCFChannelRepository jcfChannelRepository) {
-        this.channelRepository = jcfChannelRepository;
-        this.userRepository = jcfUserRepository;
+    public JCFMessageRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public void addMessage(Message message, UUID userId, UUID channelId) {
-        User user = userRepository.readUser(userId);
-        Channel channel = channelRepository.readChannel(channelId);
-        if(user == null || channel == null) {throw new IllegalArgumentException("Missing user or channel");}
-
-        message.setUser(user);
-        message.setChannel(channel);
-
-        messages.put(message.getMessageId(),message);
+    public Message save(Message message) {
+        this.data.put(message.getId(), message);
+        return message;
     }
 
     @Override
-    public Message readMessage(UUID messageId) {
-        return messages.get(messageId);
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public void deleteMessage(UUID messageId) {
-        messages.remove(messageId);
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public void updateMessage(Message message) {
-        if(messages.containsKey(message.getMessageId())) {
-            messages.put(message.getMessageId(),message);
-        }else{
-            throw new IllegalArgumentException("Message not found");
-        }
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public List<Message> readAllMessage() {
-        return new ArrayList<Message>(messages.values());
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
-
-
 }

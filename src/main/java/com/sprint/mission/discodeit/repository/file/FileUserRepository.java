@@ -4,65 +4,97 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    private final String filePath = "user.rep";
-    private Map<UUID, User> users = new HashMap<>();
-
-    @SuppressWarnings("unchecked")
-    private void loadUsers() {
-        try (FileInputStream fis = new FileInputStream(filePath);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-
-            users = (Map<UUID, User>) ois.readObject();
-
-        } catch (FileNotFoundException e) {
-            users = new HashMap<>();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+    public FileUserRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    private void saveUsers() {
-        try(FileOutputStream fos = new FileOutputStream(filePath);
-        ObjectOutputStream oos = new ObjectOutputStream(fos)){
-            oos.writeObject(users);
-        }catch (IOException e){
-            e.printStackTrace();
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
+    @Override
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(userNullable);
+    }
+
+    @Override
+    public List<User> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void addUser(User user) {
-        users.put(user.getUserId(), user);
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
     @Override
-    public User readUser(UUID userId) {
-        return users.get(userId);
-    }
-
-    @Override
-    public void deleteUser(UUID userId) {
-        users.remove(userId);
-    }
-
-    @Override
-    public void updateUser(User user) {
-        if(users.containsKey(user.getUserId())) {
-            users.put(user.getUserId(), user);
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        else{
-            throw new IllegalArgumentException("User does not exist");
-        }
-    }
-
-    /// 유저객체만 전부 모아서 반환 -> User만 필요하지 UUID 키는 필요없음
-    @Override
-    public List<User> readAllUser() {
-        /// Map.values()는 Collection<User>타입 반환
-        return new ArrayList<>(users.values());
     }
 }
