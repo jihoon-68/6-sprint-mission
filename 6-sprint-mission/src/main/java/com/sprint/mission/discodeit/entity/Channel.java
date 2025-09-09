@@ -4,6 +4,8 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +18,7 @@ public class Channel implements Serializable {
     private ChannelType type;
     private String name;
     private String description;
+    private List<UUID> userIds = new ArrayList<>();
 
     public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
@@ -40,5 +43,9 @@ public class Channel implements Serializable {
         if (anyValueUpdated) {
             this.updatedAt = Instant.now().getEpochSecond();
         }
+    }
+
+    public void addUser(User user){
+        userIds.add(user.getId());
     }
 }

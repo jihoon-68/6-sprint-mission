@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.MessageDto.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.MessageDto.UpdateMessageDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -20,17 +24,18 @@ public class BasicMessageService implements MessageService {
     //
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("Channel not found with id " + channelId);
+    public Message create(CreateMessageDto createMessageDto) {
+        if (!channelRepository.existsById(createMessageDto.channelId())) {
+            throw new NoSuchElementException("Channel not found with id " + createMessageDto.channelId());
         }
-        if (!userRepository.existsById(authorId)) {
-            throw new NoSuchElementException("Author not found with id " + authorId);
+        if (!userRepository.existsById(createMessageDto.authorId())) {
+            throw new NoSuchElementException("Author not found with id " + createMessageDto.authorId());
         }
 
-        Message message = new Message(content, channelId, authorId);
+        Message message = new Message(createMessageDto.content(), createMessageDto.channelId(), createMessageDto.authorId());
         return messageRepository.save(message);
     }
 
@@ -41,15 +46,15 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAll().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
     }
 
     @Override
-    public Message update(UUID messageId, String newContent) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
+    public Message update(UpdateMessageDto updateMessageDto) {
+        Message message = messageRepository.findById(updateMessageDto.messageId())
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + updateMessageDto.messageId() + " not found"));
+        message.update(updateMessageDto.newContent());
         return messageRepository.save(message);
     }
 
@@ -59,5 +64,6 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
         messageRepository.deleteById(messageId);
+        binaryContentRepository.deleteById(messageId); //delete id?
     }
 }
