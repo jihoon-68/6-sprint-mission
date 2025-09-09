@@ -31,18 +31,8 @@ public class Common implements Serializable {
         return updateAt;
     }
 
-    public Long setUpdateAt(){
+    public Long setUpdatedAt(){
         return this.updateAt = System.currentTimeMillis();
-    }
-
-    // User, Channel, Message의 필드 하나씩 변곁
-    protected <T> void setIfChanged(T currentValue, T newValue, Consumer<T> assign, String fieldName) {
-        if (Objects.equals(currentValue, newValue)){
-            throw new IllegalArgumentException(fieldName + " is not changed");
-        }
-        assign.accept(newValue);
-        this.setUpdateAt();
-
     }
 
 
