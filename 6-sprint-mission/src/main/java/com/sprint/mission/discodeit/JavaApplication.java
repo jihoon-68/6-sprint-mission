@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.UserDto.CreateUserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -19,7 +20,8 @@ import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 public class JavaApplication {
     static User setupUser(UserService userService) {
-        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        CreateUserDto createUserDto = new CreateUserDto("woody", "woody@codeit.com", "woody1234","c://imagePath");
+        User user = userService.create(createUserDto);
         return user;
     }
 
@@ -40,8 +42,8 @@ public class JavaApplication {
         MessageRepository messageRepository = new FileMessageRepository();
 
         // 서비스 초기화
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository);
+        UserService userService = new BasicUserService(userRepository,binaryContentRepository,userStatusRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository,readStatusRepository,messageRepository);
         MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
 
         // 셋업

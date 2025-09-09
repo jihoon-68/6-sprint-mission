@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.UserDto.CreateUserDto;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,7 +16,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class DiscodeitApplication {
 
 	static User setupUser(UserService userService) {
-		User user = userService.create("woody", "woody@codeit.com", "woody1234");
+		CreateUserDto createUserDto = new CreateUserDto("woody", "woody@codeit.com", "woody1234");
+		User user = userService.create(createUserDto);
 		return user;
 	}
 
