@@ -4,10 +4,7 @@ import com.sprint.mission.discodeit.dto.channeldto.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channeldto.FindAllChannelDto;
 import com.sprint.mission.discodeit.dto.channeldto.FindChannelDto;
 import com.sprint.mission.discodeit.dto.channeldto.UpdateChannelDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -78,8 +75,19 @@ public class BasicChannelService implements ChannelService {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
+        // 같은 채널에서 나온 읽기상태들 삭제
+        List<ReadStatus> readStatusesInChannel = readStatusRepository.findAll().stream().filter(readStatus -> readStatus.getChannelId().equals(channelId)).toList();
+        for(ReadStatus readStatus: readStatusesInChannel){
+            readStatusRepository.deleteById(readStatus.getId());
+        }
+        // 같은 채널에서 나온 메시지들 삭제
+        List<Message> messagesInChannel = messageRepository.findAll().stream().filter(msg -> msg.getChannelId().equals(channelId)).toList();
+        for(Message message: messagesInChannel){
+            messageRepository.deleteById(message.getId());
+        }
+        // 채널 id로 삭제
         channelRepository.deleteById(channelId);
-        messageRepository.deleteById(channelId);
-        readStatusRepository.deleteById(channelId);
+
+
     }
 }

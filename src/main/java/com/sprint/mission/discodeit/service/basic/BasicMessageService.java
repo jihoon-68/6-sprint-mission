@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.messagedto.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.messagedto.UpdateMessageDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -27,10 +28,10 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message create(CreateMessageDto createMessageDto) {
         if (!channelRepository.existsById(createMessageDto.channelId())) {
-            throw new NoSuchElementException("Channel not found with id " + createMessageDto.channelId());
+            throw new NoSuchElementException("채널이 없습니다 " + createMessageDto.channelId());
         }
         if (!userRepository.existsById(createMessageDto.authorId())) {
-            throw new NoSuchElementException("Author not found with id " + createMessageDto.authorId());
+            throw new NoSuchElementException("해당 유저가 없습니다 " + createMessageDto.authorId());
         }
 
         Message message = new Message(createMessageDto.content(), createMessageDto.channelId(), createMessageDto.authorId());
@@ -61,7 +62,12 @@ public class BasicMessageService implements MessageService {
         if (!messageRepository.existsById(messageId)) {
             throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
+        // 메시지의 첨부파일들 객체 삭제
+        List<BinaryContent> binaryContentsInMessage = binaryContentRepository.findAll().stream().filter(binaryContent -> binaryContent.getMessageId().equals(messageId)).toList();
+        for(BinaryContent binaryContent: binaryContentsInMessage){
+            binaryContentRepository.deleteById(binaryContent.getId());
+        }
+        // 메시지 id로 삭제
         messageRepository.deleteById(messageId);
-        binaryContentRepository.deleteById(messageId); //delete id?
     }
 }

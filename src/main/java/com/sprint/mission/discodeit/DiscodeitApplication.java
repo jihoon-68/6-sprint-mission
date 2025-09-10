@@ -10,10 +10,12 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import lombok.Value;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.Environment;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +54,13 @@ public class DiscodeitApplication {
 		UserService userService = context.getBean(BasicUserService.class);
 		ChannelService channelService = context.getBean(BasicChannelService.class);
 		MessageService messageService = context.getBean(BasicMessageService.class);
+
+		// Environment를 통해 프로퍼티 읽기
+		Environment env = context.getEnvironment();
+		String type = env.getProperty("discodeit.repository.type" , "jcf");
+
+		System.out.println("repository type = " + type);  // => jcf
+
 
 		//셋업
 		User user = setupUser(userService);

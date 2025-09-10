@@ -12,8 +12,6 @@ public class ReadStatus implements Serializable {
     private UUID id;
     private UUID userId;
     private UUID channelId;
-    private User user;
-    private Channel channel;
     private Instant lastReadAt;
 
     public ReadStatus(UUID userId, UUID channelId) {

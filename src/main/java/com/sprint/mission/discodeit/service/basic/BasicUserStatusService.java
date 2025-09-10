@@ -34,7 +34,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus find(UUID userStatusId) {
         return userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + userStatusId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public void delete(UUID userStatusId) {
         if (!userStatusRepository.existsById(userStatusId)) {
-            throw new NoSuchElementException("Message with id " + userStatusId + " not found");
+            throw new NoSuchElementException("UserStatus with id " + userStatusId + " not found");
         }
         userStatusRepository.deleteById(userStatusId);
     }

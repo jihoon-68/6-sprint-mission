@@ -45,6 +45,7 @@ public class JavaApplication {
 
 
     public static void main(String[] args) throws IOException {
+
         // 레포지토리 초기화
         UserRepository userRepository = new FileUserRepository();
         ChannelRepository channelRepository = new FileChannelRepository();
