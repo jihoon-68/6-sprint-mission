@@ -6,35 +6,35 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data;
+    private final Map<UUID, User> userMap;
 
     public JCFUserRepository() {
-        this.data = new HashMap<>();
+        this.userMap = new HashMap<>();
     }
 
     @Override
     public User save(User user) {
-        this.data.put(user.getId(), user);
+        this.userMap.put(user.getId(), user);
         return user;
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(this.data.get(id));
+        return Optional.ofNullable(this.userMap.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        return this.data.values().stream().toList();
+        return this.userMap.values().stream().toList();
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return this.data.containsKey(id);
+        return this.userMap.containsKey(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        this.data.remove(id);
+        this.userMap.remove(id);
     }
 }

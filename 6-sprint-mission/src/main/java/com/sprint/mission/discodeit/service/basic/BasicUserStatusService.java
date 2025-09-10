@@ -65,10 +65,4 @@ public class BasicUserStatusService implements UserStatusService {
         }
         userStatusRepository.deleteById(userStatusId);
     }
-//    UserStatus create(UserStatusDto userStatusDto);
-//    UserStatus find(UUID userStatusId);
-//    List<UserStatus> findAll();
-//    UserStatus update(UUID userStatusId, String isOnline);
-//    UserStatus updateByUserId(UserStatusDto userStatusDto);
-//    void delete(UUID userStatusId);
 }

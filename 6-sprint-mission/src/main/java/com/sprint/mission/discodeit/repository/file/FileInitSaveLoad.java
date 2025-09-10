@@ -34,7 +34,7 @@ public class FileInitSaveLoad {
             try {
                 List<T> list = Files.list(directory)
                         .map(path -> {
-                            try (
+                            try (                                                                   // TODO try-with-resources로 바꾸기
                                     FileInputStream fis = new FileInputStream(path.toFile());
                                     ObjectInputStream ois = new ObjectInputStream(fis)
                             ) {

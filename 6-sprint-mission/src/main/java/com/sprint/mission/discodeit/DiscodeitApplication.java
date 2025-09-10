@@ -10,10 +10,16 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,14 +40,14 @@ public class DiscodeitApplication {
 	}
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-		List<String> imagePathList = List.of("C:/Users/이호건/Downloads/AOPimage.jpeg");
+		List<String> imagePathList = List.of("C:/Users/이호건/Downloads/AOPImage.jpeg");
 		CreateMessageDto createMessageDto = new CreateMessageDto("안녕하세요.", channel.getId(), author.getId(),imagePathList);
 		Message message = messageService.create(createMessageDto);
 		System.out.println("메시지 생성: " + message.getId());
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 		UserService userService = context.getBean(BasicUserService.class);
 		ChannelService channelService = context.getBean(BasicChannelService.class);
@@ -54,6 +60,8 @@ public class DiscodeitApplication {
 		Channel channel = setupChannel(channelService,userIds);
 		// 테스트
 		messageCreateTest(messageService, channel, user);
+		// 데이터 삭제
+		FileUtils.deleteDirectory(new File("file-data"));
 
 	}
 
