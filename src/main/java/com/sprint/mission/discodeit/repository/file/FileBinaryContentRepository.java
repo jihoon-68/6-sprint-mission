@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -14,9 +16,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file"
+)
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    public final Path directory = Paths.get(System.getProperty("user.dir"), "file-data","BinaryContentData");
+    @Value("${discodeit.repository.file-directory}")
+    private String fileDirectory;
+
+    private Path directory;
+
+    @PostConstruct                 // @Value 필드값은 Bean 생성 이후에 채워짐, 인스턴스 필드 초기화 시점을 뒤로 미뤄 NullPointerException 방지
+    public void init() {
+        this.directory = Paths.get(System.getProperty("user.dir"), fileDirectory, "BinaryContentData");
+    }
 
     private Path resolvePath(UUID id) {
         return directory.resolve(id + ".ser");

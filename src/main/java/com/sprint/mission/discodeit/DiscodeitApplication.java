@@ -3,25 +3,23 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.dto.channeldto.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.messagedto.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.userdto.CreateUserDto;
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import lombok.Value;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.env.Environment;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -42,8 +40,8 @@ public class DiscodeitApplication {
 	}
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-		List<String> imagePathList = List.of("C:/Users/이호건/Downloads/AOPImage.jpeg");
-		CreateMessageDto createMessageDto = new CreateMessageDto("안녕하세요.", channel.getId(), author.getId(),imagePathList);
+//		List<String> imagePathList = List.of("C:/Users/이호건/Downloads/AOPImage.jpeg");
+		CreateMessageDto createMessageDto = new CreateMessageDto("안녕하세요.", channel.getId(), author.getId(),null);
 		Message message = messageService.create(createMessageDto);
 		System.out.println("메시지 생성: " + message.getId());
 	}
@@ -54,13 +52,6 @@ public class DiscodeitApplication {
 		UserService userService = context.getBean(BasicUserService.class);
 		ChannelService channelService = context.getBean(BasicChannelService.class);
 		MessageService messageService = context.getBean(BasicMessageService.class);
-
-		// Environment를 통해 프로퍼티 읽기
-		Environment env = context.getEnvironment();
-		String type = env.getProperty("discodeit.repository.type" , "jcf");
-
-		System.out.println("repository type = " + type);  // => jcf
-
 
 		//셋업
 		User user = setupUser(userService);
