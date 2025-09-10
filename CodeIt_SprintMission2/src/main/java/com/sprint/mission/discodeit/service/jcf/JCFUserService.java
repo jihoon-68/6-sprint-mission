@@ -8,7 +8,7 @@ import java.util.*;
 public class JCFUserService implements UserService {
 
     private final Map<UUID, User> data = new HashMap<>();
-
+    
     @Override
     public User createUser(String name, String email) {
         User user = new User(name, email);

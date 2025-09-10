@@ -10,7 +10,7 @@ public class Message extends Common implements Serializable {
     private String contents;
     private final UUID receiverId;
 
-    public Message(UUID senderId, String contents, UUID receiverId) {
+    public Message(UUID senderId, UUID receiverId, String contents) {
         super();
         this.senderId = senderId;
         this.contents = contents;

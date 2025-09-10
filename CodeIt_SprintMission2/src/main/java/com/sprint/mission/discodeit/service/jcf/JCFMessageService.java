@@ -26,7 +26,7 @@ public class JCFMessageService implements MessageService {
             return null;
         }
 
-        Message message = new Message(senderId, contents, receiverId);
+        Message message = new Message(senderId, receiverId,contents);
         data.put(message.getId(), message);
         return message;
     }

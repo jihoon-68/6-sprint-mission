@@ -6,76 +6,170 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 
+import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 public class JavaApplication {
+
     public static void main(String[] args) {
+        initialize();
 
-        JCFUserService userService = new JCFUserService();
+        UserService userService = new FileUserService();
+        ChannelService channelService = new FileChannelService();
+        MessageService messageService = new FileMessageService(userService);
 
-        System.out.println("[등록] GURU");
-        String name = "GURU";
-        String email = "guru@example.com";
-        userService.createUser(name, email);
+        // 각 도메인에 대한 CRUD 테스트 진행
+        testUserCRUD(userService);
+        testChannelCRUD(channelService);
+        testMessageCRUD(messageService, userService);
+    }
 
+    /**
+     * 테스트 실행 전, 이전에 저장된 ser 파일들을 삭제하여 초기화합니다.
+     */
+    private static void initialize() {
+        System.out.println("--- 🧹 데이터 파일 초기화를 시작합니다 ---");
+        boolean usersDeleted = new File("users.ser").delete();
+        boolean channelsDeleted = new File("channels.ser").delete();
+        boolean messagesDeleted = new File("messages.ser").delete();
 
-        UUID userId = null;
-        for (User u : userService.getAllUsers()) {
-            if (name.equals(u.getName()) && email.equals(u.getEmail())) {
-                userId = u.getId();
-                break;
-            }
-        }
+        System.out.println("users.ser 삭제: " + (usersDeleted ? "성공" : "파일 없음"));
+        System.out.println("channels.ser 삭제: " + (channelsDeleted ? "성공" : "파일 없음"));
+        System.out.println("messages.ser 삭제: " + (messagesDeleted ? "성공" : "파일 없음"));
+        System.out.println("--- ✅ 초기화 완료 ---\n");
+    }
 
+    /**
+     * User 도메인에 대한 CRUD 연산을 테스트합니다.
+     * @param userService UserService 인스턴스
+     */
+    private static void testUserCRUD(UserService userService) {
+        System.out.println("========== 👤 User CRUD 테스트 시작 ==========");
 
-        System.out.println("[조회 - 단건]");
-        User found = userService.getUserById(userId);
-        System.out.println(found);
+        // CREATE
+        System.out.println("\n--- 1. User 생성 ---");
+        User user1 = userService.createUser("Alice", "alice@email.com");
+        User user2 = userService.createUser("Bob", "bob@email.com");
+        System.out.println("생성된 User: " + user1);
+        System.out.println("생성된 User: " + user2);
 
-        System.out.println("[조회 - 다건]");
-        for (User u : userService.getAllUsers()) {
-            System.out.println(u);
-        }
+        // READ (ALL)
+        System.out.println("\n--- 2. 모든 User 조회 ---");
+        List<User> allUsers = userService.getAllUsers();
+        allUsers.forEach(user -> System.out.println("조회된 User: " + user));
 
-        System.out.println("[수정]");
-        User updated = userService.updateUser(userId, "GURU_UPDATED", "guru_updated@example.com");
-        System.out.println(updated);
+        // READ (ONE)
+        System.out.println("\n--- 3. ID로 User 조회 ---");
+        User foundUser = userService.getUserById(user1.getId());
+        System.out.println("ID로 조회된 User: " + foundUser);
 
-        System.out.println("[수정된 데이터 조회]");
-        User updatedFound = userService.getUserById(userId);
-        System.out.println(updatedFound);
+        // UPDATE
+        System.out.println("\n--- 4. User 정보 수정 ---");
+        System.out.println("수정 전 User: " + user1);
+        User updatedUser = userService.updateUser(user1.getId(), "Alice Kim", "alice.kim@email.com");
+        System.out.println("수정 후 User: " + updatedUser);
 
-        System.out.println("[삭제]");
-        boolean deleted = userService.deleteUser(userId);
-        System.out.println("삭제 결과: " + deleted);
+        // DELETE
+        System.out.println("\n--- 5. User 삭제 ---");
+        System.out.println("삭제할 User: " + user2.getName());
+        userService.deleteUser(user2.getId());
 
-        System.out.println("[조회를 통해 삭제되었는지 확인]");
-        User afterDelete = userService.getUserById(userId);
-        System.out.println(afterDelete == null ? "삭제 확인: 더 이상 조회되지 않습니다." : afterDelete.toString());
+        // 최종 조회
+        System.out.println("\n--- 6. 최종 User 목록 확인 ---");
+        userService.getAllUsers().forEach(user -> System.out.println("남아있는 User: " + user));
+        System.out.println("========== 👤 User CRUD 테스트 완료 ==========\n");
+    }
 
+    /**
+     * Channel 도메인에 대한 CRUD 연산을 테스트합니다.
+     * @param channelService ChannelService 인스턴스
+     */
+    private static void testChannelCRUD(ChannelService channelService) {
+        System.out.println("========== 💬 Channel CRUD 테스트 시작 ==========");
 
-        // 메시지 생성 시 사용자 존재 검증 데모
-        System.out.println("\n[메시지 생성 검증 데모]");
-        User sender = userService.createUser("SENDER", "sender@example.com");
-        User receiver = userService.createUser("RECEIVER", "receiver@example.com");
-        JCFMessageService messageService = new JCFMessageService(userService);
+        // CREATE
+        System.out.println("\n--- 1. Channel 생성 ---");
+        Channel channel1 = channelService.createChannel("일반", "자유롭게 대화하는 채널");
+        Channel channel2 = channelService.createChannel("개발", "개발 관련 이야기 채널");
+        System.out.println("생성된 Channel: " + channel1);
+        System.out.println("생성된 Channel: " + channel2);
 
-        System.out.println("- 정상 케이스: 존재하는 사용자들로 메시지 생성");
-        Message ok = messageService.createMessage(sender.getId(), receiver.getId(), "Hello");
-        System.out.println(ok);
+        // READ (ALL)
+        System.out.println("\n--- 2. 모든 Channel 조회 ---");
+        channelService.getAllChannels().forEach(ch -> System.out.println("조회된 Channel: " + ch));
 
-        System.out.println("- 실패 케이스: 존재하지 않는 발신자 ID로 메시지 생성");
-        UUID fakeSender = UUID.randomUUID();
-        Message fail1 = messageService.createMessage(fakeSender, receiver.getId(), "Should fail by sender");
-        System.out.println(fail1 == null ? "생성 실패 확인(발신자)" : fail1.toString());
+        // READ (ONE)
+        System.out.println("\n--- 3. ID로 Channel 조회 ---");
+        Channel foundChannel = channelService.getChannelById(channel1.getId());
+        System.out.println("ID로 조회된 Channel: " + foundChannel);
 
-        System.out.println("- 실패 케이스: 존재하지 않는 수신자 ID로 메시지 생성");
-        UUID fakeReceiver = UUID.randomUUID();
-        Message fail2 = messageService.createMessage(sender.getId(), fakeReceiver, "Should fail by receiver");
-        System.out.println(fail2 == null ? "생성 실패 확인(수신자)" : fail2.toString());
+        // UPDATE
+        System.out.println("\n--- 4. Channel 정보 수정 ---");
+        System.out.println("수정 전 Channel: " + channel1);
+        Channel updatedChannel = channelService.updateChannel(channel1.getId(), "공지사항", "중요 공지를 전달하는 채널");
+        System.out.println("수정 후 Channel: " + updatedChannel);
+
+        // DELETE
+        System.out.println("\n--- 5. Channel 삭제 ---");
+        System.out.println("삭제할 Channel: " + channel2.getName());
+        channelService.deleteChannel(channel2.getId());
+
+        // 최종 조회
+        System.out.println("\n--- 6. 최종 Channel 목록 확인 ---");
+        channelService.getAllChannels().forEach(ch -> System.out.println("남아있는 Channel: " + ch));
+        System.out.println("========== 💬 Channel CRUD 테스트 완료 ==========\n");
+    }
+
+    /**
+     * Message 도메인에 대한 CRUD 연산을 테스트합니다.
+     * @param messageService MessageService 인스턴스
+     * @param userService UserService 인스턴스 (테스트용 사용자 생성을 위해)
+     */
+    private static void testMessageCRUD(MessageService messageService, UserService userService) {
+        System.out.println("========== 📨 Message CRUD 테스트 시작 ==========");
+
+        // 테스트용 사용자 생성
+        User sender = userService.createUser("Sender", "sender@email.com");
+        User receiver = userService.createUser("Receiver", "receiver@email.com");
+
+        // CREATE
+        System.out.println("\n--- 1. Message 생성 ---");
+        Message message1 = messageService.createMessage(sender.getId(), receiver.getId(), "안녕하세요!");
+        Message message2 = messageService.createMessage(receiver.getId(), sender.getId(), "네, 안녕하세요!");
+        System.out.println("생성된 Message: " + message1);
+        System.out.println("생성된 Message: " + message2);
+
+        // READ (ALL)
+        System.out.println("\n--- 2. 모든 Message 조회 ---");
+        messageService.getAllMessages().forEach(msg -> System.out.println("조회된 Message: " + msg));
+
+        // READ (ONE)
+        System.out.println("\n--- 3. ID로 Message 조회 ---");
+        Message foundMessage = messageService.getMessageById(message1.getId());
+        System.out.println("ID로 조회된 Message: " + foundMessage);
+
+        // UPDATE
+        System.out.println("\n--- 4. Message 내용 수정 ---");
+        System.out.println("수정 전 Message: " + message1);
+        Message updatedMessage = messageService.updateMessage(message1.getId(), "안녕하세요! 반갑습니다.");
+        System.out.println("수정 후 Message: " + updatedMessage);
+
+        // DELETE
+        System.out.println("\n--- 5. Message 삭제 ---");
+        System.out.println("삭제할 Message ID: " + message2.getId());
+        messageService.deleteMessage(message2.getId());
+
+        // 최종 조회
+        System.out.println("\n--- 6. 최종 Message 목록 확인 ---");
+        messageService.getAllMessages().forEach(msg -> System.out.println("남아있는 Message: " + msg));
+        System.out.println("========== 📨 Message CRUD 테스트 완료 ==========\n");
     }
 }
