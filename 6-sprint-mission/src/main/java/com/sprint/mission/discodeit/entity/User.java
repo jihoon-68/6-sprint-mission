@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.File;
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Setter
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -21,8 +23,7 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
-    private String imagePath;
-    private File image;
+    private BinaryContent binaryContent;
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
@@ -33,11 +34,10 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public User(String username, String email, String password, String imagePath, BinaryContent binaryContent){
+    public User(String username, String email, String password, BinaryContent binaryContent){
         this(username, email, password);
-        this.imagePath = imagePath;
-        this.image = binaryContent.getImage();
         this.profileId = binaryContent.getId();
+        this.binaryContent = binaryContent;
     }
 
     public void update(String newUsername, String newEmail, String newPassword, String imagePath) {
@@ -59,8 +59,5 @@ public class User implements Serializable {
             this.updatedAt = Instant.now().getEpochSecond();
         }
 
-        if (imagePath != null){
-            this.imagePath = imagePath;
-        }
     }
 }

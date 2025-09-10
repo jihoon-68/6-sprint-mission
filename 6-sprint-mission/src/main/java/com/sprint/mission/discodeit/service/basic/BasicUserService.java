@@ -33,13 +33,13 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("유저네임 혹은 이메일이 같은 유저가 존재합니다.");
         }
         if(createUserDto.imagePath()!=null){
-            BinaryContent binaryContent = new BinaryContent(createUserDto.imagePath());
-            user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password(), createUserDto.imagePath(), binaryContent);
+            user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password());
+            BinaryContent binaryContent = new BinaryContent(user.getId(), createUserDto.imagePath());
+            user.setBinaryContent(binaryContent);
             binaryContentRepository.save(binaryContent);
         }else{
             user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password());
         }
-
         userStatusRepository.save(new UserStatus(user.getId()));
         return userRepository.save(user);
     }
