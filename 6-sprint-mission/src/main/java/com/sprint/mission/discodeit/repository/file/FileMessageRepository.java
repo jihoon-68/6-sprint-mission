@@ -14,74 +14,34 @@ import java.util.UUID;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
 
-    public FileMessageRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
-        if (Files.notExists(DIRECTORY)) {
-            try {
-                Files.createDirectories(DIRECTORY);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
+    public final Path directory = Paths.get(System.getProperty("user.dir"), "file-data","MessageData");
 
     private Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id + EXTENSION);
+        return directory.resolve(id + ".ser");
     }
 
     @Override
     public Message save(Message message) {
-        Path path = resolvePath(message.getId());
-        try (
-                FileOutputStream fos = new FileOutputStream(path.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(message);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FileInitSaveLoad.init(directory);
+
+        Path filePath = resolvePath(message.getId());
+        FileInitSaveLoad.<Message>save(filePath, message);
+
         return message;
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        Message messageNullable = null;
-        Path path = resolvePath(id);
-        if (Files.exists(path)) {
-            try (
-                    FileInputStream fis = new FileInputStream(path.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                messageNullable = (Message) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return Optional.ofNullable(messageNullable);
+        return findAll()
+                .stream()
+                .filter(msg->msg.getId().equals(id))
+                .findAny();
     }
 
     @Override
     public List<Message> findAll() {
-        try {
-            return Files.list(DIRECTORY)
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (Message) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return FileInitSaveLoad.<Message>load(directory);
     }
 
     @Override

@@ -14,7 +14,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -25,14 +27,14 @@ public class DiscodeitApplication {
 		return user;
 	}
 
-	static Channel setupChannel(ChannelService channelService) {
-		CreateChannelDto createChannelDto = new CreateChannelDto(ChannelType.PUBLIC, "공지", "공지 채널입니다.",null);
+	static Channel setupChannel(ChannelService channelService, List<UUID> userIds) {
+		CreateChannelDto createChannelDto = new CreateChannelDto(ChannelType.PUBLIC, "공지", "공지 채널입니다.",userIds);
 		Channel channel = channelService.create(createChannelDto);
 		return channel;
 	}
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-		List<String> imagePathList = List.of("c://imagePath", "c://imagePath2");
+		List<String> imagePathList = List.of("C:/Users/이호건/Downloads/AOPimage.jpeg");
 		CreateMessageDto createMessageDto = new CreateMessageDto("안녕하세요.", channel.getId(), author.getId(),imagePathList);
 		Message message = messageService.create(createMessageDto);
 		System.out.println("메시지 생성: " + message.getId());
@@ -45,9 +47,11 @@ public class DiscodeitApplication {
 		ChannelService channelService = context.getBean(BasicChannelService.class);
 		MessageService messageService = context.getBean(BasicMessageService.class);
 
-		// 셋업
+		//셋업
 		User user = setupUser(userService);
-		Channel channel = setupChannel(channelService);
+		List<UUID> userIds = new ArrayList<>();
+		userIds.add(user.getId());
+		Channel channel = setupChannel(channelService,userIds);
 		// 테스트
 		messageCreateTest(messageService, channel, user);
 
