@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTOs;
+package com.sprint.mission.discodeit.DTOs.User;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
@@ -10,6 +10,6 @@ public record UserUpdate(
         String newUsername,
         String newEmail,
         String newPassword,
-        Optional<BinaryContent> newBinaryContent) {
+        Optional<BinaryContent> newProfile) {
 
 }

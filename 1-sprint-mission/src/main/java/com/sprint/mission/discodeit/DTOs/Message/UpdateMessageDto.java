@@ -1,4 +1,9 @@
 package com.sprint.mission.discodeit.DTOs.Message;
 
-public record UpdateMessageDto() {
+import java.util.UUID;
+
+public record UpdateMessageDto(
+        UUID messageId,
+        String newContent
+) {
 }

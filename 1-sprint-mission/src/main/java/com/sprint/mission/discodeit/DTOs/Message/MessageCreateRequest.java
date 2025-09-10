@@ -1,4 +1,12 @@
 package com.sprint.mission.discodeit.DTOs.Message;
 
-public record MessageCreateRequest() {
+import java.util.List;
+import java.util.UUID;
+
+public record MessageCreateRequest(
+        String content,
+        UUID channelId,
+        UUID authorId,
+        List<String> attachments
+) {
 }

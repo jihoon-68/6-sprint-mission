@@ -1,31 +1,37 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTOs.User.UserFind;
+import com.sprint.mission.discodeit.DTOs.User.UserInfo;
+import com.sprint.mission.discodeit.DTOs.User.UserUpdate;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.FileStorageException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class BasicUserService implements UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    //
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    public BasicUserService(UserRepository userRepository) {
+    public BasicUserService(UserRepository userRepository,
+                            UserStatusRepository userStatusRepository,
+                            BinaryContentRepository binaryContentRepository) {
         this.userRepository = userRepository;
-    }
-
-    @Override
-    public User create(String username, String email, String password) {
-        if(isValidPassword(password)) {
-            User user = new User(username, email, password);
-            return userRepository.save(user);
-        }
-
-        throw new IllegalArgumentException("비밀번호는 6자 이상이어야 합니다.");
+        this.userStatusRepository = userStatusRepository;
+        this.binaryContentRepository = binaryContentRepository;
     }
 
     private boolean isValidPassword(String password) {
@@ -33,20 +39,80 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User find(UUID userId) {
-        return getUserById(userId);
+    public User create(UserInfo info) {
+        if (!isValidPassword(info.password())) {
+            throw new IllegalArgumentException("비밀번호는 6자 이상이어야 합니다.");
+        }
+
+        var allUsers = userRepository.findAll();
+
+        if (allUsers.stream().filter(u -> u.getEmail().equals(info.email())) != null) {
+            throw new IllegalStateException("이메일이 존재합니다.");
+        }
+
+        if (allUsers.stream().filter(u -> u.getUsername().equals(info.username())) != null) {
+            throw new IllegalStateException("아이디가 존재합니다.");
+        }
+
+        User user = new User(info.username(), info.email(), info.password());
+
+        var status = new UserStatus(user.getId());
+        userStatusRepository.save(status);
+
+        if (info.profileImage().isPresent()) {
+            BinaryContent img = null;
+            var p = info.profileImage().get();
+            img = binaryContentRepository.save(p);
+        }
+
+        return user;
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public UserFind find(UUID userId) {
+        var user = userRepository.findById(userId).orElseThrow();
+        var status = userStatusRepository.findByUserId(userId).orElseThrow();
+        var image = binaryContentRepository.findByUserId(userId);
+
+        return new UserFind(userId, user.getUsername(), user.getEmail(), status, image);
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User user = getUserById(userId);
-        user.update(newUsername, newEmail, newPassword);
-        return userRepository.save(user);
+    public List<UserFind> findAll() {
+        var users = userRepository.findAll();
+
+        Map<UUID, Optional<UserStatus>> statusMap = new HashMap<>();
+        Map<UUID, Optional<BinaryContent>> imageMap = new HashMap<>();
+
+        for (var u : users) {
+            statusMap.put(u.getId(), userStatusRepository.findByUserId(u.getId()));
+            imageMap.put(u.getId(), binaryContentRepository.findByUserId(u.getId()));
+        }
+
+        return users.stream()
+                .map(u -> new UserFind(
+                        u.getId(),
+                        u.getUsername(),
+                        u.getEmail(),
+                        statusMap.get(u.getId()).orElseThrow(),
+                        imageMap.get(u.getId())
+                ))
+                .toList();
+    }
+
+    @Override
+    public User update(UserUpdate update) {
+        User user = getUserById(update.userId());
+
+        user.update(update.newUsername(), update.newEmail(), update.newPassword());
+
+        userRepository.save(user);
+
+        if (update.newProfile().isPresent()) {
+            binaryContentRepository.save(update.newProfile().get());
+        }
+
+        return user;
     }
 
     @Override
@@ -54,6 +120,15 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("User with id " + userId + " not found");
         }
+
+        boolean statusDeleted = userStatusRepository.deleteByUserId(userId);
+
+        if (!statusDeleted) {
+            log.warn("UserStatus missing while deleting user: {}", userId);
+        }
+
+        binaryContentRepository.deleteByUserId(userId);
+
         userRepository.deleteById(userId);
     }
 

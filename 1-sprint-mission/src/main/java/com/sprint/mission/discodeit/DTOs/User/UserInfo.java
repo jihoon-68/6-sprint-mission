@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTOs;
+package com.sprint.mission.discodeit.DTOs.User;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
@@ -8,9 +8,9 @@ public record UserInfo(
         String username,
         String email,
         String password,
-        BinaryContent profileImage
+        Optional<BinaryContent> profileImage
 ) {
-    public Optional<BinaryContent> getProfileImage() {
-        return Optional.ofNullable(profileImage);
-    }
+//    public Optional<BinaryContent> getProfileImage() {
+//        return Optional.ofNullable(profileImage);
+//    }
 }
