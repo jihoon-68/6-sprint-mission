@@ -6,10 +6,13 @@ import java.util.UUID;
 
 public interface UserService {
 
-    User create(User user);
-    User read(UUID id);
-    List<User> readAll();
-    User update(UUID id, String newName, String newEmail);
-    boolean delete(UUID id);
+    User createUser(String name, String email);
 
+    User getUserById(UUID id);
+
+    List<User> getAllUsers();
+
+    User updateUser(UUID id, String newName, String newEmail);
+
+    boolean deleteUser(UUID id);
 }

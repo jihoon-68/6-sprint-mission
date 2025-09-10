@@ -6,12 +6,15 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    Channel create(Channel channel);
-    Channel read(UUID uuid);
-    List<Channel> readAll();
-    Channel update(UUID id,String channelName, String channelDescription);
-    boolean delete(UUID id);
+    Channel createChannel(String name, String description);
 
+    Channel getChannelById(UUID id);
+
+    List<Channel> getAllChannels();
+
+    Channel updateChannel(UUID id, String newName, String newDescription);
+
+    boolean deleteChannel(UUID id);
 
 
 }

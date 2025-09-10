@@ -8,13 +8,13 @@ public class Message extends Common implements Serializable {
 
     private final UUID senderId;
     private String contents;
-    private final UUID recieverId;
+    private final UUID receiverId;
 
-    public Message(UUID senderId, String contents, UUID recieverId) {
+    public Message(UUID senderId, String contents, UUID receiverId) {
         super();
-        this.senderId = UUID.randomUUID();;
+        this.senderId = senderId;
         this.contents = contents;
-        this.recieverId = UUID.randomUUID();;
+        this.receiverId = receiverId;
     }
 
     public UUID getSenderId() {
@@ -25,8 +25,8 @@ public class Message extends Common implements Serializable {
         return contents;
     }
 
-    public UUID getRecieverId(){
-        return recieverId;
+    public UUID getReceiverId(){
+        return receiverId;
     }
 
 
@@ -45,7 +45,7 @@ public class Message extends Common implements Serializable {
         return "Message{" +
                 "senderId='" + senderId + '\'' +
                 ", Message contents='" + contents + '\'' +
-                ", recieverId='" + recieverId + '\'' +
+                ", receiverId='" + receiverId + '\'' +
                 ", createdAt=" + getCreatedAt() +
                 ", updatedAt=" + getUpdateAt() +
                 '}';

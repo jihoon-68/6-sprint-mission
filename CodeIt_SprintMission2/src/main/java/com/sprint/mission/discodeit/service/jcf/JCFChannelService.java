@@ -7,48 +7,39 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> data;
 
-    public JCFChannelService(){
-        this.data = new LinkedHashMap<>();
+    private final Map<UUID, Channel> data = new HashMap<>();
+
+    @Override
+    public Channel createChannel(String name, String description) {
+        Channel channel = new Channel(name, description);
+        return data.put(channel.getId(), channel);
     }
 
     @Override
-    public Channel create(Channel channel){
-        data.put(channel.getId(), channel);
-        return channel;
-    }
-
-    @Override
-    public Channel read(UUID id){
-        if (data.containsKey(id)){
+    public Channel getChannelById(UUID id) {
+        if (data.containsKey(id)) {
             return data.get(id);
-        }
-        else{
-            System.out.println("해당 ID에 맞는 채널이 없습니다");
+        } else {
+            System.out.println("해당 ID에 맞는 채널이 없습니다.");
             return null;
         }
     }
 
     @Override
-    public List<Channel> readAll(){
+    public List<Channel> getAllChannels() {
         return new ArrayList<>(data.values());
     }
 
     @Override
-    public Channel update(UUID id, String channelName, String channelDescription) {
-        Channel chaneel = data.get(id);
-        if (chaneel != null) {
-            chaneel.setChannelName(channelName);
-            chaneel.setChannelDescription(channelDescription);
-        }
-        return chaneel;
+    public Channel updateChannel(UUID id, String newName, String newDescription) {
+        Channel channel = data.get(id);
+        channel.updateChannel(newName, newDescription);
+        return channel;
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public boolean deleteChannel(UUID id) {
         return data.remove(id) != null;
     }
-
-
 }

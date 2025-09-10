@@ -6,20 +6,18 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> data;
 
-    public JCFUserService(){
-        this.data = new LinkedHashMap<>();
-    }
+    private final Map<UUID, User> data = new HashMap<>();
 
     @Override
-    public User create(User user){
+    public User createUser(String name, String email) {
+        User user = new User(name, email);
         data.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User read(UUID id) {
+    public User getUserById(UUID id) {
         if (data.containsKey(id)) {
             return data.get(id);
         } else {
@@ -29,23 +27,20 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public List<User> readAll(){
+    public List<User> getAllUsers() {
         return new ArrayList<>(data.values());
     }
 
     @Override
-    public User update(UUID id, String name, String email) {
+    public User updateUser(UUID id, String newName, String newEmail) {
         User user = data.get(id);
-        if (user != null) {
-            user.setUserName(name);
-            user.setUserEmail(email);
-        }
+        user.updateUser(newName, newEmail);
         return user;
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public boolean deleteUser(UUID id) {
         return data.remove(id) != null;
     }
-
 }
+
