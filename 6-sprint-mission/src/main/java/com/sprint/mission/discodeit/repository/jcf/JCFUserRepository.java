@@ -24,22 +24,6 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByName(String name) {
-        return data.values()
-                .stream()
-                .filter(users->users.getUsername().equals(name))
-                .findAny();
-    }
-
-    @Override
-    public Optional<User> findByPassword(String password) {
-        return data.values()
-                .stream()
-                .filter(users->users.getPassword().equals(password))
-                .findAny();
-    }
-
-    @Override
     public List<User> findAll() {
         return this.data.values().stream().toList();
     }

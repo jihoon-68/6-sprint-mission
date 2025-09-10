@@ -9,13 +9,32 @@ import java.util.UUID;
 public class UserStatus {
     private UUID id;
     private UUID userid;
+    private String isOnline;
+    private Long updatedAt;
 
-    public UserStatus(User user) {
+    public UserStatus(UUID userid) {
         this.id = UUID.randomUUID();
-        this.userid = user.getId();
+        this.userid = userid;
+        this.isOnline = "Offline";
+        this.updatedAt = Instant.now().getEpochSecond();
     }
 
-    public boolean isOnline(User user) {
-        return (user.getUpdatedAt() - Instant.now().getEpochSecond()) <= 300;
+    public boolean CheckOnline() {
+        if(this.updatedAt - Instant.now().getEpochSecond()<= 300){
+            this.isOnline = "Online";
+            return true;
+        }
+        return false;
+    }
+
+    public void update() {
+        boolean anyValueUpdated = CheckOnline();
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+            System.out.println("유저가 온라인입니다");
+        } else{
+            this.isOnline= "Offline";
+            System.out.println("유저가 오프라인입니다");
+        }
     }
 }

@@ -27,10 +27,9 @@ public class BasicUserService implements UserService {
     @Override
     public User create(CreateUserDto createUserDto) {
         User user;
-//        User findUserByName  = userRepository.findAll().stream().filter(users -> users.getUsername().equals(createUserDto.username())).findAny().orElse(null);
-//        User findUserByEmail = userRepository.findAll().stream().filter(users->users.getEmail().equals(createUserDto.email())).findAny().orElse(null);
-        if (userRepository.findByName(createUserDto.username()).isPresent()
-                || userRepository.findByPassword(createUserDto.password()).isPresent()) {
+        User findUserByName  = userRepository.findAll().stream().filter(users -> users.getUsername().equals(createUserDto.username())).findAny().orElse(null);
+        User findUserByEmail = userRepository.findAll().stream().filter(users->users.getEmail().equals(createUserDto.email())).findAny().orElse(null);
+        if (findUserByName != null || findUserByEmail != null) {
             throw new IllegalArgumentException("유저네임 혹은 이메일이 같은 유저가 존재합니다.");
         }
         if(createUserDto.imagePath()!=null){
@@ -41,7 +40,7 @@ public class BasicUserService implements UserService {
             user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password());
         }
 
-        userStatusRepository.save(new UserStatus(user));
+        userStatusRepository.save(new UserStatus(user.getId()));
         return userRepository.save(user);
     }
 

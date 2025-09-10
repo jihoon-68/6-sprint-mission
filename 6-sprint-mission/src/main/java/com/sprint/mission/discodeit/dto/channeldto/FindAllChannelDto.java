@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record FindAllChannelDto(
         ChannelType type,
-        UUID userId,                //private
+        UUID userId,                // PRIVATE 채널만 필요
         Instant latestMessageTime
 ) {
 }

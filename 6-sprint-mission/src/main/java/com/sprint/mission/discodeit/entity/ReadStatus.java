@@ -21,8 +21,8 @@ public class ReadStatus {
         this.lastReadAt = Instant.EPOCH;    //  초기화
     }
 
-    public boolean lastReadMessageTime(Instant latestMessageTime){
-        return lastReadAt.isBefore(latestMessageTime);
+    public boolean hasUnreadMessage(Instant latestMessageTime){
+        return lastReadAt.isBefore(latestMessageTime);  // lastReadAt == lastestMessageTime -> false, 읽은 메시지
     }
 
     public void updateLastReadAt(Instant time) {
