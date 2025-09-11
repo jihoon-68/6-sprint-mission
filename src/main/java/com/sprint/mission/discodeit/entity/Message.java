@@ -29,12 +29,6 @@ public class Message extends BaseEntity implements Serializable {
         this.created = setTime();
     }
 
-
-    public void updateMessage(String text) {
-        this.content = text;
-        this.updated = setTime();
-    }
-
     public void update(String newContent) {
         boolean anyValueUpdated = false;
         if (newContent != null && !newContent.equals(this.content)) {
