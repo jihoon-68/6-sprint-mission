@@ -1,63 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 3L;
 
-    private final String id;
-    private final Long createdAt;
-    private final User user;
-    private final Channel channel;
+    private final UUID id;
+    private final UUID userId;
+    private final UUID channelId;
+    private final Instant createdAt;
 
-    private Long updatedAt;
+    private Instant updatedAt;
     private String content; // 내용
+    private List<BinaryContent> binaryContents = new ArrayList<>(); // null 허용
 
-    public Message(User user, Channel channel, String content){
-        this.id = UUID.randomUUID().toString();
-        this.createdAt = System.currentTimeMillis();
+    public Message(UUID userId, UUID channelId, String content){
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.userId = userId;
+        this.channelId = channelId;
         this.content = content;
-        this.user = user;
-        this.channel = channel;
-    }
-
-    // Getter
-    public String getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
     }
 
     // Setter
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
     public void setContent(String content) { // 메시지 내용 수정
         this.content = content;
+        this.updatedAt = Instant.now();
     }
+
+    public void setBinaryContents(List<BinaryContent> binaryContents) { // 메시지 첨부파일 수정
+        this.binaryContents = (binaryContents != null ? binaryContents : new ArrayList<>());
+        this.updatedAt = Instant.now();
+    }
+
 
     // toString()
     @Override
@@ -65,8 +51,8 @@ public class Message implements Serializable {
         return "Message{" +
                 "id='" + id + '\'' +
                 ", createdAt=" + createdAt +
-                ", user=" + user.toString() +
-                ", channel=" + channel.toString() +
+                ", userId=" + userId +
+                ", channelId=" + channelId +
                 ", updatedAt=" + updatedAt +
                 ", content='" + content + '\'' +
                 '}';
