@@ -16,22 +16,18 @@ public class FileChannelRepository implements ChannelRepository {
     private final Path directory = Paths.get("./src/main/resources/ChannelDate");
     private final FileEdit instance = new  FileEdit();
 
-    private Path filePaths(UUID id) {
-        return directory.resolve( id + ".ser");
-    }
-
     public FileChannelRepository(){
         instance.init(directory);
     }
 
     @Override
     public Channel save(Channel channel) {
-        instance.save(filePaths(channel.getId()), channel);
+        instance.save(directory,channel.getId(), channel);
         return channel;
     }
 
     @Override
-    public Optional<Channel> findById(UUID id) {return instance.load(filePaths(id));}
+    public Optional<Channel> findById(UUID id) {return instance.load(directory,id);}
 
     @Override
     public List<Channel> findAll() {
@@ -45,7 +41,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteById(UUID id) {
-        boolean isDelete = instance.delete(filePaths(id));
+        boolean isDelete = instance.delete(directory,id);
         if(!isDelete){
             throw new NullPointerException(" 유저 삭제 실패");
         }
