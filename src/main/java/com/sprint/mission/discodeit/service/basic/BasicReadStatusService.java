@@ -67,6 +67,6 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(UUID id) {
-        readStatusRepository.delete(id);
+        readStatusRepository.deleteById(id);
     }
 }
