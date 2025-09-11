@@ -16,33 +16,41 @@ public class JCFMessageRepository implements MessageRepository {
         MessageDate = new ArrayList<Message>();
     }
 
-    public void createMessage(Message message) {
-        MessageDate.add(message);
+    @Override
+    public Message save(Message message) {
+        int idx = MessageDate.indexOf(message);
+        if (idx >=0) {
+            MessageDate.set(idx, message);
+        }else {
+            MessageDate.add(message);
+        }
+        return message;
     }
 
+    @Override
+    public Optional<Message> findById(UUID id) {
 
-    public Optional<Message> findMessageById(UUID id) {
         return MessageDate.stream()
                 .filter(message -> message.getId().equals(id))
                 .findAny();
     }
 
-    public List<Message> findAllMessages() {
-        return MessageDate;
+    @Override
+    public List<Message> findAll() {
+
+        return List.copyOf(MessageDate);
     }
 
+    @Override
+    public boolean existsById(UUID id) {
 
-    public void updateMessage(Message message) {
-
-        int idx = MessageDate.indexOf(message);
-        if (idx == -1) {
-            throw new NullPointerException("해당 메시지 없습니다.");
-        }
-        MessageDate.set(idx, message);
-
+        return MessageDate.stream()
+                .anyMatch(message -> message.getId().equals(id));
     }
 
-    public void deleteMessage(UUID id) {
-        MessageDate.remove(findMessageById(id));
+    @Override
+    public void deleteById(UUID id) {
+
+        MessageDate.removeIf(message -> message.getId().equals(id));
     }
 }

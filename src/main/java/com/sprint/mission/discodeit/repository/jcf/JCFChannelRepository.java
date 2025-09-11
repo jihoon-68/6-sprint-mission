@@ -11,47 +11,45 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
-    private final List<Channel> channels;
+    private final List<Channel> channelsDate;
 
     public JCFChannelRepository() {
 
-        channels = new ArrayList<>();
+        channelsDate = new ArrayList<>();
     }
 
-    public void createChannel(Channel channel) {
-        channels.add(channel);
+    @Override
+    public Channel save(Channel channel) {
+        int idx = channelsDate.indexOf(channel);
+        if (idx >=0) {
+            channelsDate.set(idx, channel);
+        }else {
+            channelsDate.add(channel);
+        }
+        return channel;
     }
 
-    public Optional<Channel> findChannelById(UUID id) {
+    @Override
+    public Optional<Channel> findById(UUID id) {
 
-        return channels.stream()
+        return channelsDate.stream()
                 .filter(channel -> channel.getId().equals(id))
                 .findAny();
     }
 
-    public List<Channel> findAllChannels() {
-        return channels;
+    @Override
+    public List<Channel> findAll() {
+        return List.copyOf(channelsDate);
     }
 
-    public void updateChannel(Channel channel) {
-        int idx = channels.indexOf(channel);
-        if (idx == -1) {
-            throw new NullPointerException("해당 채널을 없습니다");
-        }
-        channels.set(idx, channel);
-
+    @Override
+    public boolean existsById(UUID id) {
+        return channelsDate.stream()
+                .anyMatch(channel -> channel.getId().equals(id));
     }
 
-    public void deleteChannel(UUID id) {
-        channels.remove(findChannelById(id));
-    }
-
-    public void addMessageToChannel(Channel channel, Message message) {
-        channel.updateChanelMessages(message);
-        updateChannel(channel);
-    }
-
-    public void removeMessageFromChannel(Channel channel, Message message) {
-
+    @Override
+    public void deleteById(UUID id) {
+        channelsDate.removeIf(channel -> channel.getId().equals(id));
     }
 }

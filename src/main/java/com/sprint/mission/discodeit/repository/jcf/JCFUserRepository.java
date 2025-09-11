@@ -9,41 +9,49 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
-    private final List<User> userDeat;
+    private final List<User> userDate;
 
     public  JCFUserRepository() {
-        userDeat = new ArrayList<User>();
+        userDate = new ArrayList<User>();
     }
 
-    public void createUser(User user) {
-        userDeat.add(user);
+    @Override
+    public User save(User user) {
+        int idx = userDate.indexOf(user);
+        if (idx >=0) {
+            userDate.set(idx, user);
+        }else {
+            userDate.add(user);
+        }
+        return user;
     }
 
-    public Optional<User> findUserById(UUID id) {
-        return userDeat.stream()
+    @Override
+    public Optional<User> findById(UUID id) {
+        return userDate.stream()
                 .filter(user-> user.getId().equals(id))
                 .findAny();
     }
 
-    public Optional<User> findUserByEmail(String userEmail) {
-        return userDeat.stream()
+    @Override
+    public Optional<User> findByEmail(String userEmail) {
+        return userDate.stream()
                 .filter(user -> user.getEmail().equals(userEmail))
                 .findAny();
     }
 
-    public List<User> findAllUsers() {
-        return userDeat;
+    @Override
+    public List<User> findAll() {
+        return List.copyOf(userDate);
     }
 
-    public void updateUser(User user) {
-        int idx = userDeat.indexOf(user);
-        if (idx == -1) {
-            throw new NullPointerException("해당 유저 없음");
-        }
-        userDeat.set(idx, user);
+    @Override
+    public boolean existsById(UUID id) {
+        return userDate.stream()
+                .anyMatch(user -> user.getId().equals(id));
     }
 
-    public void deleteUser(UUID id) {
-        userDeat.remove(findUserById(id));
+    public void deleteById(UUID id) {
+        userDate.removeIf(user -> user.getId().equals(id));
     }
 }
