@@ -6,8 +6,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class FileEdit {
+
     // 싱글 톤이면 한곳에 몰리수 있어어 인스턴스로 생성 생각중
     public void init(Path directory){
         //저장할 경로의 파일 초기화
@@ -20,7 +22,8 @@ public class FileEdit {
         }
     }
 
-    public <T> void save(Path filePath, T date){
+    public <T> void save(Path directory,UUID id, T date){
+        Path filePath = directory.resolve(id+".ser");
         try(FileOutputStream fos = new FileOutputStream(filePath.toFile());
             ObjectOutputStream oos = new ObjectOutputStream(fos);
         ){
@@ -30,7 +33,8 @@ public class FileEdit {
         }
     };
 
-    public <T> Optional<T> load(Path filePath){
+    public <T> Optional<T> load(Path directory, UUID id){
+        Path filePath = directory.resolve(id+".ser");
         Optional<T> date = Optional.empty();
         if(!Files.exists(filePath)){
             try(
@@ -70,7 +74,8 @@ public class FileEdit {
         }
     };
 
-    public Boolean delete(Path filePath){
+    public Boolean delete(Path directory, UUID id){
+        Path filePath = directory.resolve(id+".ser");
          return  filePath.toFile().delete();
     }
 
