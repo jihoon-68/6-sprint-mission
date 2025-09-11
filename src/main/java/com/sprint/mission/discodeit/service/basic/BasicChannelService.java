@@ -45,16 +45,16 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel find(FindChannelDto findChannelDto) {
-//        ChannelType channelType = findChannelDto.type();
-//        if(channelType.equals(ChannelType.PRIVATE)){
-//        }
         return channelRepository.findById(findChannelDto.channelId())
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + findChannelDto.channelId() + " not found"));
     }
 
     @Override
     public List<Channel> findAllByUserId(FindAllChannelDto findAllChannelDto) {
-        return channelRepository.findAll().stream().filter(channel -> channel.getUserIds().contains(findAllChannelDto.userId())).toList();
+        if(findAllChannelDto.type().equals(ChannelType.PRIVATE)){
+            return channelRepository.findAll().stream().filter(channel -> channel.getUserIds().contains(findAllChannelDto.userId())).toList();
+        }
+        return channelRepository.findAll();
     }
 
     @Override
