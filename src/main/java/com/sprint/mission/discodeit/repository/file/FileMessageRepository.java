@@ -22,11 +22,11 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        instance.save(filePaths(message.getId()), message);
+        instance.save(directory,message.getId(), message);
         return message;
     }
     @Override
-    public Optional<Message> findById(UUID id) { return instance.load(directory); }
+    public Optional<Message> findById(UUID id) { return instance.load(directory,id); }
 
     @Override
     public List<Message> findAll() {
@@ -40,7 +40,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteById(UUID id) {
-        boolean isDelete = instance.delete(filePaths(id));
+        boolean isDelete = instance.delete(directory,id);
         if(!isDelete){
             throw new NullPointerException(" 유저 삭제 실패");
         }
