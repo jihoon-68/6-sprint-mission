@@ -11,6 +11,7 @@ public interface UserRepository {
     //기존 CRUD
     User save(User user);
     Optional<User> findById(UUID id);
+    Optional<User> findByEmail(String email);
     List<User> findAll();
     boolean existsById(UUID id);
     void deleteById(UUID id);
