@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.DTO.User.CreateUserDTO;
+import com.sprint.mission.discodeit.DTO.User.UpdateUserDTO;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -31,25 +32,25 @@ public class User extends BaseEntity implements Serializable {
     }
 
 
-    public void update(CreateUserDTO createUserDTO) {
+    public void update(UpdateUserDTO updateUserDTO) {
         boolean anyValueUpdated = false;
-        if (createUserDTO.userName() != null && !createUserDTO.userName().equals(this.username)) {
-            this.username = createUserDTO.userName();
+        if (updateUserDTO.userName() != null && !updateUserDTO.userName().equals(this.username)) {
+            this.username = updateUserDTO.userName();
             anyValueUpdated = true;
         }
 
-        if (createUserDTO.email() != null && !createUserDTO.email().equals(this.email)) {
-            this.email = createUserDTO.email();
+        if (updateUserDTO.email() != null && !updateUserDTO.email().equals(this.email)) {
+            this.email = updateUserDTO.email();
             anyValueUpdated = true;
         }
 
-        if (createUserDTO.password() != null && !createUserDTO.password().equals(this.password)) {
-            this.password = createUserDTO.password();
+        if (updateUserDTO.password() != null && !updateUserDTO.password().equals(this.password)) {
+            this.password = updateUserDTO.password();
             anyValueUpdated = true;
         }
 
-        if (createUserDTO.profileId()!= null && !createUserDTO.profileId().equals(this.profileId)) {
-            this.profileId = createUserDTO.profileId();
+        if (updateUserDTO.profileId()!= null && !updateUserDTO.profileId().equals(this.profileId)) {
+            this.profileId = updateUserDTO.profileId();
             anyValueUpdated = true;
         }
 
