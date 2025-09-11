@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final List<Channel> channels;
 
@@ -46,7 +48,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteById(UUID id) {
-            channels.removeIf(c -> c.getId().equals(id));
+            channels.removeIf(channel -> channel.getId().equals(id));
             exploreChannels();
     }
 
@@ -57,16 +59,16 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID id) {
-        return channels.stream().filter(c -> c.getId().equals(id)).findFirst().orElse(null);
+        return channels.stream().filter(channel -> channel.getId().equals(id)).findFirst().orElse(null);
     }
 
     @Override
     public List<Channel> findByOwnerId(UUID id) {
-        return channels.stream().filter(c -> c.getOwnerId().equals(id)).toList();
+        return channels.stream().filter(channel -> channel.getOwnerId().equals(id)).toList();
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return channels.stream().anyMatch(c -> c.getId().equals(id));
+        return channels.stream().anyMatch(channel -> channel.getId().equals(id));
     }
 }

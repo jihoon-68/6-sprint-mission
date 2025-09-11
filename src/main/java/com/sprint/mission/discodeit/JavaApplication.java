@@ -1,38 +1,38 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.auth.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.auth.request.SignupRequest;
+import com.sprint.mission.discodeit.dto.channel.model.ChannelDto;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelFindAllResponse;
+import com.sprint.mission.discodeit.dto.message.reqeust.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.model.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.*;
 
 public class JavaApplication {
-    private static final UserService userService = new BasicUserService(new FileUserRepository());
-    private static final ChannelService channelService = new BasicChannelService(new FileChannelRepository());
-    private static final MessageService messageService = new BasicMessageService(new FileMessageRepository());
+    private static final ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class);
+
+    private static final UserService userService = context.getBean(BasicUserService.class);
+    private static final ChannelService channelService = context.getBean(BasicChannelService.class);
+    private static final MessageService messageService = context.getBean(BasicMessageService.class);
+    private static final AuthService authService = context.getBean(AuthService.class);
 
     private static final Scanner in = new Scanner(System.in);
 
-    private static User currentUser = null;
-    private static Channel currentChannel = null;
+    private static com.sprint.mission.discodeit.dto.user.model.UserDto currentUser = null;
+    private static ChannelDto currentChannel = null;
 
     public static void main(String[] args) {
         boolean run = true;
@@ -60,11 +60,16 @@ public class JavaApplication {
                         System.out.print("비밀번호: ");
                         String password = in.nextLine();
 
-                        currentUser = userService.login(email, password);
+                        LoginRequest loginRequest = new LoginRequest();
+                        loginRequest.setEmail(email);
+                        loginRequest.setPassword(password);
+
+                        currentUser = authService.login(loginRequest);
 
                         if (currentUser != null) {
                             System.out.println("반갑습니다 " + currentUser.getUsername() + "님");
                         }
+
                         break;
                     }
                     case 2: {
@@ -75,7 +80,12 @@ public class JavaApplication {
                         System.out.print("이름: ");
                         String username = in.nextLine();
 
-                        userService.signup(email, password, username);
+                        SignupRequest request = new SignupRequest();
+                        request.setEmail(email);
+                        request.setPassword(password);
+                        request.setUsername(username);
+
+                        authService.signup(request);
                         break;
                     }
                     default:
@@ -173,7 +183,7 @@ public class JavaApplication {
                     }
 
                     for (UUID receivedFriendRequest : copyReceivedFriendRequests) {
-                        User friendUser = userService.findUserById(receivedFriendRequest);
+                        UserDto friendUser = userService.findUserById(receivedFriendRequest);
                         String email;
                         String username;
 
@@ -205,7 +215,7 @@ public class JavaApplication {
                         break;
                     }
                     for (UUID friendId : copySentFriendRequests) {
-                        User friendUser = userService.findUserById(friendId);
+                        UserDto friendUser = userService.findUserById(friendId);
                         String email;
                         String username;
 
@@ -236,7 +246,7 @@ public class JavaApplication {
 
                     System.out.println("----------------");
                     for (int i = 0; i < friendIds.size(); i++) {
-                        User user = userService.findUserById(friendIds.get(i));
+                        UserDto user = userService.findUserById(friendIds.get(i));
                         String email;
                         String username;
                         if (user == null) {
@@ -267,18 +277,22 @@ public class JavaApplication {
 
                     System.out.println("----------------");
                     for (UUID friendId : friendIds) {
-                        User user = userService.findUserById(friendId);
+                        UserDto user = userService.findUserById(friendId);
                         String email;
                         String username;
+                        String status;
+
                         if (user == null) {
                             email = "";
                             username = "(알 수 없음)";
+                            status = "Offline";
                         } else {
                             email = user.getEmail();
                             username = user.getUsername();
+                            status = user.getUserStatus();
                         }
 
-                        System.out.println(username + " / " + email);
+                        System.out.println(username + " / " + email + " / " + status);
                     }
                     System.out.println("----------------");
                     break;
@@ -309,7 +323,25 @@ public class JavaApplication {
                 case 1:
                     System.out.print("내용: ");
                     String content = in.nextLine();
-                    messageService.createMessage(currentUser.getId(), null, friendId, content, userService.findUserById(friendId) == null);
+                    String file = null;
+                    List<String> filePath = new ArrayList<>();
+
+                    while(!Objects.equals(file, "y") && !Objects.equals(file, "n")) {
+                        System.out.print("파일 첨부 하시겠습니까?(y/n): ");
+                        file = in.nextLine();
+                    }
+
+                    if (Objects.equals(file, "y")) {
+                        while (true) {
+                            System.out.println("경로를 입력해 주세요(종료 0): ");
+                            String path =  in.nextLine();
+                            if (path.equals("0")) {
+                                break;
+                            }
+                        }
+                    }
+
+                    messageService.createMessage(currentUser.getId(), null, friendId, content, filePath);
                     break;
                 case 2: {
                     List<Message> myMessages = messageService.findMyMessagesToFriend(currentUser.getId(), friendId);
@@ -325,7 +357,11 @@ public class JavaApplication {
                     System.out.print("내용: ");
                     String newContent = in.nextLine();
 
-                    messageService.updateContent(newContent, myMessages.get(index).getId());
+                    MessageUpdateRequest request = new MessageUpdateRequest();
+                    request.setId(myMessages.get(index).getId());
+                    request.setContent(newContent);
+
+                    messageService.updateContent(request);
                     break;
                 }
                 case 3: {
@@ -352,7 +388,7 @@ public class JavaApplication {
                         if (message.isDrawnAuthor()) {
                             authorName = "(알 수 없음)";
                         } else {
-                            User user =  userService.findUserById(id);
+                            UserDto user =  userService.findUserById(id);
                             authorName = user.getUsername();
                         }
 
@@ -375,15 +411,19 @@ public class JavaApplication {
 
         System.out.println("----------------");
         for (int i = 0; i < currentUser.getFriendIds().size(); i++) {
-            User user = userService.findUserById(currentUser.getFriendIds().get(i));
+            UserDto user = userService.findUserById(currentUser.getFriendIds().get(i));
             String friendName;
+            String status;
+
             if (user == null) {
                 friendName = "(알 수 없음)";
+                status = "Offline";
             } else {
                 friendName = user.getUsername();
+                status = user.getUserStatus();
             }
 
-            System.out.println((i + 1) + ". " + friendName);
+            System.out.println((i + 1) + ". " + friendName + " / " + status);
         }
         System.out.println("----------------");
 
@@ -409,9 +449,10 @@ public class JavaApplication {
                     userInfoManager();
                     break;
                 case 2:
-                    List<UUID> channelIds = channelService.findChannelByOwnerId(currentUser.getId()).stream().map(Channel::getId).toList();
+                    List<UUID> channelIds = channelService.findAllByOwnerId(currentUser.getId()).getChannels()
+                            .stream().map(ChannelDto::getChannelId).toList();
 
-                    messageService.deleteMessageByChannelIds(channelIds);
+                    messageService.deleteAllByChannelIds(channelIds);
                     channelService.deleteChannelByOwnerId(currentUser.getId());
                     messageService.anonymizeUserMessage(currentUser.getId());
                     messageService.cleanupDM();
@@ -471,7 +512,8 @@ public class JavaApplication {
                     showMyChannelMenu();
                     break;
                 case 2: {
-                    List<Channel> channels = channelService.findAllChannels();
+                    ChannelFindAllResponse response = channelService.findAllByUserId(currentUser.getId());
+                    List<ChannelDto> channels = response.getChannels();
 
                     if (channels.isEmpty()) {
                         System.out.println("참여할 수 있는 채널이 없습니다.");
@@ -480,7 +522,7 @@ public class JavaApplication {
 
                     System.out.println("----------------");
                     for (int i = 0; i < channels.size(); i++) {
-                        User user = userService.findUserById(channels.get(i).getOwnerId());
+                        UserDto user = userService.findUserById(channels.get(i).getOwnerId());
                         System.out.println(channels.get(i).getOwnerId());
                         System.out.println((i + 1) + ". 채널명: " + channels.get(i).getChannelName() + " / 소유자:  " + user.getUsername());
                     }
@@ -494,10 +536,12 @@ public class JavaApplication {
                     break;
                 }
                 case 3: {
-                    List<Channel> channels = channelService.findAllChannels();
+                    ChannelFindAllResponse response = channelService.findAllByUserId(currentUser.getId());
+                    List<ChannelDto> channels = response.getChannels();
+
                     System.out.println("----------------");
                     for (int i = 0; i < channels.size(); i++) {
-                        User user = userService.findUserById(channels.get(i).getOwnerId());
+                        UserDto user = userService.findUserById(channels.get(i).getOwnerId());
                         System.out.println((i + 1) + ". 채널명: " + channels.get(i).getChannelName() + " / 소유자:  " + user.getUsername());
                     }
                     System.out.println("----------------");
@@ -523,10 +567,28 @@ public class JavaApplication {
                 case 1:
                     System.out.print("채널 이름: ");
                     String channelName = in.nextLine();
-                    channelService.createChannel(channelName, currentUser.getId());
+                    String channelType = "";
+                    boolean isPrivate = false;
+
+                    while(!Objects.equals(channelType, "y") && !Objects.equals(channelType, "n")) {
+                        System.out.println("Private/Public(y/n): ");
+                        channelType = in.nextLine();
+                    }
+
+                    if (channelType.equals("y")) {
+                        isPrivate = true;
+                    }
+
+                    ChannelCreateRequest request = new ChannelCreateRequest();
+                    request.setChannelName(channelName);
+                    request.setPrivate(isPrivate);
+                    request.setOwnerId(currentUser.getId());
+
+                    channelService.createChannel(request);
                     break;
                 case 2: {
-                    List<Channel> myChannels = channelService.findChannelByOwnerId(currentUser.getId());
+                    ChannelFindAllResponse response = channelService.findAllByOwnerId(currentUser.getId());
+                    List<ChannelDto> myChannels = response.getChannels();
 
                     if (myChannels.isEmpty()) {
                         System.out.println("채널을 만들고 시작해주세요.");
@@ -547,7 +609,8 @@ public class JavaApplication {
                     break;
                 }
                 case 3: {
-                    List<Channel> myChannels = channelService.findChannelByOwnerId(currentUser.getId());
+                    ChannelFindAllResponse response = channelService.findAllByOwnerId(currentUser.getId());
+                    List<ChannelDto> myChannels = response.getChannels();
 
                     if (myChannels.isEmpty()) {
                         System.out.println("채널을 만들어 보세요!");
@@ -582,11 +645,28 @@ public class JavaApplication {
                 case 1:
                     System.out.print("내용: ");
                     String content = in.nextLine();
+                    String file = null;
+                    List<String> filePath = new ArrayList<>();
 
-                    messageService.createMessage(currentUser.getId(), currentChannel.getId(), null, content, false);
+                    while(!Objects.equals(file, "y") && !Objects.equals(file, "n")) {
+                        System.out.print("파일 첨부 하시겠습니까?(y/n): ");
+                        file = in.nextLine();
+                    }
+
+                    if (Objects.equals(file, "y")) {
+                        while (true) {
+                            System.out.println("경로를 입력해 주세요(종료 0): ");
+                            String path =  in.nextLine();
+                            if (path.equals("0")) {
+                                break;
+                            }
+                        }
+                    }
+
+                    messageService.createMessage(currentUser.getId(), currentChannel.getChannelId(), null, content, filePath);
                     break;
                 case 2: {
-                    List<Message> messages = messageService.findMessagesByAuthorIdAndChannelId(currentUser.getId(), currentChannel.getId());
+                    List<Message> messages = messageService.findAllByAuthorIdAndChannelId(currentUser.getId(), currentChannel.getChannelId());
 
                     if (messages.isEmpty()) {
                         System.out.println("수정할 수 있는 메시지가 없습니다.");
@@ -604,7 +684,11 @@ public class JavaApplication {
                     System.out.print("새로운 내용: ");
                     String newContent = in.nextLine();
 
-                    messageService.updateContent(newContent, messages.get(index).getId());
+                    MessageUpdateRequest request = new MessageUpdateRequest();
+                    request.setId(messages.get(index).getId());
+                    request.setContent(newContent);
+
+                    messageService.updateContent(request);
 
                     break;
                 }
@@ -612,9 +696,9 @@ public class JavaApplication {
                     List<Message> messages;
 
                     if (!currentChannel.getOwnerId().equals(currentUser.getId())) {
-                        messages = messageService.findMessagesByAuthorIdAndChannelId(currentUser.getId(), currentChannel.getId());
+                        messages = messageService.findAllByAuthorIdAndChannelId(currentUser.getId(), currentChannel.getChannelId());
                     } else {
-                        messages = messageService.findMessagesByChannelId(currentChannel.getId());
+                        messages = messageService.findAllByChannelId(currentChannel.getChannelId());
                     }
 
                     if (messages.isEmpty()) {
@@ -624,7 +708,7 @@ public class JavaApplication {
 
                     System.out.println("----------------");
                     for (int i = 0; i < messages.size(); i++) {
-                        User user = userService.findUserById(messages.get(i).getAuthorId());
+                        UserDto user = userService.findUserById(messages.get(i).getAuthorId());
                         String username;
                         if (user == null) {
                             username = "(알 수 없음)";
@@ -641,7 +725,7 @@ public class JavaApplication {
                     break;
                 }
                 case 4: {
-                    List<Message> messages = messageService.findMessagesByChannelId(currentChannel.getId());
+                    List<Message> messages = messageService.findAllByChannelId(currentChannel.getChannelId());
 
                     if (messages.isEmpty()) {
                         System.out.println("채널에 메시지를 작성해 보세요!");
@@ -650,7 +734,7 @@ public class JavaApplication {
 
                     System.out.println("----------------");
                     for (Message m : messages) {
-                        User user = userService.findUserById(m.getAuthorId());
+                        UserDto user = userService.findUserById(m.getAuthorId());
                         String username;
                         if (user == null) {
                             username = "(알 수 없음)";
@@ -683,11 +767,16 @@ public class JavaApplication {
                     System.out.print("새로운 채널 이름: ");
                     String channelName = in.nextLine();
 
-                    channelService.updateChannelName(currentChannel.getId(), channelName);
+                    ChannelUpdateRequest request = new ChannelUpdateRequest();
+                    request.setChannelId(currentChannel.getChannelId());
+                    request.setChannelName(channelName);
+                    request.setOwnerId(currentUser.getId());
+
+                    channelService.updateChannelName(request);
                     break;
                 case 2:
-                    messageService.deleteMessageByChannelIds(List.of(currentChannel.getId()));
-                    channelService.deleteChannelById(currentChannel.getId());
+                    messageService.deleteAllByChannelIds(List.of(currentChannel.getChannelId()));
+                    channelService.deleteChannelById(currentChannel.getChannelId());
 
                     currentChannel = null;
                     return;

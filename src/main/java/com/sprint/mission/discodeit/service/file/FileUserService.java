@@ -1,41 +1,29 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.user.model.UserDto;
+import com.sprint.mission.discodeit.dto.user.request.UserUpdateProfileImageRequest;
+import com.sprint.mission.discodeit.dto.user.response.UserFindAllResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class FileUserService implements UserService {
     private final UserRepository userRepository;
-
-    public FileUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Override
-    public void createUser(String email, String password, String username) {
-        if (email.contains(" ")) {
-            System.out.println("[Error] 이메일에 공백을 포함할 수 없습니다.");
-            return;
-        }
-
-        if (password.length() < 6) {
-            System.out.println("[Error] 비밀번호는 6글자 이상이여야 합니다.");
-            return;
-        }
-
-        if (!userRepository.existsByEmail(email)) {
-            User user = new User(email, username, password);
-
-            userRepository.save(user);
-            System.out.println("[Info] 유저가 생성되었습니다.");
-        } else {
-            System.out.println("[Error] 이미 사용중인 이메일 입니다.");
-        }
-    }
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public void updateUsername(String username, UUID id) {
@@ -86,7 +74,19 @@ public class FileUserService implements UserService {
         updateUser.updateEmail(email);
         userRepository.save(updateUser);
         System.out.println("[Info] 이메일이 변경되었습니다.");
+    }
 
+    @Override
+    public void updateProfileImage(UserUpdateProfileImageRequest request) {
+        BinaryContent content = binaryContentRepository.findByUserId(request.getUserId());
+
+        if (content == null) {
+            System.out.println("[Error] 프로필을 찾지 못했습니다.");
+            return;
+        }
+
+        binaryContentRepository.save(content);
+        System.out.println("[Info] 프로필이 변경되었습니다.");
     }
 
     @Override
@@ -100,29 +100,60 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User findUserById(UUID id) {
-        return userRepository.findById(id);
-    }
+    public UserDto findUserById(UUID id) {
+        User user = userRepository.findById(id);
+        UserStatus status = userStatusRepository.findByUserId(id);
 
-    @Override
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
-    }
+        UserDto response = new UserDto();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setFriendIds(user.getFriendIds());
+        response.setReceivedFriendRequests(user.getReceivedFriendRequests());
+        response.setSentFriendRequests(user.getSentFriendRequests());
 
-    @Override
-    public User login(String email, String password) {
-        User user = userRepository.findByEmail(email);
+        Instant minusFiveMinutes = Instant.now().minusSeconds(300);
 
-        if (user == null || !user.getPassword().equals(password)) {
-            System.out.println("[Error] 잘못된 이메일 또는 비밀번호 입니다.");
-            return null;
+        if (status.isLogin() || (status.getLastLogin() != null && status.getLastLogin().isAfter(minusFiveMinutes))) {
+            response.setUserStatus("Online");
+        } else {
+            response.setUserStatus("Offline");
         }
-        return user;
+
+        return response;
     }
 
     @Override
-    public void signup(String email, String password, String username) {
-        createUser(email, password, username);
+    public UserFindAllResponse findAllUsers() {
+        List<com.sprint.mission.discodeit.dto.user.model.UserDto> users = new ArrayList<>();
+
+        for (User user : userRepository.findAll()) {
+            UserStatus status = userStatusRepository.findByUserId(user.getId());
+
+            com.sprint.mission.discodeit.dto.user.model.UserDto userDto = new com.sprint.mission.discodeit.dto.user.model.UserDto();
+            userDto.setId(user.getId());
+            userDto.setUsername(user.getUsername());
+            userDto.setEmail(user.getEmail());
+            userDto.setFriendIds(user.getFriendIds());
+            userDto.setReceivedFriendRequests(user.getReceivedFriendRequests());
+            userDto.setSentFriendRequests(user.getSentFriendRequests());
+            users.add(userDto);
+
+            Instant minusFiveMinutes = Instant.now().minusSeconds(300); //현재에서 5분 빼기
+
+            if (status.isLogin() || (status.getLastLogin() != null && status.getLastLogin().isAfter(minusFiveMinutes))) {
+                userDto.setUserStatus("Online");
+            } else {
+                userDto.setUserStatus("Offline");
+            }
+
+            users.add(userDto);
+        }
+
+        UserFindAllResponse response = new UserFindAllResponse();
+        response.setUsers(users);
+
+        return response;
     }
 
     @Override

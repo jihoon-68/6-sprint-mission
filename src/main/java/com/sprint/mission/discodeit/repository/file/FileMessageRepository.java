@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private final List<Message> messages;
 
@@ -52,13 +54,19 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public void deleteByChannelId(UUID id) {
+        messages.removeIf(message -> Objects.equals(message.getChannelId(), id));
+        exploreMessages();
+    }
+
+    @Override
     public Message findById(UUID id) {
-        return messages.stream().filter(m -> m.getId().equals(id)).findFirst().orElse(null);
+        return messages.stream().filter(message -> message.getId().equals(id)).findFirst().orElse(null);
     }
 
     @Override
     public List<Message> findByAuthorIdAndChannelId(UUID authorId, UUID channelId) {
-        return messages.stream().filter(m ->Objects.equals(m.getAuthorId(), authorId) && Objects.equals(m.getChannelId(), channelId))
+        return messages.stream().filter(message ->Objects.equals(message.getAuthorId(), authorId) && Objects.equals(message.getChannelId(), channelId))
                 .toList();
     }
 
@@ -69,11 +77,11 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findByChannelId(UUID id) {
-        return messages.stream().filter(m -> Objects.equals(m.getChannelId(), id)).toList();
+        return messages.stream().filter(message -> Objects.equals(message.getChannelId(), id)).toList();
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return messages.stream().anyMatch(m -> m.getId().equals(id));
+        return messages.stream().anyMatch(message -> message.getId().equals(id));
     }
 }

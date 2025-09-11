@@ -1,10 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.user.model.UserDto;
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
     private UUID id;
     private Long updateAt;
@@ -26,42 +31,6 @@ public class User implements Serializable {
         this.friendIds = new ArrayList<>();
         this.sentFriendRequests = new ArrayList<>();
         this.receivedFriendRequests = new ArrayList<>();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getUpdateAt() {
-        return updateAt;
-    }
-
-    public Long getCreateAt() {
-        return createAt;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public List<UUID> getFriendIds() {
-        return friendIds;
-    }
-
-    public List<UUID> getSentFriendRequests() {
-        return sentFriendRequests;
-    }
-
-    public List<UUID> getReceivedFriendRequests() {
-        return receivedFriendRequests;
     }
 
     public void updatePassword(String password) {
@@ -103,5 +72,24 @@ public class User implements Serializable {
                 "\nusername: '" + username + '\'' +
                 "\npassword: '" + password + '\'' +
                 "\nfriendIds: " + friendIds;
+    }
+
+    public UserDto toDto (UserStatus userStatus) {
+        Instant minusFiveMinutes = Instant.now().minusSeconds(300);
+        UserDto userDto = new UserDto();
+
+        userDto.setId(id);
+        userDto.setEmail(email);
+        userDto.setUsername(username);
+        userDto.setSentFriendRequests(sentFriendRequests);
+        userDto.setFriendIds(friendIds);
+        userDto.setReceivedFriendRequests(receivedFriendRequests);
+        if (userStatus.isLogin() || userStatus.getLastLogin().isAfter(minusFiveMinutes)) {
+            userDto.setUserStatus("Online");
+        } else {
+            userDto.setUserStatus("Offline");
+        }
+
+        return userDto;
     }
 }

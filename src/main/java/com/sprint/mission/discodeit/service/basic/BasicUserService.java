@@ -1,127 +1,175 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.model.UserDto;
+import com.sprint.mission.discodeit.dto.user.request.UserUpdateProfileImageRequest;
+import com.sprint.mission.discodeit.dto.user.response.UserFindAllResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Service
+@Primary
+@RequiredArgsConstructor
+@Slf4j
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Override
-    public void createUser(String email, String password, String username) {
-        if (email.contains(" ")) {
-            System.out.println("[Error] 이메일에 공백을 포함할 수 없습니다.");
-            return;
-        }
-
-        if (password.length() < 6) {
-            System.out.println("[Error] 비밀번호는 6글자 이상이여야 합니다.");
-            return;
-        }
-
-        if (!userRepository.existsByEmail(email)) {
-            User user = new User(email, username, password);
-
-            userRepository.save(user);
-            System.out.println("[Info] 유저가 생성되었습니다.");
-        } else {
-            System.out.println("[Error] 이미 사용중인 이메일 입니다.");
-        }
-    }
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public void updateUsername(String username, UUID id) {
-        if (userRepository.existsById(id)) {
-            User updateUser = userRepository.findById(id);
-            updateUser.updateUsername(username);
+        User user = userRepository.findById(id);
 
-            userRepository.save(updateUser);
-        } else {
-            System.out.println("[Error] 유저를 찾을 수 없습니다.");
+        if (user == null) {
+            log.warn("User를 찾을 수 없습니다. - userId: {}", id);
+            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
         }
+
+        user.updateUsername(username);
+        userRepository.save(user);
     }
 
     @Override
     public void updatePassword(String password, UUID id) {
         if (password.length() < 6) {
-            System.out.println("[Error] 비밀번호는 6글자 이상이여야 합니다.");
-            return;
+            log.info("잘못된 password 형식 - userId: {}", id);
+            throw new IllegalArgumentException("password는 6자 이상이여야 합니다.");
         }
 
-        if (userRepository.existsById(id)) {
-            User updateUser = userRepository.findById(id);
-            updateUser.updatePassword(password);
-            System.out.println("[Info] 비밀번호가 변경되었습니다.");
-        } else {
-            System.out.println("[Error] 유저를 찾을 수 없습니다.");
+        User user = userRepository.findById(id);
+
+        if (user == null) {
+            log.warn("User를 찾을 수 없습니다. - userId: {}", id);
+            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
         }
+
+        user.updatePassword(password);
     }
 
     @Override
     public void updateEmail(String email, UUID id) {
-        if (email.contains(" ")) {
-            System.out.println("[Error] 이메일에 공백을 포함할 수 없습니다.");
-            return;
-        }
+        User user = userRepository.findById(id);
 
-        if (!userRepository.existsById(id)) {
-            System.out.println("[Error] 유저를 찾을 수 없습니다.");
-            return;
+        if (user == null) {
+            log.warn("User를 찾을 수 없습니다. - userId: {}", id);
+            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
         }
 
         if (userRepository.existsByEmail(email)) {
-            System.out.println("[Error] 이미 사용중인 이메일 입니다.");
-            return;
+            log.info("중복된 email - userId: {}", id);
+            throw new IllegalStateException("이미 사용중인 email입니다.");
         }
 
-        User updateUser = userRepository.findById(id);
-        updateUser.updateEmail(email);
-        userRepository.save(updateUser);
-        System.out.println("[Info] 이메일이 변경되었습니다.");
+        if (email.contains(" ")) {
+            log.info("잘못된 email 형식 - userId: {}", id);
+            throw new IllegalArgumentException("email에 공백을 포함할 수 없습니다.");
+        }
 
+        user.updateEmail(email);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateProfileImage(UserUpdateProfileImageRequest request) {
+        BinaryContent content = binaryContentRepository.findByUserId(request.getUserId());
+
+        if (content == null) {
+            content = new BinaryContent(request.getUserId(), null, request.getPath());
+            binaryContentRepository.save(content);
+        } else {
+            content.setPath(request.getPath());
+            binaryContentRepository.save(content);
+        }
     }
 
     @Override
     public void deleteUserById(UUID id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            System.out.println("[Info] 유저가 삭제되었습니다.");
+        User user = userRepository.findById(id);
+
+        if (user == null) {
+            log.warn("User를 찾을 수 없습니다. - userId: {}", id);
+            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
+        }
+
+        binaryContentRepository.deleteByUserId(id);
+        userStatusRepository.deleteByUserId(id);
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDto findUserById(UUID id) {
+        User user = userRepository.findById(id);
+
+        if (user == null) {
+            log.warn("User를 찾을 수 없습니다. -  userId: {}", id);
+            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
+        }
+
+        UserStatus userStatus = userStatusRepository.findByUserId(id);
+
+        UserDto response = new UserDto();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setFriendIds(user.getFriendIds());
+        response.setReceivedFriendRequests(user.getReceivedFriendRequests());
+        response.setSentFriendRequests(user.getSentFriendRequests());
+
+        Instant minusFiveMinutes = Instant.now().minusSeconds(300);
+
+        if (userStatus.isLogin() || (userStatus.getLastLogin() != null && userStatus.getLastLogin().isAfter(minusFiveMinutes))) {
+            response.setUserStatus("Online");
         } else {
-            System.out.println("[Error] 유저 삭제에 실패했습니다.");
+            response.setUserStatus("Offline");
         }
+
+        return response;
     }
 
     @Override
-    public User findUserById(UUID id) {
-        return userRepository.findById(id);
-    }
+    public UserFindAllResponse findAllUsers() {
+        List<UserDto> users = new ArrayList<>();
 
-    @Override
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
-    }
+        for (User user : userRepository.findAll()) {
+            UserStatus status = userStatusRepository.findByUserId(user.getId());
 
-    @Override
-    public User login(String email, String password) {
-        User user = userRepository.findByEmail(email);
+            UserDto userDto = new UserDto();
 
-        if (user == null || !user.getPassword().equals(password)) {
-            System.out.println("[Error] 잘못된 이메일 또는 비밀번호 입니다.");
-            return null;
+            userDto.setId(user.getId());
+            userDto.setUsername(user.getUsername());
+            userDto.setEmail(user.getEmail());
+            userDto.setFriendIds(user.getFriendIds());
+            userDto.setReceivedFriendRequests(user.getReceivedFriendRequests());
+            userDto.setSentFriendRequests(user.getSentFriendRequests());
+
+            Instant minusFiveMinutes = Instant.now().minusSeconds(300); //현재에서 5분 빼기
+
+            if (status.isLogin() || (status.getLastLogin() != null && status.getLastLogin().isAfter(minusFiveMinutes))) {
+                userDto.setUserStatus("Online");
+            } else {
+                userDto.setUserStatus("Offline");
+            }
+
+            users.add(userDto);
         }
-        return user;
-    }
 
-    @Override
-    public void signup(String email, String password, String username) {
-        createUser(email, password, username);
+        UserFindAllResponse response = new UserFindAllResponse();
+        response.setUsers(users);
+
+        return response;
     }
 
     @Override
@@ -130,23 +178,23 @@ public class BasicUserService implements UserService {
         User currentUser = userRepository.findById(userId);
 
         if (friendUser == null) {
-            System.out.println("[Error] 유저를 찾을 수 없습니다.");
-            return;
+            log.warn("friendUser를 찾을 수 없습니다. - friendUserEmail: {}", email);
+            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
         }
 
         if (email.equals(currentUser.getEmail())) {
-            System.out.println("[Error] 자기 자신은 추가 할 수 없습니다.");
-            return;
+            log.info("자신의 email과 동일 - friendEmail: {}, userEmail: {}" , email, currentUser.getEmail());
+            throw new IllegalStateException("자기 자신에게는 친구 요청을 보낼 수 없습니다.");
         }
 
         if (currentUser.getSentFriendRequests().contains(friendUser.getId())) {
-            System.out.println("[Error] 이미 처리중인 요청입니다.");
-            return;
+            log.info("중복된 친구 요청 - userSentFriendRequest: {}, friendEmail: {}",  currentUser.getSentFriendRequests(), email);
+            throw new IllegalStateException("이미 처리중인 요청입니다.");
         }
 
         if (currentUser.getFriendIds().contains(friendUser.getId())) {
-            System.out.println("[Error] 이미 추가된 친구입니다.");
-            return;
+            log.info("이미 추가된 친구 - userFriendIds: {}, friendId: {}", currentUser.getFriendIds(), friendUser.getId());
+            throw new IllegalStateException("이미 추가된 친구입니다.");
         }
 
         friendUser.getReceivedFriendRequests().add(userId);
@@ -154,8 +202,6 @@ public class BasicUserService implements UserService {
 
         userRepository.save(friendUser);
         userRepository.save(currentUser);
-
-        System.out.println("[Info] 친구 요청을 보냈습니다.");
     }
 
     @Override
@@ -178,14 +224,12 @@ public class BasicUserService implements UserService {
 
         userRepository.save(currentUser);
         userRepository.save(friendUser);
-
-        System.out.println("[Info] 친구 추가가 완료되었습니다.");
     }
 
     @Override
     public void rejectFriendRequest(UUID userId, UUID friendId) {
         User currentUser = userRepository.findById(userId);
-        User friendUser =  userRepository.findById(friendId);
+        User friendUser = userRepository.findById(friendId);
 
         if (friendUser == null) {
             currentUser.getReceivedFriendRequests().remove(friendId);
@@ -203,7 +247,7 @@ public class BasicUserService implements UserService {
     @Override
     public void cancelSendFriendRequest(UUID userId, UUID friendId) {
         User currentUser = userRepository.findById(userId);
-        User friendUser =  userRepository.findById(friendId);
+        User friendUser = userRepository.findById(friendId);
 
         if (friendUser == null) {
             currentUser.getSentFriendRequests().remove(friendId);
@@ -221,7 +265,7 @@ public class BasicUserService implements UserService {
     @Override
     public void deleteFriend(UUID userId, UUID friendId) {
         User currentUser = userRepository.findById(userId);
-        User friendUser =  userRepository.findById(friendId);
+        User friendUser = userRepository.findById(friendId);
 
         if (friendUser == null) {
             currentUser.getFriendIds().remove(friendId);
@@ -234,7 +278,5 @@ public class BasicUserService implements UserService {
 
         userRepository.save(currentUser);
         userRepository.save(friendUser);
-
-        System.out.println("[Info] 친구 삭제가 완료되었습니다.");
     }
 }
