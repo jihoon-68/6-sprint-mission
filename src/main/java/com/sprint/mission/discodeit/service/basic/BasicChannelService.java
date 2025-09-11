@@ -91,17 +91,18 @@ public class BasicChannelService implements ChannelService {
             return;
         }
         channel.update(updateChannelDTO.name(), updateChannelDTO.description());
+        channelRepository.save(channel);
     }
 
     @Override
     public void delete(UUID id) {
         readStatusRepository.findAll().stream()
                 .filter(rs -> rs.getChannelId().equals(id))
-                .forEach(rsDelete -> readStatusRepository.delete(rsDelete.getId()));
+                .forEach(rsDelete -> readStatusRepository.deleteById(rsDelete.getId()));
 
         messageRepository.findAll().stream()
                 .filter(m -> m.getChannel().equals(id))
-                .forEach(mDelete -> readStatusRepository.delete(mDelete.getId()));
+                .forEach(mDelete -> readStatusRepository.deleteById(mDelete.getId()));
 
         channelRepository.deleteById(id);
     }
