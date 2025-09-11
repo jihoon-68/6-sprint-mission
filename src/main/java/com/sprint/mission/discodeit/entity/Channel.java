@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.DTO.Channel.CreatePublicChannelDTO;
 import com.sprint.mission.discodeit.Enum.ChannelType;
 import lombok.Getter;
 
@@ -8,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class Channel extends BaseEntity implements Serializable{
+public class Channel implements Serializable{
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Instant created;
@@ -18,13 +19,23 @@ public class Channel extends BaseEntity implements Serializable{
     private Instant updated;
     private String description;
 
-    public Channel(String name, String description , ChannelType type) {
+    public Channel(CreatePublicChannelDTO createPublicChannelDTO) {
         this.id = UUID.randomUUID();
-        this.name = name;
-        this.type = type;
-        this.created = setTime();
-        this.description = description;
+        this.name = createPublicChannelDTO.channelName();
+        this.type = createPublicChannelDTO.channelType();
+        this.created = Instant.now();
+        this.description = createPublicChannelDTO.description();
     }
+
+    public Channel(ChannelType channelType) {
+        this.id = UUID.randomUUID();
+        this.created = Instant.now();
+        this.type = channelType;
+        this.name = "";
+        this.description = "";
+    }
+
+
 
     public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
@@ -38,7 +49,7 @@ public class Channel extends BaseEntity implements Serializable{
         }
 
         if (anyValueUpdated) {
-            this.updated = setTime();
+            this.updated = Instant.now();
         }
     }
 
