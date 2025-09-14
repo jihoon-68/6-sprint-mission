@@ -7,9 +7,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class FileMessageRepository implements MessageRepository {
     private final Path DIRECTORY;
@@ -62,6 +64,19 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findByChannelId(UUID channelId) {
+        return findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+    }
+
+    @Override
+    public Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId) {
+        return findByChannelId(channelId).stream()
+                .max(Comparator.comparing(Message::getCreatedAt));
+    }
+
+    @Override
     public List<Message> findAll() {
         try {
             return Files.list(DIRECTORY)
@@ -96,5 +111,10 @@ public class FileMessageRepository implements MessageRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        findByChannelId(channelId).forEach(message -> deleteById(message.getId()));
     }
 }
