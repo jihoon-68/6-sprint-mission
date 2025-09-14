@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -17,10 +18,8 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,28 +63,36 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<FindChannelDTO> findAllByUserId(UUID userId) {
-        List<ReadStatus> readStatuses = readStatusRepository.findAll().stream()
+
+        //공개 채널부터 다넣음
+        List<Channel> channel = channelRepository.findAll().stream()
+                .filter(c -> c.getType().equals(ChannelType.PUBLIC))
+                .collect(Collectors.toList());
+
+        //비공개 채널 전채 채널 리스트에 추가
+        readStatusRepository.findAll().stream()
                 .filter(rs -> rs.getUserId().equals(userId))
-                .toList();
-
-        Map<Channel,List<Message>> channelMessageMap = readStatuses.stream()
-                .collect(Collectors.toMap(rs-> channelRepository.findById(rs.getChannelId()).orElse(null),
-                        rs -> messageRepository.findAll().stream()
-                                .filter(m -> m.getChannel().equals(rs.getChannelId())).limit(1).toList())
-                );
-
-
-
-        return readStatuses.stream()
-                .map(rs -> {
-                    Channel channel = channelRepository.findById(rs.getChannelId())
-                            .orElseThrow(() -> new NullPointerException("Channel not found"));
-                    if(channelMessageMap.get(channel).isEmpty()){
-                        return new FindChannelDTO(channel,channel.getCreated(),rs.getUserId());
+                .forEach(rs -> {
+                   Channel channel1 = channelRepository.findById(rs.getChannelId())
+                           .orElseThrow(() -> new NullPointerException("Channel not found"));
+                    channel.add(channel1);
+                });
+        //채널별 최근채팅시간 연결
+        return channel.stream()
+                .map(channel1 -> {
+                    Message message = messageRepository.findAll().stream()
+                            .filter(m -> m.getChannel().equals(channel1.getId()))
+                            .findFirst().orElse(null);
+                    if(message == null){
+                        return new FindChannelDTO(channel1,channel1.getCreated(),userId);
+                    }else {
+                        return new FindChannelDTO(channel1,message.getCreated(),message.getSender());
                     }
-                    return new FindChannelDTO(channel,channelMessageMap.get(channel).get(0).getCreated(),rs.getUserId());
                 })
                 .toList();
+
+
+
     }
 
     @Override
