@@ -40,6 +40,8 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentStorage binaryContentStorage;
     private final PageResponseMapper pageResponseMapper;
 
+
+
     @Override
     public MessageDto create(List<MultipartFile> multipartFiles, MessageCreateRequest messageCreateRequest) {
 
