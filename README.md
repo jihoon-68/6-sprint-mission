@@ -58,7 +58,7 @@
     }
     ````
 ## Spring 핵심 개념 이해하기
-- [ ] JavaApplication과 DiscodeitApplication에서 Service를 초기화하는 방식의 차이에 대해 다음의 키워드를 중심으로 정리해보세요.
+- [x] JavaApplication과 DiscodeitApplication에서 Service를 초기화하는 방식의 차이에 대해 다음의 키워드를 중심으로 정리해보세요.
   - IoC Container
   - Dependency Injection
   - Bean
@@ -144,8 +144,8 @@
     - [x] create
       - 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
       - DTO를 활용해 파라미터를 그룹화합니다.
-      - 유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
-        - username과 email은 다른 유저와 같으면 안됩니다.
+        - 유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
+          - username과 email은 다른 유저와 같으면 안됩니다.
       - UserStatus를 같이 생성합니다.
     - [x] find, findAll
       - DTO를 활용하여:
@@ -303,7 +303,7 @@
    ```    
 
 ## 새로운 도메인 Repository 구현체 구현
-- [ ] 지금까지 인터페이스로 설계한 각각의 Repository를 JCF, File로 각각 구현하세요.
+- [x] 지금까지 인터페이스로 설계한 각각의 Repository를 JCF, File로 각각 구현하세요.
     ```mermaid
     classDiagram
         class FileRepository
@@ -312,3 +312,24 @@
         FileRepository --|> Repository
         JCFRepository --|> Repository
    ```   
+
+# 심화 요구사항
+## Bean 다루기
+- [x]  Repository 구현체 중에 어떤 구현체를 Bean으로 등록할지 Java 코드의 변경 없이 application.yaml 설정 값을 통해 제어해보세요.
+    ```
+        #application.yaml
+        discodeit:
+        repository:
+        type: jcf   # jcf | file
+    ```
+   - [x] discodeit.repository.type 설정값에 따라 Repository 구현체가 정해집니다.
+     - [x] 값이 jcf 이거나 없으면 JCF*Repository 구현체가 Bean으로 등록되어야 합니다.
+     - [x] 값이 file 이면 File*Repository 구현체가 Bean으로 등록되어야 합니다.
+- [x]  File*Repository 구현체의 파일을 저장할 디렉토리 경로를 application.yaml 설정 값을 통해 제어해보세요.
+    ```
+    # application.yaml
+    discodeit:
+    repository:
+    type: jcf   # jcf | file
+    file-directory: .discodeit
+    ```

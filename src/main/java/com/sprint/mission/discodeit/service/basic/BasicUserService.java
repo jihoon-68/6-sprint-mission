@@ -43,7 +43,7 @@ public class BasicUserService implements UserService{
             throw new DuplicateRequestException("Email already exists");
         }
 
-        User user =userRepository.save(new User(createUserDTO));
+        User user = userRepository.save(new User(createUserDTO));
         userStatusRepository.save(new UserStatus(user.getId()));
         return user;
     }
@@ -56,11 +56,19 @@ public class BasicUserService implements UserService{
     }
 
     @Override
+    public FindUserDTO findEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(()->new NullPointerException("User not found"));
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElseThrow(()->new NullPointerException("UserStatus not found"));
+        return new FindUserDTO(user,userStatus);
+    }
+
+    @Override
     public List<FindUserDTO> findAll() {
         List<User> users = userRepository.findAll();
         List<UserStatus> userStatuses = userStatusRepository.findAll();
         Map<UUID, UserStatus> userStatusMap = userStatuses.stream()
                 .collect(Collectors.toMap(UserStatus::getUserId, userStatus->userStatus));
+
         return users.stream()
                 .map(user -> new FindUserDTO(user,userStatusMap.get(user.getId())))
                 .toList();

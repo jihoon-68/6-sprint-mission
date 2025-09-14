@@ -17,8 +17,11 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,22 +68,24 @@ public class BasicChannelService implements ChannelService {
                 .filter(rs -> rs.getUserId().equals(userId))
                 .toList();
 
-        List<Message> recentMessages = readStatuses.stream()
-                .map(rs ->
-                        messageRepository.findAll().stream()
-                                .filter(message -> message.getChannel().equals(rs.getChannelId()))
-                                .findFirst()
-                                .orElse(new Message(rs.getUserId(),rs.getChannelId(),"Message not found"))
-                ).toList();
+        Map<Channel,List<Message>> channelMessageMap = readStatuses.stream()
+                .collect(Collectors.toMap(rs-> channelRepository.findById(rs.getChannelId()).orElse(null),
+                        rs -> messageRepository.findAll().stream()
+                                .filter(m -> m.getChannel().equals(rs.getChannelId())).limit(1).toList())
+                );
 
 
-        return recentMessages.stream()
-                .map(rm -> {
-                    Channel channel = channelRepository.findById(rm.getId())
+
+        return readStatuses.stream()
+                .map(rs -> {
+                    Channel channel = channelRepository.findById(rs.getChannelId())
                             .orElseThrow(() -> new NullPointerException("Channel not found"));
-                    return new FindChannelDTO(channel,rm.getCreated(),rm.getSender());
+                    if(channelMessageMap.get(channel).isEmpty()){
+                        return new FindChannelDTO(channel,channel.getCreated(),rs.getUserId());
                     }
-                ).toList();
+                    return new FindChannelDTO(channel,channelMessageMap.get(channel).get(0).getCreated(),rs.getUserId());
+                })
+                .toList();
     }
 
     @Override

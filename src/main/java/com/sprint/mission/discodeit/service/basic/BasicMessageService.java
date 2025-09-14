@@ -24,6 +24,8 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
 
+
+
     @Override
     public Message create(CreateMessageDTO createMessageDTO) {
         boolean sender = userRepository.existsById(createMessageDTO.userId());

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
@@ -11,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileChannelRepository implements ChannelRepository {
     private final Path directory = Paths.get("./src/main/resources/ChannelDate");
@@ -25,7 +27,6 @@ public class FileChannelRepository implements ChannelRepository {
         instance.save(directory,channel.getId(), channel);
         return channel;
     }
-
     @Override
     public Optional<Channel> findById(UUID id) {return instance.load(directory,id);}
 

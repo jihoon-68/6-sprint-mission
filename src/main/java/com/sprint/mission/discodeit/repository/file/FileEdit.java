@@ -41,7 +41,8 @@ public class FileEdit {
                     FileInputStream fis = new FileInputStream(filePath.toFile());
                     ObjectInputStream ois = new ObjectInputStream(fis);
             ) {
-                date = (Optional<T>) ois.readObject();
+                Object dateO = ois.readObject();
+                return  (Optional<T>) ois.readObject();
 
             }catch (IOException | ClassNotFoundException e){
                 throw new RuntimeException(e);

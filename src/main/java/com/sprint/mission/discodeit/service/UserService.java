@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface UserService {
       User create(CreateUserDTO createUserDTO);
       FindUserDTO find(UUID id);
+      FindUserDTO findEmail(String email);
       List<FindUserDTO> findAll();
       void update(UpdateUserDTO updateUserDTO);
       void delete(UUID id);
