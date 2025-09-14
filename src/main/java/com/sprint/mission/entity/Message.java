@@ -13,9 +13,9 @@ public class Message extends EntityCommon{
     private UUID channelId;
     private UUID senderId;
     private String content;
-    List<User> attachments;
+    List<BinaryContent> attachments;
 
-    public Message(UUID channelId, UUID senderId, String content, List<User> attachments) {
+    public Message(UUID channelId, UUID senderId, String content, List<BinaryContent> attachments) {
 
         super();
         this.channelId = channelId;

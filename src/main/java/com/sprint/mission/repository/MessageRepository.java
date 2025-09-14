@@ -1,5 +1,6 @@
 package com.sprint.mission.repository;
 
+import com.sprint.mission.dto.message.MessageCreateDto;
 import com.sprint.mission.dto.user.UserCreateDto;
 import com.sprint.mission.entity.Message;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 public interface MessageRepository {
 
-    Message save(UserCreateDto userCreateDto);
+    Message save(MessageCreateDto messageCreateDto);
     Optional<Message> findById(UUID id);
     List<Message> findAll();
     boolean existsById(UUID id);
