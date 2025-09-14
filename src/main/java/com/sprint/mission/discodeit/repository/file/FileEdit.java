@@ -33,22 +33,22 @@ public class FileEdit {
         }
     };
 
+    //단일 노드 오류 있음
     public <T> Optional<T> load(Path directory, UUID id){
         Path filePath = directory.resolve(id+".ser");
-        Optional<T> date = Optional.empty();
-        if(!Files.exists(filePath)){
+        if(Files.exists(filePath)){
             try(
                     FileInputStream fis = new FileInputStream(filePath.toFile());
                     ObjectInputStream ois = new ObjectInputStream(fis);
             ) {
-                Object dateO = ois.readObject();
-                return  (Optional<T>) ois.readObject();
+                T date = (T) ois.readObject();
+                return  Optional.of(date);
 
             }catch (IOException | ClassNotFoundException e){
                 throw new RuntimeException(e);
             }
         }
-        return date;
+        return Optional.empty();
     }
 
     public <T> List<T> loadAll(Path directory){
