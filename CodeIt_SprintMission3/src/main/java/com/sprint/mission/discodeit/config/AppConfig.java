@@ -1,67 +1,13 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileReadStatusRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserStatusRepository;
-import com.sprint.mission.discodeit.repository.file.FileBinaryContentRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
-import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import com.sprint.mission.discodeit.service.basic.BasicAuthService;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.basic.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfig {
-
-    // ==== Repositories ====
-    @Bean
-    public UserRepository userRepository() {
-        return new FileUserRepository();
-    }
-
-    @Bean
-    public MessageRepository messageRepository() {
-        return new FileMessageRepository();
-    }
-
-    @Bean
-    public ChannelRepository channelRepository() {
-        return new FileChannelRepository();
-    }
-
-    @Bean
-    public ReadStatusRepository readStatusRepository() {
-        return new FileReadStatusRepository();
-    }
-
-    @Bean
-    public UserStatusRepository userStatusRepository() {
-        return new FileUserStatusRepository();
-    }
-
-    @Bean
-    public BinaryContentRepository binaryContentRepository() {
-        return new FileBinaryContentRepository();
-    }
 
     // ==== Services ====
     @Bean
