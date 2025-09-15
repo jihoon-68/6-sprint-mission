@@ -2,58 +2,45 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(name = "repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFBinaryContentRepository implements BinaryContentRepository {
+    private final Map<UUID, BinaryContent> data;
 
-    private final Map<UUID, BinaryContent> map = new HashMap<>();
+    public JCFBinaryContentRepository() {
+        this.data = new HashMap<>();
+    }
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        map.put(binaryContent.getId(), binaryContent);
+        this.data.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
 
     @Override
-    public Optional<BinaryContent> find(UUID id) {
-        return Optional.ofNullable(map.get(id));
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public Optional<BinaryContent> findByUserId(UUID userId) {
-        return map.entrySet()
-                .stream()
-                .filter(x -> x.getValue().getProfileId().equals(userId))
-                .map(Map.Entry::getValue)
-                .findFirst();
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        return this.data.values().stream()
+                .filter(content -> ids.contains(content.getId()))
+                .toList();
     }
 
     @Override
-    public Map<UUID, BinaryContent> findAll() {
-        return Map.of();
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override
-    public void deleteByUserId(UUID userId) {
-        map.entrySet().removeIf(x -> x.getValue().getProfileId().equals(userId));
-    }
-
-    @Override
-    public void deleteByMessageId(UUID messageId) {
-        map.entrySet().removeIf(x -> x.getValue().getMessageId().equals(messageId));
-    }
-
-    @Override
-    public void delete(UUID id) {
-        map.remove(id);
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }
