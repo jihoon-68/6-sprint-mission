@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.model.UserDto;
-import com.sprint.mission.discodeit.dto.user.request.UserUpdateProfileImageRequest;
-import com.sprint.mission.discodeit.dto.user.response.UserFindAllResponse;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -11,272 +12,128 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
-@Service
-@Primary
 @RequiredArgsConstructor
-@Slf4j
+@Service
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+    //
     private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
-    public void updateUsername(String username, UUID id) {
-        User user = userRepository.findById(id);
-
-        if (user == null) {
-            log.warn("User를 찾을 수 없습니다. - userId: {}", id);
-            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
-        }
-
-        user.updateUsername(username);
-        userRepository.save(user);
-    }
-
-    @Override
-    public void updatePassword(String password, UUID id) {
-        if (password.length() < 6) {
-            log.info("잘못된 password 형식 - userId: {}", id);
-            throw new IllegalArgumentException("password는 6자 이상이여야 합니다.");
-        }
-
-        User user = userRepository.findById(id);
-
-        if (user == null) {
-            log.warn("User를 찾을 수 없습니다. - userId: {}", id);
-            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
-        }
-
-        user.updatePassword(password);
-    }
-
-    @Override
-    public void updateEmail(String email, UUID id) {
-        User user = userRepository.findById(id);
-
-        if (user == null) {
-            log.warn("User를 찾을 수 없습니다. - userId: {}", id);
-            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
-        }
+    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        String username = userCreateRequest.username();
+        String email = userCreateRequest.email();
 
         if (userRepository.existsByEmail(email)) {
-            log.info("중복된 email - userId: {}", id);
-            throw new IllegalStateException("이미 사용중인 email입니다.");
+            throw new IllegalArgumentException("User with email " + email + " already exists");
+        }
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("User with username " + username + " already exists");
         }
 
-        if (email.contains(" ")) {
-            log.info("잘못된 email 형식 - userId: {}", id);
-            throw new IllegalArgumentException("email에 공백을 포함할 수 없습니다.");
-        }
+        UUID nullableProfileId = optionalProfileCreateRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+        String password = userCreateRequest.password();
 
-        user.updateEmail(email);
-        userRepository.save(user);
+        User user = new User(username, email, password, nullableProfileId);
+        User createdUser = userRepository.save(user);
+
+        Instant now = Instant.now();
+        UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+        userStatusRepository.save(userStatus);
+
+        return createdUser;
     }
 
     @Override
-    public void updateProfileImage(UserUpdateProfileImageRequest request) {
-        BinaryContent content = binaryContentRepository.findByUserId(request.getUserId());
-
-        if (content == null) {
-            content = new BinaryContent(request.getUserId(), null, request.getPath());
-            binaryContentRepository.save(content);
-        } else {
-            content.setPath(request.getPath());
-            binaryContentRepository.save(content);
-        }
+    public UserDto find(UUID userId) {
+        return userRepository.findById(userId)
+                .map(this::toDto)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
-    public void deleteUserById(UUID id) {
-        User user = userRepository.findById(id);
-
-        if (user == null) {
-            log.warn("User를 찾을 수 없습니다. - userId: {}", id);
-            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
-        }
-
-        binaryContentRepository.deleteByUserId(id);
-        userStatusRepository.deleteByUserId(id);
-        userRepository.deleteById(id);
+    public List<UserDto> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
     @Override
-    public UserDto findUserById(UUID id) {
-        User user = userRepository.findById(id);
+    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-        if (user == null) {
-            log.warn("User를 찾을 수 없습니다. -  userId: {}", id);
-            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
+        String newUsername = userUpdateRequest.newUsername();
+        String newEmail = userUpdateRequest.newEmail();
+        if (userRepository.existsByEmail(newEmail)) {
+            throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+        }
+        if (userRepository.existsByUsername(newUsername)) {
+            throw new IllegalArgumentException("User with username " + newUsername + " already exists");
         }
 
-        UserStatus userStatus = userStatusRepository.findByUserId(id);
+        UUID nullableProfileId = optionalProfileCreateRequest
+                .map(profileRequest -> {
+                    Optional.ofNullable(user.getProfileId())
+                                    .ifPresent(binaryContentRepository::deleteById);
 
-        UserDto response = new UserDto();
-        response.setId(user.getId());
-        response.setUsername(user.getUsername());
-        response.setEmail(user.getEmail());
-        response.setFriendIds(user.getFriendIds());
-        response.setReceivedFriendRequests(user.getReceivedFriendRequests());
-        response.setSentFriendRequests(user.getSentFriendRequests());
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
 
-        Instant minusFiveMinutes = Instant.now().minusSeconds(300);
+        String newPassword = userUpdateRequest.newPassword();
+        user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
-        if (userStatus.isLogin() || (userStatus.getLastLogin() != null && userStatus.getLastLogin().isAfter(minusFiveMinutes))) {
-            response.setUserStatus("Online");
-        } else {
-            response.setUserStatus("Offline");
-        }
-
-        return response;
+        return userRepository.save(user);
     }
 
     @Override
-    public UserFindAllResponse findAllUsers() {
-        List<UserDto> users = new ArrayList<>();
+    public void delete(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-        for (User user : userRepository.findAll()) {
-            UserStatus status = userStatusRepository.findByUserId(user.getId());
+        Optional.ofNullable(user.getProfileId())
+                        .ifPresent(binaryContentRepository::deleteById);
+        userStatusRepository.deleteByUserId(userId);
 
-            UserDto userDto = new UserDto();
-
-            userDto.setId(user.getId());
-            userDto.setUsername(user.getUsername());
-            userDto.setEmail(user.getEmail());
-            userDto.setFriendIds(user.getFriendIds());
-            userDto.setReceivedFriendRequests(user.getReceivedFriendRequests());
-            userDto.setSentFriendRequests(user.getSentFriendRequests());
-
-            Instant minusFiveMinutes = Instant.now().minusSeconds(300); //현재에서 5분 빼기
-
-            if (status.isLogin() || (status.getLastLogin() != null && status.getLastLogin().isAfter(minusFiveMinutes))) {
-                userDto.setUserStatus("Online");
-            } else {
-                userDto.setUserStatus("Offline");
-            }
-
-            users.add(userDto);
-        }
-
-        UserFindAllResponse response = new UserFindAllResponse();
-        response.setUsers(users);
-
-        return response;
+        userRepository.deleteById(userId);
     }
 
-    @Override
-    public void sendFriendRequest(UUID userId, String email) {
-        User friendUser = userRepository.findByEmail(email);
-        User currentUser = userRepository.findById(userId);
+    private UserDto toDto(User user) {
+        Boolean online = userStatusRepository.findByUserId(user.getId())
+                .map(UserStatus::isOnline)
+                .orElse(null);
 
-        if (friendUser == null) {
-            log.warn("friendUser를 찾을 수 없습니다. - friendUserEmail: {}", email);
-            throw new IllegalArgumentException("User를 찾을 수 없습니다.");
-        }
-
-        if (email.equals(currentUser.getEmail())) {
-            log.info("자신의 email과 동일 - friendEmail: {}, userEmail: {}" , email, currentUser.getEmail());
-            throw new IllegalStateException("자기 자신에게는 친구 요청을 보낼 수 없습니다.");
-        }
-
-        if (currentUser.getSentFriendRequests().contains(friendUser.getId())) {
-            log.info("중복된 친구 요청 - userSentFriendRequest: {}, friendEmail: {}",  currentUser.getSentFriendRequests(), email);
-            throw new IllegalStateException("이미 처리중인 요청입니다.");
-        }
-
-        if (currentUser.getFriendIds().contains(friendUser.getId())) {
-            log.info("이미 추가된 친구 - userFriendIds: {}, friendId: {}", currentUser.getFriendIds(), friendUser.getId());
-            throw new IllegalStateException("이미 추가된 친구입니다.");
-        }
-
-        friendUser.getReceivedFriendRequests().add(userId);
-        currentUser.getSentFriendRequests().add(friendUser.getId());
-
-        userRepository.save(friendUser);
-        userRepository.save(currentUser);
-    }
-
-    @Override
-    public void acceptFriendRequest(UUID userId, UUID friendId) {
-        User currentUser = userRepository.findById(userId);
-        User friendUser = userRepository.findById(friendId);
-
-        if (friendUser == null) {
-            currentUser.getReceivedFriendRequests().remove(friendId);
-            userRepository.save(currentUser);
-            return;
-        }
-
-        currentUser.getFriendIds().add(friendId);
-        currentUser.getReceivedFriendRequests().remove(friendId);
-
-
-        friendUser.getFriendIds().add(userId);
-        friendUser.getSentFriendRequests().remove(userId);
-
-        userRepository.save(currentUser);
-        userRepository.save(friendUser);
-    }
-
-    @Override
-    public void rejectFriendRequest(UUID userId, UUID friendId) {
-        User currentUser = userRepository.findById(userId);
-        User friendUser = userRepository.findById(friendId);
-
-        if (friendUser == null) {
-            currentUser.getReceivedFriendRequests().remove(friendId);
-            userRepository.save(currentUser);
-            return;
-        }
-
-        currentUser.getReceivedFriendRequests().remove(friendId);
-        friendUser.getSentFriendRequests().remove(userId);
-
-        userRepository.save(currentUser);
-        userRepository.save(friendUser);
-    }
-
-    @Override
-    public void cancelSendFriendRequest(UUID userId, UUID friendId) {
-        User currentUser = userRepository.findById(userId);
-        User friendUser = userRepository.findById(friendId);
-
-        if (friendUser == null) {
-            currentUser.getSentFriendRequests().remove(friendId);
-            userRepository.save(currentUser);
-            return;
-        }
-
-        currentUser.getSentFriendRequests().remove(friendId);
-        friendUser.getReceivedFriendRequests().remove(userId);
-
-        userRepository.save(currentUser);
-        userRepository.save(friendUser);
-    }
-
-    @Override
-    public void deleteFriend(UUID userId, UUID friendId) {
-        User currentUser = userRepository.findById(userId);
-        User friendUser = userRepository.findById(friendId);
-
-        if (friendUser == null) {
-            currentUser.getFriendIds().remove(friendId);
-            userRepository.save(currentUser);
-            return;
-        }
-
-        currentUser.getFriendIds().remove(friendId);
-        friendUser.getFriendIds().remove(userId);
-
-        userRepository.save(currentUser);
-        userRepository.save(friendUser);
+        return new UserDto(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getProfileId(),
+                online
+        );
     }
 }

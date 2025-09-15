@@ -1,48 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.userStatus.model.UserStatusDto;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@Setter
 public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private UUID userId;
-    private Instant updateAt;
-    private Instant createAt;
-    private Instant lastLogin;
-    private boolean isLogin;
-    private static final long serializableId = 1L;
+    private Instant lastActiveAt;
 
-    public UserStatus(UUID userId) {
+    public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.userId = userId;
-        this.createAt = Instant.now();
-        this.isLogin = false;
+        this.lastActiveAt = lastActiveAt;
     }
 
-    public void updateLastLogin() {
-        this.lastLogin = Instant.now();
-        this.updateAt = Instant.now();
+    public void update(Instant lastActiveAt) {
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public void updateIsLogin(boolean isLogin) {
-        this.isLogin = isLogin;
-        this.updateAt = Instant.now();
-    }
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-    public static UserStatusDto toDto(UserStatus userStatus) {
-        UserStatusDto userStatusDto = new UserStatusDto();
-        userStatusDto.setId(userStatus.getId());
-        userStatusDto.setUserId(userStatus.getUserId());
-        userStatusDto.setLogin(userStatus.isLogin);
-        userStatusDto.setLastLogin(userStatus.lastLogin);
-
-        return  userStatusDto;
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
 }

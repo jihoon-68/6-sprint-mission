@@ -9,52 +9,37 @@ import java.util.UUID;
 
 @Getter
 public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private UUID id;
-    private Instant updateAt;
-    private Instant createAt;
-    private UUID authorId;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private String content;
+    //
     private UUID channelId;
-    private UUID receiverId;
-    private boolean isDrawnAuthor;
-    private boolean isDrawnReceiver;
-    private static final long serializableId = 1L;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
 
-    public Message(UUID authorId, UUID channelId, UUID receiverId, String content, boolean isDrawnReceiver) {
-        this.authorId = authorId;
-        this.channelId = channelId;
-        this.content = content;
-        this.createAt = Instant.now();
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
-        this.receiverId = receiverId;
-        this.isDrawnAuthor = false;
-        this.isDrawnReceiver = isDrawnReceiver;
-    }
-
-    public void updateContent(String content) {
+        this.createdAt = Instant.now();
+        //
         this.content = content;
-        this.updateAt = Instant.now();
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
 
-    public void updateIsDrawnAuthor(boolean isDrawnAuthor) {
-        this.isDrawnAuthor = isDrawnAuthor;
-        this.updateAt = Instant.now();
-    }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    public void updateIsDrawnReceiver(boolean isDrawnReceiver) {
-        this.isDrawnReceiver = isDrawnReceiver;
-        this.updateAt = Instant.now();
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "\nauthorId=" + authorId +
-                ",\ncontent='" + content + '\'' +
-                ",\nchannelId=" + channelId +
-                ",\nreceiverId=" + receiverId +
-                ",\nisDrawnAuthor=" + isDrawnAuthor +
-                ",\nisDrawnReceiver=" + isDrawnReceiver +
-                "\n}";
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
