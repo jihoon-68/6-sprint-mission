@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,13 @@ public class BasicUserService implements UserService {
     //
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
+
+    @PostConstruct
+    public void printInjectedBeans() {
+        System.out.println("UserRepository bean = " + userRepository.getClass().getName());
+        System.out.println("BinaryContentRepository bean = " + binaryContentRepository.getClass().getName());
+        System.out.println("UserStatusRepository bean = " + userStatusRepository.getClass().getName());
+    }
 
     @Override
     public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -45,7 +53,7 @@ public class BasicUserService implements UserService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
                     return binaryContentRepository.save(binaryContent).getId();
                 })
                 .orElse(null);
@@ -93,7 +101,7 @@ public class BasicUserService implements UserService {
         UUID nullableProfileId = optionalProfileCreateRequest
                 .map(profileRequest -> {
                     Optional.ofNullable(user.getProfileId())
-                                    .ifPresent(binaryContentRepository::deleteById);
+                            .ifPresent(binaryContentRepository::deleteById);
 
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
@@ -115,10 +123,19 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
         Optional.ofNullable(user.getProfileId())
-                        .ifPresent(binaryContentRepository::deleteById);
+                .ifPresent(binaryContentRepository::deleteById);
         userStatusRepository.deleteByUserId(userId);
 
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    public void updatePresence(UUID id) {
+        var status = userStatusRepository.findByUserId(id).orElseThrow(() -> new NoSuchElementException("User with id " + id + " not found"));
+
+        status.update(Instant.now());
+
+        return;
     }
 
     private UserDto toDto(User user) {

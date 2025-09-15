@@ -63,6 +63,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
             ) {
                 userStatusNullable = (UserStatus) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
+                System.out.println(e.getMessage());
                 throw new RuntimeException(e);
             }
         }

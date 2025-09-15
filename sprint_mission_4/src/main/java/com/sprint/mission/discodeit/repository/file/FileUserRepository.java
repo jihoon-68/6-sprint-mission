@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -121,7 +122,13 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public boolean existsByUsername(String username) {
+        if (username == null || username.isBlank()) {
+            return false;
+        }
+
+        // FIXME: - 기존 코드는 user.getUsername()을 통한 비교를 진행했었음 ( 위에 비교문을 통해서 username이 빈값인지 까지 확인했는데도 발생했음 )
+        // FIXME: - 허나 NPE가 발생했지만 Object로 시도하니 통과했음 -> 이유가 뭘까?
         return this.findAll().stream()
-                .anyMatch(user -> user.getUsername().equals(username));
+                .anyMatch(u -> Objects.equals(u.getUsername(), username));
     }
 }
