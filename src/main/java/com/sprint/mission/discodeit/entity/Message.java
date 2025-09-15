@@ -21,13 +21,14 @@ public class Message implements Serializable {
     private UUID authorId;
     private List<UUID> attachmentIds;
 
-    public Message(String content, UUID channelId, UUID authorId) {
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         //
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
 
     public void update(String newContent) {
@@ -40,14 +41,5 @@ public class Message implements Serializable {
         if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
-    }
-    public void addAttachment(UUID attachmentId) {
-        attachmentIds.add(attachmentId);
-    }
-    public void removeAttachment(UUID attachmentId) {
-        attachmentIds.remove(attachmentId);
-    }
-    public List<UUID> getAttachmentIds() {
-        return List.copyOf(attachmentIds);
     }
 }

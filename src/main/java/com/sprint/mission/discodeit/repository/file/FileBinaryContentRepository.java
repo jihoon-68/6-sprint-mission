@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -16,14 +16,14 @@ import java.util.UUID;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
-public class FileUserRepository implements UserRepository {
+public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserRepository(
+    public FileBinaryContentRepository(
             @Value("${discodeit.repository.file-directory:data}") String fileDirectory
     ) {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, User.class.getSimpleName());
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, BinaryContent.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -38,45 +38,38 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(User user) {
-        Path path = resolvePath(user.getId());
+    public BinaryContent save(BinaryContent binaryContent) {
+        Path path = resolvePath(binaryContent.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
-            oos.writeObject(user);
+            oos.writeObject(binaryContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return user;
+        return binaryContent;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
-        User userNullable = null;
+    public Optional<BinaryContent> findById(UUID id) {
+        BinaryContent binaryContentNullable = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
                     ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-                userNullable = (User) ois.readObject();
+                binaryContentNullable = (BinaryContent) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
-        return Optional.ofNullable(userNullable);
+        return Optional.ofNullable(binaryContentNullable);
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return this.findAll().stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst();
-    }
-
-    @Override
-    public List<User> findAll() {
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
@@ -85,11 +78,12 @@ public class FileUserRepository implements UserRepository {
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
                         ) {
-                            return (User) ois.readObject();
+                            return (BinaryContent) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
                     })
+                    .filter(content -> ids.contains(content.getId()))
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -110,17 +104,5 @@ public class FileUserRepository implements UserRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return this.findAll().stream()
-                .anyMatch(user -> user.getEmail().equals(email));
-    }
-
-    @Override
-    public boolean existsByUsername(String username) {
-        return this.findAll().stream()
-                .anyMatch(user -> user.getUsername().equals(username));
     }
 }
