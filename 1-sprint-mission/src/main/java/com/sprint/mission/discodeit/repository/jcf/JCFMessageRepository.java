@@ -16,6 +16,7 @@ import java.util.*;
 )
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data;
+    private int asd;
 
     public JCFMessageRepository() {
         this.data = new HashMap<>();
