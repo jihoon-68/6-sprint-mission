@@ -2,7 +2,7 @@
 const API_BASE_URL = '/api/v1';
 const ENDPOINTS = {
     USERS: `${API_BASE_URL}/users/findAll`,
-    BINARY_CONTENT: `${API_BASE_URL}/binaryContent/find`
+    BINARY_CONTENT: `${API_BASE_URL}/binary-content/find`
 };
 
 // Initialize the application
