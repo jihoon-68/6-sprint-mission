@@ -43,23 +43,23 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "KimMinjae",
+									"value": "LeeJaesung",
 									"type": "text"
 								},
 								{
 									"key": "email",
-									"value": "KMJ@example.com",
+									"value": "LJS@example.com",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "kim1234",
+									"value": "lee1234",
 									"type": "text"
 								},
 								{
 									"key": "profile",
 									"type": "file",
-									"src": "/C:/Users/Kwonchanho/Downloads/woody.jpeg"
+									"src": "/C:/Users/Kwonchanho/Downloads/rex.png"
 								}
 							]
 						},
@@ -137,8 +137,8 @@
 								},
 								{
 									"key": "profile",
-									"value": "",
-									"type": "text",
+									"type": "file",
+									"src": [],
 									"disabled": true
 								}
 							]
