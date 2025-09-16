@@ -56,8 +56,8 @@ public class UserStatusService {
                 .toList();
     }
 
-    public UserStatusResponseDto update(UserStatusUpdateRequestDto dto){
-        UserStatus userStatus = userStatusRepository.findById(dto.id());
+    public UserStatusResponseDto update(UUID id, UserStatusUpdateRequestDto dto){
+        UserStatus userStatus = userStatusRepository.findById(id);
         userStatus.setLastlyConnectedAt(dto.lastlyConnectedAt());
         userStatusRepository.save(userStatus);
         return new UserStatusResponseDto(

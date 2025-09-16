@@ -123,9 +123,9 @@ public class ChannelService {
     }
 
 
-    public ChannelResponseDto update(ChannelUpdateRequestDto dto) {
+    public ChannelResponseDto update(UUID id, ChannelUpdateRequestDto dto) {
         // validateCreator(user, channel);
-        Channel channel = channelRepository.findById(dto.id());
+        Channel channel = channelRepository.findById(id);
 
         if (channel == null) {
             throw new NoSuchElementException("존재하지 않는 채널입니다.");
@@ -151,7 +151,7 @@ public class ChannelService {
                     channel.getId(),
                     null,
                     null,
-                    latestMessageAddedAt(dto.id()),
+                    latestMessageAddedAt(id),
                     channel.getParticipants()
             );
         }
@@ -160,7 +160,7 @@ public class ChannelService {
                     channel.getId(),
                     channel.getName(),
                     channel.getDescription(),
-                    latestMessageAddedAt(dto.id()),
+                    latestMessageAddedAt(id),
                     null
             );
         }

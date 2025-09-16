@@ -41,38 +41,53 @@ public class UserService {
         System.out.println("유저 추가 완료: " + user.getUsername());
         return new UserResponseDto(
                 user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
+                user.getProfileImageId(),
                 userStatus.isOnline());
     }
 
     public UserResponseDto findByUsername(String name) {
         User user = userRepository.findByUsername(name);
-        UserStatus status = userStatusRepository.findByUserId(user.getId());
-        boolean isUserOnline = status.isOnline();
-        return new UserResponseDto(user.getId(),
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+        boolean isUserOnline = userStatus != null && userStatus.isOnline();
+        return new UserResponseDto(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
+                user.getProfileImageId(),
                 isUserOnline);
     }
 
     public UserResponseDto findByEmail(String email) {
         User user = userRepository.findByEmail(email);
-        UserStatus status = userStatusRepository.findByUserId(user.getId());
-        boolean isUserOnline = status.isOnline();
-        return new UserResponseDto(user.getId(),
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+        boolean isUserOnline = userStatus != null && userStatus.isOnline();
+        return new UserResponseDto(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
+                user.getProfileImageId(),
                 isUserOnline);
     }
 
     public UserResponseDto findById(UUID id){
         User user = userRepository.findById(id);
         UserStatus userStatus = userStatusRepository.findByUserId(id);
-        boolean isUserOnline = userStatus.isOnline();
-        return new UserResponseDto(user.getId(),
+        boolean isUserOnline = userStatus != null && userStatus.isOnline();
+        return new UserResponseDto(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
+                user.getProfileImageId(),
                 isUserOnline);
     }
 
@@ -80,17 +95,28 @@ public class UserService {
         List<User> users = userRepository.findAll();
         return users.stream()
                 .map(user -> {
-                    UserStatus status = userStatusRepository.findByUserId(user.getId());
-                    boolean isUserOnline = status.isOnline();
-                    return new UserResponseDto(user.getId(), user.getUsername(), user.getEmail(), isUserOnline);
+                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+                    boolean isUserOnline = (userStatus != null && userStatus.isOnline());
+                    return new UserResponseDto(
+                            user.getId(),
+                            user.getCreatedAt(),
+                            user.getUpdatedAt(),
+                            user.getEmail(),
+                            user.getUsername(),
+                            user.getProfileImageId(),
+                            isUserOnline);
                 })
                 .collect(Collectors.toList());
     }
 
     // 수정
-    public UserResponseDto update(UserUpdateRequestDto dto) {
+    public UserResponseDto update(UUID id, UserUpdateRequestDto dto) {
 
-        User user = userRepository.findById(dto.userId());
+        User user = userRepository.findById(id);
+
+        if (user == null) {
+            throw new NoSuchElementException("존재하지 않는 유저입니다.");
+        }
 
         if (dto.username() != null){
             User existingUser = userRepository.findByUsername(dto.username());
@@ -111,14 +137,18 @@ public class UserService {
         if (dto.password() != null) user.setPassword(dto.password());
 
         userRepository.save(user);
-        UserStatus userStatus = new UserStatus(user.getId());
+        UserStatus userStatus = userStatusRepository.findByUserId(id);
+        boolean isUserOnline = (userStatus != null && userStatus.isOnline());
 
         System.out.println("수정 및 저장 완료 : " + user.getUsername());
         return new UserResponseDto(
                 user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
-                userStatus.isOnline());
+                user.getProfileImageId(),
+                isUserOnline);
     }
 
     // 유저 삭제

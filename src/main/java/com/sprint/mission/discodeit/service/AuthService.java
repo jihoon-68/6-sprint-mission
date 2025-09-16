@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,8 +35,11 @@ public class AuthService {
 
         return new UserResponseDto(
                 user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
+                user.getProfileImageId(),
                 userStatus.isOnline()
         );
     }

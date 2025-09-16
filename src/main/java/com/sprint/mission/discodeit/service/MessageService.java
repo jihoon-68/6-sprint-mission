@@ -78,9 +78,9 @@ public class MessageService {
     }
 
     // 내용 수정
-    public MessageResponseDto update(MessageUpdateRequestDto dto) {
+    public MessageResponseDto update(UUID id, MessageUpdateRequestDto dto) {
         // validateWriter(user, message);
-        Message message = messageRepository.findById(dto.messageId());
+        Message message = messageRepository.findById(id);
         if (message == null) {
             throw new NoSuchElementException("존재하지 않는 메시지입니다.");
         }
