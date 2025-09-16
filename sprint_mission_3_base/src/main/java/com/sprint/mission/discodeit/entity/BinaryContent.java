@@ -10,22 +10,20 @@ import java.util.UUID;
 public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
-    private UUID profileId;
-    private UUID messageId;
     private Instant createdAt;
-    private String content;
+    //
+    private String fileName;
+    private Long size;
+    private String contentType;
+    private byte[] bytes;
 
-    public BinaryContent(UUID profileId, UUID messageId, String content) {
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
         this.id = UUID.randomUUID();
-        this.profileId = profileId;
-        this.messageId = messageId;
-        this.createdAt = Instant.ofEpochSecond(Instant.now().getEpochSecond());
-        this.content = content;
-    }
-
-    public void update(String newcContent) {
-        if(newcContent != null && !newcContent.equals(this.content)) {
-            this.content = newcContent;
-        }
+        this.createdAt = Instant.now();
+        //
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+        this.bytes = bytes;
     }
 }
