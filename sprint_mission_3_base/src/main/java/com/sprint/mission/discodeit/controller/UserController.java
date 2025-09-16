@@ -50,7 +50,7 @@ public class UserController {
         userService.delete(userId);
     }
 
-    @GetMapping("/getAllUsers")
+    @GetMapping("/findAll")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.findAll());
     }
