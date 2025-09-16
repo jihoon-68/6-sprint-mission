@@ -13,7 +13,9 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,7 +31,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User create(UserCreateRequest userCreateRequest, Optional<MultipartFile> optionalProfileCreateRequest) {
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
@@ -42,11 +44,16 @@ public class BasicUserService implements UserService {
 
         UUID nullableProfileId = optionalProfileCreateRequest
                 .map(profileRequest -> {
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                    try {
+                        String fileName = profileRequest.getName();
+                        String contentType = profileRequest.getContentType();
+                        byte[] bytes = profileRequest.getBytes();
+                        BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                        return binaryContentRepository.save(binaryContent).getId();
+                    }
+                    catch (IOException e) {
+                        throw new IllegalArgumentException("Invalid profile request", e);
+                    }
                 })
                 .orElse(null);
         String password = userCreateRequest.password();
@@ -77,7 +84,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<MultipartFile> optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
@@ -92,14 +99,19 @@ public class BasicUserService implements UserService {
 
         UUID nullableProfileId = optionalProfileCreateRequest
                 .map(profileRequest -> {
-                    Optional.ofNullable(user.getProfileId())
-                                    .ifPresent(binaryContentRepository::deleteById);
+                    try {
+                        Optional.ofNullable(user.getProfileId())
+                                .ifPresent(binaryContentRepository::deleteById);
 
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                        String fileName = profileRequest.getName();
+                        String contentType = profileRequest.getContentType();
+                        byte[] bytes = profileRequest.getBytes();
+                        BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                        return binaryContentRepository.save(binaryContent).getId();
+                    }
+                    catch (IOException e) {
+                        throw new IllegalArgumentException("Invalid profile request", e);
+                    }
                 })
                 .orElse(null);
 
