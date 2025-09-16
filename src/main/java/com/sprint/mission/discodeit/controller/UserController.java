@@ -34,13 +34,13 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDto> update(@PathVariable UUID id,
-                                                  @RequestBody UserUpdateRequestDto dto) { // TODO dto 클래스에서 id 분리
+                                                  @RequestBody UserUpdateRequestDto dto) {
         return ResponseEntity.ok(userService.update(id, dto));
     }
 
-    @PostMapping("/{id}/")
+    @PutMapping("/{id}/")
     public ResponseEntity<UserStatusResponseDto> updateUserStatus(@PathVariable UUID id,
-                                                                  @RequestBody UserStatusUpdateRequestDto dto) {  // TODO dto 클래스에서 id 분리
+                                                                  @RequestBody UserStatusUpdateRequestDto dto) {
         return ResponseEntity.ok(userStatusService.updateByUserId(id, dto.lastlyConnectedAt()));
     }
 
