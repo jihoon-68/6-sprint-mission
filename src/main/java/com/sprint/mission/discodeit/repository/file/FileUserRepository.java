@@ -24,6 +24,8 @@ public class FileUserRepository implements UserRepository {
     public FileUserRepository(
             @Value("${discodeit.repository.file-directory:data}") String fileDirectory
     ) {
+        //user.dir: 현재 작업중인 디렉토리
+        //Paths.get: 운영체제에 맞게 경로 합침
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, User.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
