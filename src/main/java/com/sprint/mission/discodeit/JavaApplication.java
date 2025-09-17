@@ -1,43 +1,14 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.DiscordDTO;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.enums.ChannelType;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-
-import java.nio.file.Path;
-
-import static com.sprint.mission.discodeit.config.PathConfig.FILE_PATH;
-
+@Deprecated
 public class JavaApplication {
 
-    static String fileDirectory = FILE_PATH;
-    static final String strongPassword = "fe5A3sad@lks^";
+    //static String fileDirectory = FILE_PATH;
+    //static final String strongPassword = "fe5A3sad@lks^";
 
     public static void main(String[] args) {
 
-        testJcfUserService();
+        /*testJcfUserService();
         testJcfChannelService();
         testJcfMessageService();
         testFileUserService();
@@ -45,11 +16,11 @@ public class JavaApplication {
         testFileMessageService();
         testBasicUserService();
         testBasicChannelService();
-        testBasicMessageService();
+        testBasicMessageService();*/
 
     }
 
-    public static void testJcfUserService() {
+    /*public static void testJcfUserService() {
 
         UserService jcfUserCrudService = new JCFUserService();
 
@@ -82,7 +53,7 @@ public class JavaApplication {
 
         //유저 수정
         System.out.println("유저 수정");
-        DiscordDTO.UpdateUserRequest requestOne = new DiscordDTO.UpdateUserRequest.Builder()
+        DiscordDTO.UpdateUserRequest requestOne = DiscordDTO.UpdateUserRequest.builder()
                 .id(userOne.getId())
                 .nickname(userOne.getNickname())
                 .email(userOne.getEmail())
@@ -142,7 +113,7 @@ public class JavaApplication {
 
         //유저 수정
         System.out.println("유저 수정");
-        DiscordDTO.UpdateUserRequest requestOne = new DiscordDTO.UpdateUserRequest.Builder()
+        DiscordDTO.UpdateUserRequest requestOne = DiscordDTO.UpdateUserRequest.builder()
                 .id(userOne.getId())
                 .nickname(userOne.getNickname())
                 .email(userOne.getEmail())
@@ -176,8 +147,8 @@ public class JavaApplication {
     public static void testBasicUserService() {
 
         //UserRepository jcfUserRepository = new JCFUserRepository();
-        UserRepository fileUserRepository = new FileUserRepository("users");
-        UserService basicUserCrudService = new BasicUserService(fileUserRepository);
+        UserRepository fileUserRepository = new FileUserRepository();
+        UserService basicUserCrudService = new BasicUserService(fileUserRepository, new Validator());
 
         //유저 등록
         System.out.println("유저 등록");
@@ -208,7 +179,7 @@ public class JavaApplication {
 
         //유저 수정
         System.out.println("유저 수정");
-        DiscordDTO.UpdateUserRequest requestOne = new DiscordDTO.UpdateUserRequest.Builder()
+        DiscordDTO.UpdateUserRequest requestOne = DiscordDTO.UpdateUserRequest.builder()
                 .id(userOne.getId())
                 .nickname(userOne.getNickname())
                 .email(userOne.getEmail())
@@ -261,11 +232,11 @@ public class JavaApplication {
                 .isVoiceChannel(true)
                 .build();
         jcfChannelCrudService.createChannel(channelOne);
-        jcfChannelCrudService.addUserToChannel(channelOne.getId(), user);
-        jcfChannelCrudService.addMessageToChannel(channelOne.getId(), message);
+        //jcfChannelCrudService.addUserToChannel(channelOne.getId(), user);
+        //jcfChannelCrudService.addMessageToChannel(channelOne.getId(), message);
         jcfChannelCrudService.createChannel(channelTwo);
-        jcfChannelCrudService.addUserToChannel(channelTwo.getId(), user);
-        jcfChannelCrudService.addMessageToChannel(channelTwo.getId(), message);
+        //jcfChannelCrudService.addUserToChannel(channelTwo.getId(), user);
+        //jcfChannelCrudService.addMessageToChannel(channelTwo.getId(), message);
         System.out.println("==========================");
 
         //채널 읽기
@@ -279,7 +250,7 @@ public class JavaApplication {
 
         //채널 수정
         System.out.println("채널 수정");
-        DiscordDTO.UpdateChannelRequest requestTwo = new DiscordDTO.UpdateChannelRequest.Builder()
+        DiscordDTO.UpdateChannelRequest requestTwo = DiscordDTO.UpdateChannelRequest.builder()
                 .id(channelTwo.getId())
                 .channelName(channelTwo.getChannelName())
                 .category(ChannelType.DM)
@@ -294,11 +265,11 @@ public class JavaApplication {
 
         //채널 삭제
         System.out.println("채널 삭제");
-        System.out.println(channelOne.getChannelName() + " 에서 "
-                + channelOne.getUserMap().get(user.getId()).getNickname() + " 유저 삭제");
-        jcfChannelCrudService.deleteUserFromChannel(channelOne.getId(), channelOne.getUserMap().get(user.getId()).getId());
+        //System.out.println(channelOne.getChannelName() + " 에서 "
+                //+ channelOne.getUserMap().get(user.getId()).getNickname() + " 유저 삭제");
+        //jcfChannelCrudService.deleteUserFromChannel(channelOne.getId(), channelOne.getUserMap().get(user.getId()).getId());
         System.out.println(channelOne.getChannelName() + " 에서 1번째 메시지 삭제");
-        jcfChannelCrudService.deleteMessageFromChannel(channelOne.getId(), channelOne.getMessageMap().get(message.getId()).getId());
+        //jcfChannelCrudService.deleteMessageFromChannel(channelOne.getId(), channelOne.getMessageMap().get(message.getId()).getId());
         jcfChannelCrudService.deleteChannelById(channelTwo.getId());
         System.out.println(channelTwo.getChannelName() + " 채널 삭제");
         System.out.println("채널 목록 읽기");
@@ -328,11 +299,11 @@ public class JavaApplication {
                 .isVoiceChannel(true)
                 .build();
         fileChannelCrudService.createChannel(channelOne);
-        fileChannelCrudService.addUserToChannel(channelOne.getId(), user);
-        fileChannelCrudService.addMessageToChannel(channelOne.getId(), message);
+        //fileChannelCrudService.addUserToChannel(channelOne.getId(), user);
+        //fileChannelCrudService.addMessageToChannel(channelOne.getId(), message);
         fileChannelCrudService.createChannel(channelTwo);
-        fileChannelCrudService.addUserToChannel(channelTwo.getId(), user);
-        fileChannelCrudService.addMessageToChannel(channelTwo.getId(), message);
+        //fileChannelCrudService.addUserToChannel(channelTwo.getId(), user);
+        //fileChannelCrudService.addMessageToChannel(channelTwo.getId(), message);
         System.out.println("==========================");
 
         //채널 읽기
@@ -346,7 +317,7 @@ public class JavaApplication {
 
         //채널 수정
         System.out.println("채널 수정");
-        DiscordDTO.UpdateChannelRequest requestTwo = new DiscordDTO.UpdateChannelRequest.Builder()
+        DiscordDTO.UpdateChannelRequest requestTwo = DiscordDTO.UpdateChannelRequest.builder()
                 .id(channelTwo.getId())
                 .channelName(channelTwo.getChannelName())
                 .category(ChannelType.DM)
@@ -365,12 +336,12 @@ public class JavaApplication {
 
         //채널 삭제
         System.out.println("채널 삭제");
-        System.out.println(channelOne.getChannelName() + " 에서 "
-                + channelOne.getUserMap().get(user.getId()).getNickname() + " 유저 삭제");
-        fileChannelCrudService.deleteUserFromChannel(channelOne.getId(), user.getId());
+        //System.out.println(channelOne.getChannelName() + " 에서 "
+                //+ channelOne.getUserMap().get(user.getId()).getNickname() + " 유저 삭제");
+        //fileChannelCrudService.deleteUserFromChannel(channelOne.getId(), user.getId());
         System.out.println(channelOne.getChannelName() + " 에서 1번째 메시지 삭제");
-        fileChannelCrudService.deleteMessageFromChannel(channelOne.getId(), message.getId());
-        channelOne.getMessageMap().entrySet().forEach(m -> System.out.println(m.toString()));
+        //fileChannelCrudService.deleteMessageFromChannel(channelOne.getId(), message.getId());
+        //channelOne.getMessageMap().entrySet().forEach(m -> System.out.println(m.toString()));
         fileChannelCrudService.deleteChannelById(channelTwo.getId());
         System.out.println(channelTwo.getChannelName() + " 채널 삭제");
         System.out.println("채널 목록 읽기");
@@ -387,7 +358,7 @@ public class JavaApplication {
     public static void testBasicChannelService() {
 
         //ChannelRepository jcfChannelRepository = new JCFChannelRepository();
-        ChannelRepository fileChannelRepository = new FileChannelRepository("channels");
+        ChannelRepository fileChannelRepository = new FileChannelRepository();
         ChannelService basicChannelCrudService = new BasicChannelService(fileChannelRepository);
 
         //채널 등록
@@ -405,11 +376,11 @@ public class JavaApplication {
                 .isVoiceChannel(true)
                 .build();
         basicChannelCrudService.createChannel(channelOne);
-        basicChannelCrudService.addUserToChannel(channelOne.getId(), user);
-        basicChannelCrudService.addMessageToChannel(channelOne.getId(), message);
+        //basicChannelCrudService.addUserToChannel(channelOne.getId(), user);
+        //basicChannelCrudService.addMessageToChannel(channelOne.getId(), message);
         basicChannelCrudService.createChannel(channelTwo);
-        basicChannelCrudService.addUserToChannel(channelTwo.getId(), user);
-        basicChannelCrudService.addMessageToChannel(channelTwo.getId(), message);
+        //basicChannelCrudService.addUserToChannel(channelTwo.getId(), user);
+        //basicChannelCrudService.addMessageToChannel(channelTwo.getId(), message);
         System.out.println("==========================");
 
         //채널 읽기
@@ -423,7 +394,7 @@ public class JavaApplication {
 
         //채널 수정
         System.out.println("채널 수정");
-        DiscordDTO.UpdateChannelRequest requestTwo = new DiscordDTO.UpdateChannelRequest.Builder()
+        DiscordDTO.UpdateChannelRequest requestTwo = DiscordDTO.UpdateChannelRequest.builder()
                 .id(channelTwo.getId())
                 .channelName(channelTwo.getChannelName())
                 .category(ChannelType.DM)
@@ -444,9 +415,9 @@ public class JavaApplication {
                         .orElseThrow(() -> new IllegalArgumentException("No such users."));
         System.out.println(channelOne.getChannelName() + " 에서 "
                 + user.getNickname() + " 유저 삭제");
-        basicChannelCrudService.deleteUserFromChannel(channelOne.getId(), channelOne.getUserMap().get(user.getId()).getId());
+        //basicChannelCrudService.deleteUserFromChannel(channelOne.getId(), channelOne.getUserMap().get(user.getId()).getId());
         System.out.println(channelOne.getChannelName() + " 에서 1번째 메시지 삭제");
-        basicChannelCrudService.deleteMessageFromChannel(channelOne.getId(), channelOne.getMessageMap().get(message.getId()).getId());
+        //basicChannelCrudService.deleteMessageFromChannel(channelOne.getId(), channelOne.getMessageMap().get(message.getId()).getId());
         basicChannelCrudService.deleteChannelById(channelTwo.getId());
         System.out.println(channelTwo.getChannelName() + " 채널 삭제");
         System.out.println("채널 목록 읽기");
@@ -512,7 +483,7 @@ public class JavaApplication {
 
         //메시지 수정
         System.out.println("메시지 수정");
-        DiscordDTO.UpdateMessageRequest requestOne = new DiscordDTO.UpdateMessageRequest.Builder()
+        DiscordDTO.UpdateMessageRequest requestOne = DiscordDTO.UpdateMessageRequest.builder()
                 .id(messageOne.getId())
                 .content("messageOne edited")
                 .isReply(messageOne.isReply())
@@ -586,7 +557,7 @@ public class JavaApplication {
 
         //메시지 수정
         System.out.println("메시지 수정");
-        DiscordDTO.UpdateMessageRequest requestOne = new DiscordDTO.UpdateMessageRequest.Builder()
+        DiscordDTO.UpdateMessageRequest requestOne = DiscordDTO.UpdateMessageRequest.builder()
                 .id(messageOne.getId())
                 .content("messageOne edited")
                 .isReply(messageOne.isReply())
@@ -619,10 +590,10 @@ public class JavaApplication {
         UserRepository jcfUserRepository = new JCFUserRepository();
         ChannelRepository jcfChannelRepository = new JCFChannelRepository();
         //MessageRepository jcfMessageRepository = new JCFMessageRepository();
-        MessageRepository fileMessageRepository = new FileMessageRepository("messages");
-        UserService basicUserCrudService = new BasicUserService(jcfUserRepository);
+        MessageRepository fileMessageRepository = new FileMessageRepository();
+        UserService basicUserCrudService = new BasicUserService(jcfUserRepository, new Validator());
         ChannelService basicChannelCrudService = new BasicChannelService(jcfChannelRepository);
-        MessageService basicMessageCrudService = new BasicMessageService(jcfUserRepository, jcfChannelRepository, fileMessageRepository);
+        MessageService basicMessageCrudService = new BasicMessageService(fileMessageRepository, jcfUserRepository, jcfChannelRepository);
 
         //메시지 등록
         System.out.println("메시지 등록");
@@ -667,7 +638,7 @@ public class JavaApplication {
 
         //메시지 수정
         System.out.println("메시지 수정");
-        DiscordDTO.UpdateMessageRequest requestOne = new DiscordDTO.UpdateMessageRequest.Builder()
+        DiscordDTO.UpdateMessageRequest requestOne = DiscordDTO.UpdateMessageRequest.builder()
                 .id(messageOne.getId())
                 .content("messageOne edited")
                 .isReply(messageOne.isReply())
@@ -698,6 +669,6 @@ public class JavaApplication {
         basicUserCrudService.findAllUsers()
                 .forEach(user -> basicUserCrudService.deleteUserById(user.getId()));
 
-    }
+    }*/
 
 }

@@ -1,55 +1,24 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
+@RequiredArgsConstructor
 public class Message extends BaseEntity implements Serializable {
 
     private String content;
     private boolean isReply;
-    private UUID parentMessageId;
+    private UUID parentMessageId = null;
     private UUID channelId;
     private UUID userId;
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(UUID channelId) {
-        this.channelId = channelId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public boolean isReply() {
-        return isReply;
-    }
-
-    public void setReply(boolean reply) {
-        isReply = reply;
-    }
-
-    public UUID getParentMessageId() {
-        return parentMessageId;
-    }
-
-    public void setParentMessageId(UUID parentMessageId) {
-        this.parentMessageId = parentMessageId;
-    }
+    private List<UUID> binaryContentIdList = new ArrayList<>();
 
     public Message(UUID userId, UUID channelId, String content, boolean isReply, UUID parentMessageId) {
         super();
@@ -64,7 +33,21 @@ public class Message extends BaseEntity implements Serializable {
         this.content = content;
         this.isReply = isReply;
         this.parentMessageId = parentMessageId;
-        super.setUpdatedAt();
+        super.update();
+    }
+
+    public void addBinaryContent(UUID binaryContentId) {
+        binaryContentIdList.add(binaryContentId);
+    }
+
+    public void removeBinaryContent(UUID... binaryContentIds) {
+        for (UUID binaryContentId : binaryContentIds) {
+            binaryContentIdList.remove(binaryContentId);
+        }
+    }
+
+    public void removeAllBinaryContent() {
+        binaryContentIdList.clear();
     }
 
     @Override

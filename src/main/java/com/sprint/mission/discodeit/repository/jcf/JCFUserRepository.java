@@ -2,15 +2,21 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "code.repository.type", havingValue = "jcf")
 public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> data;
 
     public JCFUserRepository() {
-        data = new TreeMap<>();
+        data = new HashMap<>();
     }
 
     @Override
@@ -34,6 +40,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean existByNickname(String nickname) {
+        return data.values().stream().anyMatch(user -> user.getNickname().equals(nickname));
+    }
+
+    @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
     }
@@ -42,6 +53,13 @@ public class JCFUserRepository implements UserRepository {
     public Optional<User> findByEmail(String email) {
         return data.entrySet().stream()
                 .filter(entry -> entry.getValue().getEmail().equals(email))
+                .findFirst().map(Map.Entry::getValue);
+    }
+
+    @Override
+    public Optional<User> findByNickname(String nickname) {
+        return data.entrySet().stream()
+                .filter(entry -> entry.getValue().getNickname().equals(nickname))
                 .findFirst().map(Map.Entry::getValue);
     }
 

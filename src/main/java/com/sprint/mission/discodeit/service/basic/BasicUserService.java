@@ -1,42 +1,61 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.DiscordDTO;
+import com.sprint.mission.discodeit.dto.UserDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.utils.SecurityUtil;
-import com.sprint.mission.discodeit.utils.ValidationUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
     private final SecurityUtil securityUtil = new SecurityUtil();
-    private final ValidationUtil validationUtil = new ValidationUtil();
-
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
-    public void createUser(User user) {
+    public void createUser(UserDTO.CreateUserRequest request) {
 
-        if (userRepository.existById(user.getId())) {
+        if (userRepository.existByEmail(request.email()) || userRepository.existByNickname(request.nickname())) {
             throw new IllegalArgumentException("User already exists.");
         }
 
-        if (!validationUtil.isPasswordValid(user.getPassword()) || !validationUtil.isEmailValid(user.getEmail()) || user.getNickname().isBlank()) {
+        User user = new User.Builder()
+                .email(request.email())
+                .password(securityUtil.hashPassword(request.password()))
+                .nickname(request.nickname())
+                .description(request.description())
+                .build();
+
+        userStatusRepository.save(new UserStatus(user.getId()));
+
+        if (request.profileImage() != null && request.fileType() != null) {
+
+            BinaryContent binaryContent = BinaryContent.builder()
+                    .data(request.profileImage())
+                    .fileType(request.fileType())
+                    .build();
+
+            binaryContentRepository.save(binaryContent);
+            user.updateProfileImageId(binaryContent.getId());
+
+        } else if (request.profileImage() == null && request.fileType() != null) {
+            throw new IllegalArgumentException("Invalid user data.");
+        } else if (request.profileImage() != null) {
             throw new IllegalArgumentException("Invalid user data.");
         }
-
-        if (userRepository.existByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already exists.");
-        }
-
-        user.setPassword(securityUtil.hashPassword(user.getPassword()));
 
         userRepository.save(user);
 
@@ -53,46 +72,103 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<User> findUserById(UUID id) {
+    public boolean existUserByNickname(String nickname) {
+        return userRepository.existByNickname(nickname);
+    }
 
-        if (!userRepository.existById(id)) {
-            throw new IllegalArgumentException("No such user.");
-        }
+    @Override
+    public Optional<UserDTO.FindUserResult> findUserById(UUID id) {
 
-        return userRepository.findById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No such user."));
+
+        UserStatus userStatus = userStatusRepository.findByUserId(id)
+                .orElseThrow(() -> new IllegalArgumentException("No such user status."));
+
+        return Optional.ofNullable(UserDTO.FindUserResult.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .description(user.getDescription())
+                .profileImageId(user.getProfileImageId())
+                .isOnline(userStatus.isLogin())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build());
 
     }
 
     @Override
-    public Optional<User> findUserByEmail(String email) {
+    public Optional<UserDTO.FindUserResult> findUserByEmail(String email) {
 
-        if (!userRepository.existByEmail(email)) {
-            throw new IllegalArgumentException("No such user.");
-        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("No such user."));
 
-        return userRepository.findByEmail(email);
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("No such user status."));
+
+        return Optional.ofNullable(UserDTO.FindUserResult.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .description(user.getDescription())
+                .profileImageId(user.getProfileImageId())
+                .isOnline(userStatus.isLogin())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build());
 
     }
 
     @Override
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
+    public Optional<UserDTO.FindUserResult> findUserByNickname(String nickname) {
+
+        User user = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new IllegalArgumentException("No such user."));
+
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("No such user status."));
+
+        return Optional.ofNullable(UserDTO.FindUserResult.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .description(user.getDescription())
+                .profileImageId(user.getProfileImageId())
+                .isOnline(userStatus.isLogin())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build());
+
     }
 
     @Override
-    public void updateUser(DiscordDTO.UpdateUserRequest request) {
+    public List<UserDTO.FindUserResult> findAllUsers() {
 
-        if (!validationUtil.isEmailValid(request.email()) ||
-                !validationUtil.isPasswordValid(request.newPassword()) ||
-                !validationUtil.isPasswordValid(request.currentPassword()) ||
-                request.nickname().isBlank()) {
-            throw new IllegalArgumentException("Invalid user data.");
-        }
+        return userRepository.findAll().stream()
+                .map(user -> UserDTO.FindUserResult.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .nickname(user.getNickname())
+                        .description(user.getDescription())
+                        .profileImageId(user.getProfileImageId())
+                        .isOnline(userStatusRepository.findByUserId(user.getId())
+                                .orElseThrow(() -> new IllegalArgumentException("No such user status.")).isLogin())
+                        .createdAt(user.getCreatedAt())
+                        .updatedAt(user.getUpdatedAt())
+                        .build())
+                .toList();
+    }
 
-        User updatedUser = findUserById(request.id()).orElseThrow(() -> new IllegalArgumentException("No such user."));
+    @Override
+    public void updateUser(UserDTO.UpdateUserRequest request) {
 
-        if (userRepository.existByEmail(request.email()) && !updatedUser.getId().equals(request.id())) {
-            throw new IllegalArgumentException("Email already exists.");
+        User updatedUser = userRepository.findById(request.id()).orElseThrow(() -> new IllegalArgumentException("No such user."));
+
+        if ((userRepository.existByNickname(request.nickname()) ||
+                userRepository.existByEmail(request.email())) &&
+                !updatedUser.getId().equals(request.id())) {
+            throw new IllegalArgumentException("User already exists.");
         }
 
         if (!securityUtil.hashPassword(request.currentPassword()).equals(updatedUser.getPassword())) {
@@ -101,6 +177,18 @@ public class BasicUserService implements UserService {
 
         updatedUser.update(request.nickname(), request.email(), securityUtil.hashPassword(request.currentPassword()), request.description());
 
+        if (request.isProfileImageUpdated()) {
+
+            BinaryContent binaryContent = BinaryContent.builder()
+                    .data(request.profileImage())
+                    .fileType(request.fileType())
+                    .build();
+
+            binaryContentRepository.save(binaryContent);
+            updatedUser.updateProfileImageId(binaryContent.getId());
+
+        }
+
         userRepository.save(updatedUser);
 
     }
@@ -108,10 +196,10 @@ public class BasicUserService implements UserService {
     @Override
     public void deleteUserById(UUID id) {
 
-        if (!userRepository.existById(id)) {
-            throw new IllegalArgumentException("No such user.");
-        }
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such user."));
 
+        binaryContentRepository.deleteById(user.getProfileImageId());
+        userStatusRepository.deleteByUserId(user.getId());
         userRepository.deleteById(id);
 
     }

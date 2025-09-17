@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.DiscordDTO;
+import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -35,19 +35,23 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void createMessage(Message message) {
+    public void createMessage(MessageDTO.CreateMessageRequest request) {
 
-        if (!userService.existUserById(message.getUserId())) {
+        if (!userService.existUserById(request.userId())) {
             throw new IllegalArgumentException("No such user.");
         }
 
-        if (!channelService.existChannelById(message.getChannelId())) {
+        if (!channelService.existChannelById(request.channelId())) {
             throw new IllegalArgumentException("No such channel.");
         }
 
-        if (existMessageById(message.getId())) {
-            throw new IllegalArgumentException("Message already exists.");
-        }
+        Message message = new Message.Builder()
+                .userId(request.userId())
+                .channelId(request.channelId())
+                .content(request.content())
+                .isReply(request.isReply())
+                .parentMessageId(request.parentMessageId())
+                .build();
 
         try(FileOutputStream fos = new FileOutputStream(path.resolve( message.getId() + FILE_EXTENSION).toFile());
             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
@@ -64,14 +68,23 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Optional<Message> findMessageById(UUID id) {
+    public Optional<MessageDTO.FindMessageResult> findMessageById(UUID id) {
 
         try (FileInputStream fis = new FileInputStream(path.resolve(id + FILE_EXTENSION).toFile());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
 
             Message message = (Message) ois.readObject();
 
-            return Optional.ofNullable(message);
+            return Optional.ofNullable(MessageDTO.FindMessageResult.builder()
+                    .id(message.getId())
+                    .content(message.getContent())
+                    .isReply(message.isReply())
+                    .parentMessageId(message.getParentMessageId())
+                    .channelId(message.getChannelId())
+                    .userId(message.getUserId())
+                    .createdAt(message.getCreatedAt())
+                    .updatedAt(message.getUpdatedAt())
+                    .build());
 
         } catch (IOException | ClassNotFoundException e) {
             return Optional.empty();
@@ -80,51 +93,77 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findChildMessagesById(UUID id) {
+    public List<MessageDTO.FindMessageResult> findChildMessagesById(UUID id) {
 
         if (!existMessageById(id)) {
             throw new IllegalArgumentException("No such message.");
         }
 
-        //System.out.println(findAllMessages().size());
-
-        //System.out.println("답글 수 : " + childMessageList.size());
-
         return findAllMessages().stream()
-                .filter(message -> message.isReply() && message.getParentMessageId() != null && message.getParentMessageId().equals(id))
+                .filter(message -> message.isReply() && message.parentMessageId() != null && message.parentMessageId().equals(id))
+                .map(message -> MessageDTO.FindMessageResult.builder()
+                        .id(message.id())
+                        .content(message.content())
+                        .isReply(message.isReply())
+                        .parentMessageId(message.parentMessageId())
+                        .channelId(message.channelId())
+                        .userId(message.userId())
+                        .createdAt(message.createdAt())
+                        .updatedAt(message.updatedAt())
+                        .build())
                 .toList();
 
     }
 
     @Override
-    public List<Message> findMessagesByUserId(UUID userId) {
+    public List<MessageDTO.FindMessageResult> findMessagesByUserId(UUID userId) {
 
         if (!userService.existUserById(userId)) {
             throw new IllegalArgumentException("No such user.");
         }
 
         return findAllMessages().stream()
-                .filter(message -> message.getUserId().equals(userId))
+                .filter(message -> message.id().equals(userId))
+                .map(message -> MessageDTO.FindMessageResult.builder()
+                        .id(message.id())
+                        .content(message.content())
+                        .isReply(message.isReply())
+                        .parentMessageId(message.parentMessageId())
+                        .channelId(message.channelId())
+                        .userId(message.userId())
+                        .createdAt(message.createdAt())
+                        .updatedAt(message.updatedAt())
+                        .build())
                 .toList();
 
     }
 
     @Override
-    public List<Message> findMessagesByChannelId(UUID channelId) {
+    public List<MessageDTO.FindMessageResult> findMessagesByChannelId(UUID channelId) {
 
         if (!channelService.existChannelById(channelId)) {
             throw new IllegalArgumentException("No such channel.");
         }
 
         return findAllMessages().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .sorted(Comparator.comparing(Message::getCreatedAt))
+                .filter(message -> message.channelId().equals(channelId))
+                .sorted(Comparator.comparing(MessageDTO.FindMessageResult::createdAt))
+                .map(message -> MessageDTO.FindMessageResult.builder()
+                        .id(message.id())
+                        .content(message.content())
+                        .isReply(message.isReply())
+                        .parentMessageId(message.parentMessageId())
+                        .channelId(message.channelId())
+                        .userId(message.userId())
+                        .createdAt(message.createdAt())
+                        .updatedAt(message.updatedAt())
+                        .build())
                 .toList();
 
     }
 
     @Override
-    public List<Message> findAllMessages() {
+    public List<MessageDTO.FindMessageResult> findAllMessages() {
 
         try (Stream<Path> pathStream = Files.list(path)) {
             return pathStream
@@ -141,6 +180,16 @@ public class FileMessageService implements MessageService {
                         }
                     })
                     .filter(Objects::nonNull)
+                    .map(message -> MessageDTO.FindMessageResult.builder()
+                            .id(message.getId())
+                            .content(message.getContent())
+                            .isReply(message.isReply())
+                            .parentMessageId(message.getParentMessageId())
+                            .channelId(message.getChannelId())
+                            .userId(message.getUserId())
+                            .createdAt(message.getCreatedAt())
+                            .updatedAt(message.getUpdatedAt())
+                            .build())
                     .toList();
         } catch (IOException e) {
             return new ArrayList<>();
@@ -149,10 +198,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(DiscordDTO.UpdateMessageRequest request) {
-
-        Message message = findMessageById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException("No such message."));
+    public void updateMessage(MessageDTO.UpdateMessageRequest request) {
 
         if (request.isReply() && (request.parentMessageId() == null || !existMessageById(request.parentMessageId()))) {
             throw new IllegalArgumentException("No such parent message.");
@@ -163,13 +209,19 @@ public class FileMessageService implements MessageService {
         }
 
         try (FileOutputStream fos = new FileOutputStream(path.resolve(request.id() + FILE_EXTENSION).toFile());
+             FileInputStream fis = new FileInputStream(path.resolve(request.id() + FILE_EXTENSION).toFile());
+             ObjectInputStream ois = new ObjectInputStream(fis);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+
+            Message message = (Message) ois.readObject();
 
             message.update(request.content(), request.isReply(), request.parentMessageId());
             oos.writeObject(message);
 
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to update message.");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("No such message.");
         }
 
     }

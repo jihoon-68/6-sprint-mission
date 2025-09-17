@@ -2,15 +2,21 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "code.repository.type", havingValue = "jcf")
 public class JCFMessageRepository implements MessageRepository {
 
     private final Map<UUID, Message> data;
 
     public JCFMessageRepository() {
-        data = new TreeMap<>();
+        data = new HashMap<>();
     }
 
     @Override
@@ -37,7 +43,7 @@ public class JCFMessageRepository implements MessageRepository {
     public List<Message> findChildById(UUID id) {
         return data.values().stream()
                 .filter(Message::isReply)
-                .filter(message -> message.getParentMessageId() != null && message.getParentMessageId().equals(id))
+                .filter(message -> message.getParentMessageId().equals(id))
                 .toList();
     }
 
@@ -65,5 +71,10 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void deleteById(UUID id) {
         data.remove(id);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        findByChannelId(channelId).forEach(message -> deleteById(message.getId()));
     }
 }

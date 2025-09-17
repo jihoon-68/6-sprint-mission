@@ -1,15 +1,16 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.DiscordDTO;
+import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileChannelService implements ChannelService {
@@ -31,15 +32,17 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void createChannel(Channel channel) {
+    public void createChannel(ChannelDTO.CreatePublicChannelRequest request) {
 
-        if (existChannelById(channel.getId())) {
-            throw new IllegalArgumentException("Channel already exists.");
-        }
-
-        if (channel.getChannelName().isBlank() || channel.getCategory() == null) {
+        if (request.channelName().isBlank() || request.category() == null) {
             throw new IllegalArgumentException("Invalid channel data.");
         }
+
+        Channel channel = new Channel.Builder()
+                .channelName(request.channelName())
+                .category(request.category())
+                .isVoiceChannel(request.isVoiceChannel())
+                .build();
 
         try(FileOutputStream fos = new FileOutputStream(path.resolve( channel.getId() + FILE_EXTENSION).toFile());
             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
@@ -53,38 +56,27 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void addUserToChannel(UUID channelId, User user) {
+    public void createPrivateChannel(ChannelDTO.CreatePrivateChannelRequest request) {
 
-        Channel channel = findChannelById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("No such channel."));
+        Channel channel = new Channel.Builder()
+                .category(request.category())
+                .isPrivate(true)
+                .build();
 
-        if (channel.getUserMap().containsKey(user.getId())) {
-            throw new IllegalArgumentException("User already exists in channel.");
+        if (existChannelById(channel.getId())) {
+            throw new IllegalArgumentException("Channel already exists.");
         }
 
-        channel.getUserMap().put(user.getId(), user);
-
-        try (FileOutputStream fos = new FileOutputStream(path.resolve(channelId + FILE_EXTENSION).toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(channel);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to add user to channel.");
+        if (channel.getChannelName().isBlank() || channel.getCategory() == null) {
+            throw new IllegalArgumentException("Invalid channel data.");
         }
 
-    }
+        try(FileOutputStream fos = new FileOutputStream(path.resolve( channel.getId() + FILE_EXTENSION).toFile());
+            ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-    @Override
-    public void addMessageToChannel(UUID channelId, Message message) {
-
-        Channel channel = findChannelById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("No such channel."));
-        channel.getMessageMap().put(message.getId(), message);
-
-        try (FileOutputStream fos = new FileOutputStream(path.resolve(channelId + FILE_EXTENSION).toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(channel);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to add message to channel.");
+            throw new IllegalArgumentException("Failed to create channel.");
         }
 
     }
@@ -95,14 +87,24 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<Channel> findChannelById(UUID id) {
+    public Optional<ChannelDTO.FindChannelResult> findChannelById(UUID id) {
 
         try (FileInputStream fis = new FileInputStream(path.resolve(id + FILE_EXTENSION).toFile());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
 
             Channel channel = (Channel) ois.readObject();
 
-            return Optional.ofNullable(channel);
+            ChannelDTO.FindChannelResult findChannelResult = ChannelDTO.FindChannelResult.builder()
+                    .id(channel.getId())
+                    .channelName(channel.getChannelName())
+                    .category(channel.getCategory())
+                    .isVoiceChannel(channel.isVoiceChannel())
+                    .isPrivate(channel.isPrivate())
+                    .createdAt(channel.getCreatedAt())
+                    .updatedAt(channel.getUpdatedAt())
+                    .build();
+
+            return Optional.ofNullable(findChannelResult);
 
         } catch (IOException | ClassNotFoundException e) {
             return Optional.empty();
@@ -111,14 +113,12 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findChannelsByUserId(UUID userId) {
-        return findAllChannels().stream()
-                .filter(channel -> channel.getUserMap().containsKey(userId))
-                .toList();
+    public List<ChannelDTO.FindChannelResult> findChannelsByUserId(UUID userId) {
+        return List.of();
     }
 
     @Override
-    public List<Channel> findAllChannels() {
+    public List<ChannelDTO.FindChannelResult> findAllChannels() {
 
         try (Stream<Path> pathStream = Files.list(path)) {
             return pathStream
@@ -135,6 +135,15 @@ public class FileChannelService implements ChannelService {
                         }
                     })
                     .filter(Objects::nonNull)
+                    .map(channel -> ChannelDTO.FindChannelResult.builder()
+                            .id(channel.getId())
+                            .channelName(channel.getChannelName())
+                            .category(channel.getCategory())
+                            .isVoiceChannel(channel.isVoiceChannel())
+                            .isPrivate(channel.isPrivate())
+                            .createdAt(channel.getCreatedAt())
+                            .updatedAt(channel.getUpdatedAt())
+                            .build())
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException();
@@ -143,23 +152,30 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(DiscordDTO.UpdateChannelRequest request) {
-
-        Channel channel = findChannelById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException("No such channel."));
+    public void updateChannel(ChannelDTO.UpdateChannelRequest request) {
 
         if (request.channelName().isBlank() || request.category() == null) {
             throw new IllegalArgumentException("Invalid channel data.");
         }
 
         try (FileOutputStream fos = new FileOutputStream(path.resolve(request.id() + FILE_EXTENSION).toFile());
+             FileInputStream fis = new FileInputStream(path.resolve(request.id() + FILE_EXTENSION).toFile());
+             ObjectInputStream ois = new ObjectInputStream(fis);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+
+            Channel channel = (Channel) ois.readObject();
+
+            if (channel.isPrivate()) {
+                throw new IllegalArgumentException("Private channel cannot be updated.");
+            }
 
             channel.update(request.channelName(), request.category(), request.isVoiceChannel());
             oos.writeObject(channel);
 
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to update channel.");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("No such channel.");
         }
 
     }
@@ -179,35 +195,4 @@ public class FileChannelService implements ChannelService {
 
     }
 
-    @Override
-    public void deleteUserFromChannel(UUID channelId, UUID userId) {
-
-        Channel channel = findChannelById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("No such channel."));
-        channel.getUserMap().remove(userId);
-
-        try (FileOutputStream fos = new FileOutputStream(path.resolve(channelId + FILE_EXTENSION).toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(channel);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to delete user from channel.");
-        }
-
-    }
-
-    @Override
-    public void deleteMessageFromChannel(UUID channelId, UUID messageId) {
-
-        Channel channel = findChannelById(channelId)
-                .orElseThrow(() -> new IllegalArgumentException("No such channel."));
-        channel.getMessageMap().remove(messageId);
-
-        try (FileOutputStream fos = new FileOutputStream(path.resolve(channelId + FILE_EXTENSION).toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(channel);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Failed to delete message from channel.");
-        }
-
-    }
 }

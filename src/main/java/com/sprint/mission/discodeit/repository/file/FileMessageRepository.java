@@ -2,6 +2,11 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,17 +14,24 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.sprint.mission.discodeit.config.PathConfig.FILE_PATH;
-
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "code.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
 
-    private final Path path;
-    private static final String FILE_EXTENSION = ".ser";
-    private final String folderName;
+    @Value("${file.upload.path}")
+    private String fileUploadFolder;
+    @Value("${file.upload.folder.message.name}")
+    private String folderName;
+    @Value("${file.upload.extension}")
+    private String fileExtension;
 
-    public FileMessageRepository(String folderName) {
-        this.folderName = folderName;
-        path = Path.of(FILE_PATH + folderName);
+    private Path path;
+
+    @PostConstruct
+    private void initFolder() {
+
+        Path path = Path.of(fileUploadFolder + folderName);
 
         if (!path.toFile().exists()) {
             try {
@@ -28,16 +40,19 @@ public class FileMessageRepository implements MessageRepository {
                 throw new IllegalArgumentException("Failed to create directory.");
             }
         }
+
+        this.path = path;
+
     }
 
     @Override
     public void save(Message message) {
 
-        try(FileOutputStream fos = new FileOutputStream(path.resolve( message.getId() + FILE_EXTENSION).toFile());
+        try(FileOutputStream fos = new FileOutputStream(path.resolve( message.getId() + fileExtension).toFile());
             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(message);
         } catch (IOException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(e);
         }
 
     }
@@ -49,13 +64,13 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public boolean existById(UUID id) {
-        return Files.exists(path.resolve(id + FILE_EXTENSION));
+        return Files.exists(path.resolve(id + fileExtension));
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
 
-        try (FileInputStream fis = new FileInputStream(path.resolve(id + FILE_EXTENSION).toFile());
+        try (FileInputStream fis = new FileInputStream(path.resolve(id + fileExtension).toFile());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
 
             Message message = (Message) ois.readObject();
@@ -72,7 +87,7 @@ public class FileMessageRepository implements MessageRepository {
     public List<Message> findChildById(UUID id) {
         return findAll().stream()
                 .filter(Message::isReply)
-                .filter(message -> message.getParentMessageId() != null && message.getParentMessageId().equals(id))
+                .filter(message -> message.getParentMessageId().equals(id))
                 .toList();
     }
 
@@ -97,10 +112,10 @@ public class FileMessageRepository implements MessageRepository {
 
         try (Stream<Path> pathStream = Files.list(path)) {
             return pathStream
-                    .filter(path -> path.toString().endsWith(FILE_EXTENSION))
-                    .map(path -> {
+                    .filter(file -> file.toString().endsWith(fileExtension))
+                    .map(file -> {
                         try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
+                                FileInputStream fis = new FileInputStream(file.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
                         ) {
                             Object data = ois.readObject();
@@ -112,7 +127,7 @@ public class FileMessageRepository implements MessageRepository {
                     .filter(Objects::nonNull)
                     .toList();
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
 
     }
@@ -121,10 +136,15 @@ public class FileMessageRepository implements MessageRepository {
     public void deleteById(UUID id) {
 
         try {
-            Files.deleteIfExists(path.resolve(id + FILE_EXTENSION));
+            Files.deleteIfExists(path.resolve(id + fileExtension));
         } catch (IOException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(e);
         }
 
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        findByChannelId(channelId).forEach(message -> deleteById(message.getId()));
     }
 }

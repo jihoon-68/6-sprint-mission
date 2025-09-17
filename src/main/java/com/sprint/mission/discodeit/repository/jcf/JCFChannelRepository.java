@@ -2,15 +2,21 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "code.repository.type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> data;
 
     public JCFChannelRepository() {
-        data = new TreeMap<>();
+        data = new HashMap<>();
     }
 
     @Override
@@ -31,13 +37,6 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public Optional<Channel> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
-    }
-
-    @Override
-    public List<Channel> findByUserId(UUID userId) {
-        return findAll().stream()
-                .filter(channel -> channel.getUserMap().containsKey(userId))
-                .toList();
     }
 
     @Override

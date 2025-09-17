@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.dto.DiscordDTO;
+import com.sprint.mission.discodeit.dto.UserDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.utils.SecurityUtil;
-import com.sprint.mission.discodeit.utils.ValidationUtil;
 
 import java.util.*;
 
@@ -12,28 +11,26 @@ public class JCFUserService implements UserService {
 
     private final Map<UUID, User> data;
     private final SecurityUtil securityUtil = new SecurityUtil();
-    private final ValidationUtil validationUtil = new ValidationUtil();
 
     public JCFUserService() {
         data = new TreeMap<>();
     }
 
     @Override
-    public void createUser(User user) {
+    public void createUser(UserDTO.CreateUserRequest request) {
 
-        if (data.containsKey(user.getId())) {
+        if (existUserByEmail(request.email()) || existUserByNickname(request.nickname())) {
             throw new IllegalArgumentException("User already exists.");
         }
 
-        if (!validationUtil.isPasswordValid(user.getPassword()) || !validationUtil.isPasswordValid(user.getPassword()) || user.getNickname().isBlank()) {
-            throw new IllegalArgumentException("Invalid user data.");
-        }
+        User user = new User.Builder()
+                .email(request.email())
+                .password(request.password())
+                .nickname(request.nickname())
+                .description(request.description())
+                .build();
 
-        if (existUserByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already exists.");
-        }
-
-        user.setPassword(securityUtil.hashPassword(user.getPassword()));
+        user.updatePassword(securityUtil.hashPassword(user.getPassword()));
         data.put(user.getId(), user);
 
     }
@@ -57,7 +54,20 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Optional<User> findUserById(UUID id) {
+    public boolean existUserByNickname(String nickname) {
+
+        for (User existingUser : data.values()) {
+            if (existingUser.getNickname().equals(nickname)) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    @Override
+    public Optional<UserDTO.FindUserResult> findUserById(UUID id) {
 
         if (!data.containsKey(id)) {
             return Optional.empty();
@@ -65,37 +75,78 @@ public class JCFUserService implements UserService {
 
         User user = data.get(id);
 
-        return Optional.of(user);
+        return Optional.ofNullable(UserDTO.FindUserResult.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .description(user.getDescription())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build());
 
     }
 
     @Override
-    public Optional<User> findUserByEmail(String email) {
+    public Optional<UserDTO.FindUserResult> findUserByEmail(String email) {
 
         if (!existUserByEmail(email)) {
             return Optional.empty();
         }
 
-        return data.entrySet().stream()
+        User user = data.entrySet().stream()
                 .filter(entry -> entry.getValue().getEmail().equals(email))
-                .findFirst().map(Map.Entry::getValue);
+                .findFirst().map(Map.Entry::getValue).orElseThrow(() -> new IllegalArgumentException("No such user."));
+
+        return Optional.ofNullable(UserDTO.FindUserResult.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .description(user.getDescription())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build());
 
     }
 
     @Override
-    public List<User> findAllUsers() {
-        return new ArrayList<>(data.values());
-    }
+    public Optional<UserDTO.FindUserResult> findUserByNickname(String nickname) {
 
-    @Override
-    public void updateUser(DiscordDTO.UpdateUserRequest request) {
-
-        if (!validationUtil.isEmailValid(request.email()) ||
-                request.nickname().isBlank() ||
-                !validationUtil.isPasswordValid(request.newPassword()) ||
-                !validationUtil.isPasswordValid(request.currentPassword())) {
-            throw new IllegalArgumentException("Invalid user data.");
+        if (!existUserByNickname(nickname)) {
+            return Optional.empty();
         }
+
+        User user = data.entrySet().stream()
+                .filter(entry -> entry.getValue().getNickname().equals(nickname))
+                .findFirst().map(Map.Entry::getValue).orElseThrow(() -> new IllegalArgumentException("No such user."));
+
+        return Optional.ofNullable(UserDTO.FindUserResult.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .description(user.getDescription())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build());
+
+    }
+
+    @Override
+    public List<UserDTO.FindUserResult> findAllUsers() {
+
+        List<User> userList = new ArrayList<>(data.values());
+
+        return userList.stream().map(user -> UserDTO.FindUserResult.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .description(user.getDescription())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build()).toList();
+    }
+
+    @Override
+    public void updateUser(UserDTO.UpdateUserRequest request) {
 
         if (!data.containsKey(request.id())) {
             throw new IllegalArgumentException("No such user.");

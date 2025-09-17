@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.dto.DiscordDTO;
+import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
@@ -17,43 +15,39 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void createChannel(Channel channel) {
+    public void createChannel(ChannelDTO.CreatePublicChannelRequest request) {
 
-        if (data.containsKey(channel.getId())) {
-            throw new IllegalArgumentException("Channel already exists.");
-        }
-
-        if (channel.getChannelName().isBlank() || channel.getCategory() == null) {
+        if (request.channelName().isBlank() || request.category() == null) {
             throw new IllegalArgumentException("Invalid channel data.");
         }
+
+        Channel channel = new Channel.Builder()
+                .channelName(request.channelName())
+                .category(request.category())
+                .isVoiceChannel(request.isVoiceChannel())
+                .build();
 
         data.put(channel.getId(), channel);
 
     }
 
     @Override
-    public void addUserToChannel(UUID channelId, User user) {
+    public void createPrivateChannel(ChannelDTO.CreatePrivateChannelRequest request) {
 
-        if (!data.containsKey(channelId)) {
-            throw new IllegalArgumentException("No such channel.");
+        Channel channel = new Channel.Builder()
+                .category(request.category())
+                .isPrivate(true)
+                .build();
+
+        if (data.containsKey(channel.getId())) {
+            throw new IllegalArgumentException("Channel already exists.");
         }
 
-        if (data.get(channelId).getUserMap().containsKey(user.getId())) {
-            throw new IllegalArgumentException("User already exists in channel.");
+        if (channel.getCategory() == null) {
+            throw new IllegalArgumentException("Invalid channel data.");
         }
 
-        data.get(channelId).getUserMap().put(user.getId(), user);
-
-    }
-
-    @Override
-    public void addMessageToChannel(UUID channelId, Message message) {
-
-        if (!data.containsKey(channelId)) {
-            throw new IllegalArgumentException("No such channel.");
-        }
-
-        data.get(channelId).getMessageMap().put(message.getId(), message);
+        data.put(channel.getId(), channel);
 
     }
 
@@ -63,7 +57,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<Channel> findChannelById(UUID id) {
+    public Optional<ChannelDTO.FindChannelResult> findChannelById(UUID id) {
 
         if (!data.containsKey(id)) {
             return Optional.empty();
@@ -71,24 +65,39 @@ public class JCFChannelService implements ChannelService {
 
         Channel channel = data.get(id);
 
-        return Optional.ofNullable(channel);
+        ChannelDTO.FindChannelResult findChannelResult = ChannelDTO.FindChannelResult.builder()
+                .id(channel.getId())
+                .channelName(channel.getChannelName())
+                .category(channel.getCategory())
+                .isVoiceChannel(channel.isVoiceChannel())
+                .isPrivate(channel.isPrivate())
+                .createdAt(channel.getCreatedAt())
+                .updatedAt(channel.getUpdatedAt())
+                .build();
+
+        return Optional.ofNullable(findChannelResult);
 
     }
 
     @Override
-    public List<Channel> findChannelsByUserId(UUID userId) {
-        return findAllChannels().stream()
-                .filter(channel -> channel.getUserMap().containsKey(userId))
-                .toList();
+    public List<ChannelDTO.FindChannelResult> findChannelsByUserId(UUID userId) {
+        return List.of();
     }
 
     @Override
-    public List<Channel> findAllChannels() {
-        return new ArrayList<>(data.values());
+    public List<ChannelDTO.FindChannelResult> findAllChannels() {
+        return new ArrayList<>(data.values().stream().map(channel -> ChannelDTO.FindChannelResult.builder()
+                .id(channel.getId())
+                .channelName(channel.getChannelName())
+                .isVoiceChannel(channel.isVoiceChannel())
+                .isPrivate(channel.isPrivate())
+                .createdAt(channel.getCreatedAt())
+                .updatedAt(channel.getUpdatedAt())
+                .category(channel.getCategory()).build()).toList());
     }
 
     @Override
-    public void updateChannel(DiscordDTO.UpdateChannelRequest request) {
+    public void updateChannel(ChannelDTO.UpdateChannelRequest request) {
 
         if (!data.containsKey(request.id())) {
             throw new IllegalArgumentException("No such channel.");
@@ -96,6 +105,10 @@ public class JCFChannelService implements ChannelService {
 
         if (request.channelName().isBlank() || request.category() == null) {
             throw new IllegalArgumentException("Invalid channel data.");
+        }
+
+        if (data.get(request.id()).isPrivate()) {
+            throw new IllegalArgumentException("Private channel cannot be updated.");
         }
 
         data.get(request.id()).update(request.channelName(), request.category(), request.isVoiceChannel());
@@ -113,25 +126,4 @@ public class JCFChannelService implements ChannelService {
 
     }
 
-    @Override
-    public void deleteUserFromChannel(UUID channelId, UUID userId) {
-
-        if (!data.containsKey(channelId)) {
-            throw new IllegalArgumentException("No such channel.");
-        }
-
-        data.get(channelId).getUserMap().remove(userId);
-
-    }
-
-    @Override
-    public void deleteMessageFromChannel(UUID channelId, UUID messageId) {
-
-        if (!data.containsKey(channelId)) {
-            throw new IllegalArgumentException("No such channel.");
-        }
-
-        data.get(channelId).getMessageMap().remove(messageId);
-
-    }
 }

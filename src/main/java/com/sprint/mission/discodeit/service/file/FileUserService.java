@@ -1,15 +1,17 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.DiscordDTO;
+import com.sprint.mission.discodeit.dto.UserDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.utils.SecurityUtil;
-import com.sprint.mission.discodeit.utils.ValidationUtil;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public class FileUserService implements UserService {
@@ -17,7 +19,6 @@ public class FileUserService implements UserService {
     private final Path path;
     private static final String FILE_EXTENSION = ".ser";
     private final SecurityUtil securityUtil = new SecurityUtil();
-    private final ValidationUtil validationUtil = new ValidationUtil();
 
     public FileUserService(Path path) {
 
@@ -33,21 +34,20 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void createUser(User user) {
+    public void createUser(UserDTO.CreateUserRequest request) {
 
-        if (existUserById(user.getId())) {
+        if (existUserByEmail(request.email()) || existUserByNickname(request.nickname())) {
             throw new IllegalArgumentException("User already exists.");
         }
 
-        if (!validationUtil.isPasswordValid(user.getPassword())|| !validationUtil.isEmailValid(user.getEmail()) || user.getNickname().isBlank()) {
-            throw new IllegalArgumentException("Invalid user data.");
-        }
+        User user = new User.Builder()
+                .email(request.email())
+                .password(request.password())
+                .nickname(request.nickname())
+                .description(request.description())
+                .build();
 
-        if (existUserByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already exists.");
-        }
-
-        user.setPassword(securityUtil.hashPassword(user.getPassword()));
+        user.updatePassword(securityUtil.hashPassword(user.getPassword()));
 
         try(FileOutputStream fos = new FileOutputStream(path.resolve(user.getId() + FILE_EXTENSION).toFile());
             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
@@ -67,8 +67,8 @@ public class FileUserService implements UserService {
     @Override
     public boolean existUserByEmail(String email) {
 
-        for (User existingUser : findAllUsers()) {
-            if (existingUser.getEmail().equals(email)) {
+        for (UserDTO.FindUserResult existingUser : findAllUsers()) {
+            if (existingUser.email().equals(email)) {
                 return true;
             }
         }
@@ -78,7 +78,19 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public Optional<User> findUserById(UUID id) {
+    public boolean existUserByNickname(String nickname) {
+
+        for (UserDTO.FindUserResult existingUser : findAllUsers()) {
+            if (existingUser.nickname().equals(nickname)) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    public Optional<User> parseUserById(UUID id) {
 
         try (FileInputStream fis = new FileInputStream(path.resolve(id + FILE_EXTENSION).toFile());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
@@ -94,7 +106,30 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public Optional<User> findUserByEmail(String email) {
+    public Optional<UserDTO.FindUserResult> findUserById(UUID id) {
+
+        try (FileInputStream fis = new FileInputStream(path.resolve(id + FILE_EXTENSION).toFile());
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+
+            User user = (User) ois.readObject();
+
+            return Optional.ofNullable(UserDTO.FindUserResult.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .nickname(user.getNickname())
+                    .description(user.getDescription())
+                    .createdAt(user.getCreatedAt())
+                    .updatedAt(user.getUpdatedAt())
+                    .build());
+
+        } catch (IOException | ClassNotFoundException e) {
+            return Optional.empty();
+        }
+
+    }
+
+    @Override
+    public Optional<UserDTO.FindUserResult> findUserByEmail(String email) {
 
         if (!existUserByEmail(email)) {
             return Optional.empty();
@@ -116,6 +151,14 @@ public class FileUserService implements UserService {
                     })
                     .filter(Objects::nonNull)
                     .filter(user -> user.getEmail().equals(email))
+                    .map(user -> UserDTO.FindUserResult.builder()
+                            .id(user.getId())
+                            .email(user.getEmail())
+                            .nickname(user.getNickname())
+                            .description(user.getDescription())
+                            .createdAt(user.getCreatedAt())
+                            .updatedAt(user.getUpdatedAt())
+                            .build())
                     .findFirst();
         } catch (IOException e) {
             return Optional.empty();
@@ -124,7 +167,11 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public List<User> findAllUsers() {
+    public Optional<UserDTO.FindUserResult> findUserByNickname(String nickname) {
+
+        if (existUserByNickname(nickname)) {
+            return Optional.empty();
+        }
 
         try (Stream<Path> pathStream = Files.list(path)) {
             return pathStream
@@ -141,6 +188,47 @@ public class FileUserService implements UserService {
                         }
                     })
                     .filter(Objects::nonNull)
+                    .filter(user -> user.getNickname().equals(nickname))
+                    .map(user -> UserDTO.FindUserResult.builder()
+                            .id(user.getId())
+                            .email(user.getEmail())
+                            .nickname(user.getNickname())
+                            .description(user.getDescription())
+                            .createdAt(user.getCreatedAt())
+                            .updatedAt(user.getUpdatedAt())
+                            .build())
+                    .findFirst();
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<UserDTO.FindUserResult> findAllUsers() {
+
+        try (Stream<Path> pathStream = Files.list(path)) {
+            return pathStream
+                    .filter(path -> path.toString().endsWith(FILE_EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            Object data = ois.readObject();
+                            return (User) data;
+                        } catch (IOException | ClassNotFoundException e) {
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .map(user -> UserDTO.FindUserResult.builder()
+                            .id(user.getId())
+                            .email(user.getEmail())
+                            .nickname(user.getNickname())
+                            .description(user.getDescription())
+                            .createdAt(user.getCreatedAt())
+                            .updatedAt(user.getUpdatedAt())
+                            .build())
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException();
@@ -149,16 +237,9 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void updateUser(DiscordDTO.UpdateUserRequest request) {
+    public void updateUser(UserDTO.UpdateUserRequest request) {
 
-        if (!validationUtil.isEmailValid(request.email()) ||
-                !validationUtil.isPasswordValid(request.newPassword()) ||
-                !validationUtil.isPasswordValid(request.currentPassword()) ||
-                request.nickname().isBlank()) {
-            throw new IllegalArgumentException("Invalid user data.");
-        }
-
-        User user = findUserById(request.id())
+        User user = parseUserById(request.id())
                 .orElseThrow(() -> new IllegalArgumentException("No such user."));
 
         if (existUserByEmail(request.email()) && !user.getEmail().equals(request.email())) {
