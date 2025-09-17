@@ -5,39 +5,44 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
 
     private List<Channel> data = new ArrayList<>();
 
     @Override
-    public void save(Channel ch) {
-        data.add(ch);
+    public void save(Channel channel) {
+        data.removeIf(c -> c.getId().equals(channel.getId()));
+        data.add(channel);
     }
 
-    // 채널 단건 조회
     @Override
-    public Channel findByChannelName(String name) { // 채널 이름이 독립적이라고 가정
-        for (Channel channel : data) {
-            if (channel.getName().equals(name)) {
-                return channel;
-            }
-        }
-        System.out.println("해당 채널이 존재하지 않습니다.");
-        return null;
+    public Channel findById(UUID id) {
+        return data.stream()
+                .filter(channel -> channel.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     // 채널 전체 조회
     @Override
     public List<Channel> findAll() {
-        if (data.isEmpty()) {
-            throw new RuntimeException("채널이 존재하지 않습니다.");
-        }
-        return data;
+        return List.copyOf(data);
     }
 
     @Override
-    public void delete(Channel ch) {
-        data.remove(ch);
+    public void delete(Channel channel) {
+        boolean removed = data.removeIf(c -> c.getId().equals(channel.getId()));
+        if (!removed) {
+            throw new NoSuchElementException("존재하지 않는 채널입니다. id=" + channel.getId());
+        }
     }
+
+    @Override
+    public void clear(){
+        data.clear();
+    }
+
 }
