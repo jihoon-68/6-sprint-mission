@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 public class FileUserRepository implements UserRepository {
     private final List<User> users;
 
@@ -57,12 +59,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findById(UUID id) {
-        return users.stream().filter(u -> u.getId().equals(id)).findFirst().orElse(null);
+        return users.stream().filter(user -> user.getId().equals(id)).findFirst().orElse(null);
     }
 
     @Override
     public User findByEmail(String email) {
-        return users.stream().filter(u ->  u.getEmail().equals(email)).findFirst().orElse(null);
+        return users.stream().filter(user ->  user.getEmail().equals(email)).findFirst().orElse(null);
     }
 
     @Override

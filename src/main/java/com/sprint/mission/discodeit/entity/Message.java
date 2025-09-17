@@ -1,12 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable {
     private UUID id;
-    private Long updateAt;
-    private Long createAt;
+    private Instant updateAt;
+    private Instant createAt;
     private UUID authorId;
     private String content;
     private UUID channelId;
@@ -19,70 +24,26 @@ public class Message implements Serializable {
         this.authorId = authorId;
         this.channelId = channelId;
         this.content = content;
-        this.createAt = System.currentTimeMillis();
+        this.createAt = Instant.now();
         this.id = UUID.randomUUID();
         this.receiverId = receiverId;
         this.isDrawnAuthor = false;
         this.isDrawnReceiver = isDrawnReceiver;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getUpdateAt() {
-        return updateAt;
-    }
-
-    public Long getCreateAt() {
-        return createAt;
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public UUID getReceiverId() {return receiverId;}
-
-    public boolean isDrawnAuthor() {
-        return isDrawnAuthor;
-    }
-
-    public boolean isDrawnReceiver() {
-        return isDrawnReceiver;
-    }
-
     public void updateContent(String content) {
         this.content = content;
-        this.updateAt = System.currentTimeMillis();
-    }
-
-    public void updateReceiverId(UUID receiverId) {
-        this.receiverId = receiverId;
-        this.updateAt = System.currentTimeMillis();
-    }
-
-    public void updateAuthorId(UUID authorId) {
-        this.authorId = authorId;
-        this.updateAt = System.currentTimeMillis();
+        this.updateAt = Instant.now();
     }
 
     public void updateIsDrawnAuthor(boolean isDrawnAuthor) {
         this.isDrawnAuthor = isDrawnAuthor;
-        this.updateAt = System.currentTimeMillis();
+        this.updateAt = Instant.now();
     }
 
     public void updateIsDrawnReceiver(boolean isDrawnReceiver) {
         this.isDrawnReceiver = isDrawnReceiver;
-        this.updateAt = System.currentTimeMillis();
+        this.updateAt = Instant.now();
     }
 
     @Override

@@ -20,4 +20,6 @@ public interface MessageRepository {
     List<Message> findByChannelId(UUID id);
 
     boolean existsById(UUID id);
+
+    void deleteByChannelId(UUID id);
 }

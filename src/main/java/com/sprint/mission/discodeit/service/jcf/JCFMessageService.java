@@ -1,51 +1,63 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.message.reqeust.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
-
-    public JCFMessageService(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
-    }
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void createMessage(UUID authorId, UUID channelId, UUID receiverId, String content, boolean isDrawnReceiver) {
+    public void createMessage(UUID authorId, UUID channelId, UUID receiverId, String content, List<String> filePath) {
         if (content.trim().isEmpty()) {
             System.out.println("[Error] 메시지는 1글자 이상 입력해주세요.");
             return;
         }
 
-        Message message = new Message(authorId, channelId, receiverId, content, isDrawnReceiver);
+        Message message = new Message(authorId, channelId, receiverId, content, userRepository.findById(receiverId) == null);
 
+        if (filePath != null) {
+            for (String path : filePath) {
+                BinaryContent binaryContent = new BinaryContent(null, message.getId(), path);
+                binaryContentRepository.save(binaryContent);
+            }
+        }
         messageRepository.save(message);
 
         System.out.println("[Info] 메시지가 생성되었습니다.");
     }
 
     @Override
-    public void updateContent(String content, UUID id) {
-        if (content.trim().isEmpty()) {
+    public void updateContent(MessageUpdateRequest request) {
+        Message message = messageRepository.findById(request.getId());
+
+        if (message == null) {
+            System.out.println("[Error] 메시지를 찾을 수 없습니다.");
+            return;
+        }
+        if (request.getContent().trim().isEmpty()) {
             System.out.println("[Error] 메시지는 1글자 이상 입력해주세요.");
             return;
         }
+        message.updateContent(request.getContent());
+        messageRepository.save(message);
 
-        Message message = messageRepository.findById(id);
-
-        if (message != null) {
-            message.updateContent(content);
-            messageRepository.save(message);
-
-            System.out.println("[Info] 메시지 업데이트가 완료되었습니다.");
-        } else {
-            System.out.println("[Error] 메시지 업데이트에 실패했습니다.");
-        }
+        System.out.println("[Info] 메시지 업데이트가 완료되었습니다.");
     }
 
     @Override
@@ -80,12 +92,12 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findMessagesByAuthorIdAndChannelId(UUID authorId, UUID channelId) {
+    public List<Message> findAllByAuthorIdAndChannelId(UUID authorId, UUID channelId) {
         return messageRepository.findByAuthorIdAndChannelId(authorId, channelId);
     }
 
     @Override
-    public List<Message> findMessagesByChannelId(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         return messageRepository.findByChannelId(channelId);
     }
 
@@ -105,7 +117,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void deleteMessageByChannelIds(List<UUID> channelIds) {
+    public void deleteAllByChannelIds(List<UUID> channelIds) {
         for (UUID id : channelIds) {
             List<Message> messages = messageRepository.findByChannelId(id);
             for (Message message : messages) {

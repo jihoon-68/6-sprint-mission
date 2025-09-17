@@ -30,6 +30,11 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public void deleteByChannelId(UUID id) {
+        messages.removeIf(m -> m.getChannelId().equals(id));
+    }
+
+    @Override
     public Message findById(UUID id) {
         return messages.stream().filter(m -> m.getId().equals(id)).findFirst().orElse(null);
     }
