@@ -1,57 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
-import java.util.List;
 
+@Getter
 public class User extends Common implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+    //
+    private String username;
+    private String email;
+    private String password;
 
-    private String name;
-    private transient String password;
-    private String nickname = null;
-    private String description;
-    private String activeType;
-    private List<String> badges;
-
-    public User(String name, String password, String nickname, String description, String activeType, List<String> badges) {
+    public User(String username, String email, String password) {
         super();
-        this.activeType = activeType;
-        this.name = name;
+        //
+        this.username = username;
+        this.email = email;
         this.password = password;
-        this.nickname = (nickname == null) ? name : nickname;
-        this.description = description;
-        this.badges = badges;
     }
 
-    public String getName() {
-        return name;
-    }
+    public void update(String newUsername, String newEmail, String newPassword) {
 
-    public String getActiveType() {
-        return activeType;
-    }
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public List<String> getBadges() {
-        return badges;
-    }
-
-    public void update(String name, String nickname) {
-        if (name != null) this.name = name;
-        if (nickname != null) this.nickname = nickname;
-        super.updatedAt();
+        if (anyValueUpdated) {
+            super.refreshUpdatedAt();
+        }
     }
 }
-
-

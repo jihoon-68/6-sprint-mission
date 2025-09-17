@@ -1,88 +1,95 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.DTOs.Message.MessageCreateRequest;
+import com.sprint.mission.discodeit.DTOs.Message.UpdateMessageDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.FileStorageException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
+@Service
 public class BasicMessageService implements MessageService {
-
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    //
     private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     public BasicMessageService(MessageRepository messageRepository,
+                               ChannelRepository channelRepository,
                                UserRepository userRepository,
-                               ChannelRepository channelRepository) {
-        this.messageRepository  = Objects.requireNonNull(messageRepository, "messageRepository");
-        this.userRepository     = Objects.requireNonNull(userRepository, "userRepository");
-        this.channelRepository  = Objects.requireNonNull(channelRepository, "channelRepository");
+                               BinaryContentRepository binaryContentRepository) {
+        this.messageRepository = messageRepository;
+        this.channelRepository = channelRepository;
+        this.userRepository = userRepository;
+        this.binaryContentRepository = binaryContentRepository;
     }
 
     @Override
-    public Message create(User author, String content, Channel channel) {
-        Objects.requireNonNull(author, "author");
-        Objects.requireNonNull(channel, "channel");
-        requireNonBlank(content, "content");
-
-        // 연관 도메인 존재 검증
-        if (!userRepository.existsById(author.getId())) {
-            throw new NoSuchElementException("Author not found: " + author.getId());
+    public Message create(MessageCreateRequest messageCreateRequest) {
+        if (!channelRepository.existsById(messageCreateRequest.channelId())) {
+            throw new NoSuchElementException("Channel not found with id " + messageCreateRequest.channelId());
         }
-        if (!channelRepository.existsById(channel.getId())) {
-            throw new NoSuchElementException("Channel not found: " + channel.getId());
+        if (!userRepository.existsById(messageCreateRequest.authorId())) {
+            throw new NoSuchElementException("Author not found with id " + messageCreateRequest.authorId());
         }
 
-        // (선택) 채널 멤버십 검증: 작성자가 그 채널의 users에 포함되는지 등
-        Channel persistedChannel = channelRepository.findById(channel.getId());
-        boolean member = persistedChannel.getUsers().stream()
-                .anyMatch(u -> u.getId().equals(author.getId()));
-        if (!member) {
-            throw new IllegalStateException("Author is not a member of the channel: " + channel.getId());
+        Message message = new Message(messageCreateRequest.content(), messageCreateRequest.channelId(), messageCreateRequest.authorId());
+
+        if(messageCreateRequest.attachments() != null) {
+            for (String url : messageCreateRequest.attachments()) {
+                BinaryContent binaryContent = new BinaryContent(messageCreateRequest.authorId(),message.getId(),url);
+                binaryContentRepository.save(binaryContent);
+            }
         }
 
-        // 엔티티 생성자 시그니처에 맞춰 생성하세요.
-        // 예) new Message(author, content, channel);
-        Message m = new Message(author, content, channel);
-        return messageRepository.save(m);
+        return messageRepository.save(message);
     }
 
     @Override
-    public Message findById(UUID id) {
-        Message m = messageRepository.findById(id);
-        if (m == null) throw new NoSuchElementException("Message not found: " + id);
-        return m;
+    public Message find(UUID messageId) {
+        return getMessageById(messageId);
     }
 
     @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
+    public List<Message> findallByChannelId(UUID channelId) {
+        return messageRepository.findAll().stream()
+                        .filter(m -> m.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
-    public Message update(UUID id, String content) {
-        requireNonBlank(content, "content");
-        Message m = messageRepository.findById(id);
-        if (m == null) throw new NoSuchElementException("Message not found: " + id);
-
-        m.update(content); // 엔티티에 update(content) 있다고 가정
-        return messageRepository.save(m);
+    public Message update(UpdateMessageDto updateMessageDto) {
+        Message message = getMessageById(updateMessageDto.messageId());
+        message.update(updateMessageDto.newContent());
+        return messageRepository.save(message);
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return messageRepository.deleteById(id);
-    }
-
-    // ===== helpers =====
-    private void requireNonBlank(String v, String field) {
-        if (v == null || v.isBlank()) {
-            throw new IllegalArgumentException(field + " must not be blank");
+    public void delete(UUID messageId) {
+        if (!messageRepository.existsById(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
+
+        messageRepository.deleteById(messageId);
+
+        binaryContentRepository.deleteByMessageId(messageId);
+    }
+
+    private Message getMessageById(UUID messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 }

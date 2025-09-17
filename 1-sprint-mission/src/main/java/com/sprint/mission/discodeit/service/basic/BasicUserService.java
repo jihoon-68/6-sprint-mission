@@ -1,86 +1,139 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTOs.User.UserFind;
+import com.sprint.mission.discodeit.DTOs.User.UserInfo;
+import com.sprint.mission.discodeit.DTOs.User.UserUpdate;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.FileStorageException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 
+@Service
 public class BasicUserService implements UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    //
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    private final UserRepository repository;
+    public BasicUserService(UserRepository userRepository,
+                            UserStatusRepository userStatusRepository,
+                            BinaryContentRepository binaryContentRepository) {
+        this.userRepository = userRepository;
+        this.userStatusRepository = userStatusRepository;
+        this.binaryContentRepository = binaryContentRepository;
+    }
 
-    public BasicUserService(UserRepository repository) {
-        this.repository = Objects.requireNonNull(repository, "repository");
+    private boolean isValidPassword(String password) {
+        return password.length() >= 6;
     }
 
     @Override
-    public User create(String name,
-                       String password,
-                       String nickname,
-                       String activeType,
-                       String description,
-                       List<String> badges) {
-
-        // === 비즈니스 검증 ===
-        requireNonBlank(name, "name");
-        requireNonBlank(password, "password");
-        if (password.length() < 6) {
-            throw new IllegalArgumentException("password must be at least 6 chars");
+    public User create(UserInfo info) {
+        if (!isValidPassword(info.password())) {
+            throw new IllegalArgumentException("비밀번호는 6자 이상이어야 합니다.");
         }
 
-        User user = new User(name, password, nickname, description, activeType, badges);
+        var allUsers = userRepository.findAll();
 
-        return repository.save(user);
+        if (allUsers.stream().filter(u -> u.getEmail().equals(info.email())) != null) {
+            throw new IllegalStateException("이메일이 존재합니다.");
+        }
+
+        if (allUsers.stream().filter(u -> u.getUsername().equals(info.username())) != null) {
+            throw new IllegalStateException("아이디가 존재합니다.");
+        }
+
+        User user = new User(info.username(), info.email(), info.password());
+
+        var status = new UserStatus(user.getId());
+        userStatusRepository.save(status);
+
+        if (info.profileImage().isPresent()) {
+            BinaryContent img = null;
+            var p = info.profileImage().get();
+            img = binaryContentRepository.save(p);
+        }
+
+        return user;
     }
 
     @Override
-    public User findById(UUID id) {
-        User u = repository.findById(id);
-        if (u == null) {
-            throw new NoSuchElementException("User not found: " + id);
-        }
-        return u;
+    public UserFind find(UUID userId) {
+        var user = userRepository.findById(userId).orElseThrow();
+        var status = userStatusRepository.findByUserId(userId).orElseThrow();
+        var image = binaryContentRepository.findByUserId(userId);
+
+        return new UserFind(userId, user.getUsername(), user.getEmail(), status, image);
     }
 
     @Override
-    public List<User> findAll() {
-        return repository.findAll();
+    public List<UserFind> findAll() {
+        var users = userRepository.findAll();
+
+        Map<UUID, Optional<UserStatus>> statusMap = new HashMap<>();
+        Map<UUID, Optional<BinaryContent>> imageMap = new HashMap<>();
+
+        for (var u : users) {
+            statusMap.put(u.getId(), userStatusRepository.findByUserId(u.getId()));
+            imageMap.put(u.getId(), binaryContentRepository.findByUserId(u.getId()));
+        }
+
+        return users.stream()
+                .map(u -> new UserFind(
+                        u.getId(),
+                        u.getUsername(),
+                        u.getEmail(),
+                        statusMap.get(u.getId()).orElseThrow(),
+                        imageMap.get(u.getId())
+                ))
+                .toList();
     }
 
     @Override
-    public User update(UUID id, String name, String nickname) {
-        User u = repository.findById(id);
-        if (u == null) {
-            throw new NoSuchElementException("User not found: " + id);
+    public User update(UserUpdate update) {
+        User user = getUserById(update.userId());
+
+        user.update(update.newUsername(), update.newEmail(), update.newPassword());
+
+        userRepository.save(user);
+
+        if (update.newProfile().isPresent()) {
+            binaryContentRepository.save(update.newProfile().get());
         }
 
-        if (name != null && !name.isBlank()) {
-            u.update(name, nickname != null && !nickname.isBlank() ? nickname : u.getNickname());
-        } else if (nickname != null && !nickname.isBlank()) {
-            u.update(u.getName(), nickname);
-        } else {
-            return u;
-        }
-
-        return repository.save(u); // 최종 저장
+        return user;
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return repository.deleteById(id);
-    }
-
-    private void requireNonBlank(String v, String field) {
-        if (v == null || v.isBlank()) {
-            throw new IllegalArgumentException(field + " must not be blank");
+    public void delete(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
+
+        boolean statusDeleted = userStatusRepository.deleteByUserId(userId);
+
+        if (!statusDeleted) {
+            log.warn("UserStatus missing while deleting user: {}", userId);
+        }
+
+        binaryContentRepository.deleteByUserId(userId);
+
+        userRepository.deleteById(userId);
     }
 
-     private void validateActiveType(String activeType) {
-         Set<String> allowed = Set.of("online", "offline", "away");
-         if (activeType == null || !allowed.contains(activeType.toLowerCase())) {
-             throw new IllegalArgumentException("invalid activeType: " + activeType);
-         }
-     }
+    private User getUserById(UUID userId) {
+        return userRepository
+                .findById(userId).orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+    }
 }
