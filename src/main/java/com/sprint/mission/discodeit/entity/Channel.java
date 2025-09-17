@@ -1,53 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private ChannelType type;
+    private String name;
+    private String description;
 
-  private UUID channelId;
-  private Long createdAt;
-  private Long updatedAt;
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
+    }
 
-  private String channelName;
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
-  public Channel(String channelName){
-
-    this.channelId = UUID.randomUUID();
-    this.createdAt = System.currentTimeMillis();
-    this.updatedAt = System.currentTimeMillis();
-
-    this.channelName = channelName;
-  }
-  public UUID getChannelId() {
-    return channelId;
-  }
-
-  public Long getCreatedAt() {
-    return createdAt;
-  }
-
-  public Long getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public String getChannelName() {
-    return channelName;
-  }
-
-  public void updateChannelName(String newChannelName) {
-    this.channelName = newChannelName;
-    this.updatedAt = System.currentTimeMillis();
-  }
-
-  @Override
-  public String toString() {
-    return "Channel{" +
-        "channelId=" + channelId +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        ", channelName='" + channelName + '\'' +
-        '}';
-  }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
+    }
 }

@@ -1,69 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
-  private UUID messageId;
-  private Long createdAt;
-  private Long updatedAt;
-  String text;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
 
-  /// 서비스간 의존성 주입
-  private User user; //메시지 생성 사용자 정보
-  private Channel channel; // 메시지 속하는 채널 정보
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
+    }
 
-  public Message(String text) {
-    this.messageId = UUID.randomUUID();
-    this.createdAt = System.currentTimeMillis();
-    this.updatedAt = System.currentTimeMillis();
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    this.text = text;
-  }
-
-  public UUID getMessageId() {
-    return messageId;
-  }
-
-  public Long getCreatedAt() {
-    return createdAt;
-  }
-
-  public Long getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public String getText() {
-    return text;
-  }
-
-  public void setText(String text) {
-    this.text = text;
-  }
-
-  public void updateText(String newText) {
-    this.text = newText;
-    this.updatedAt = System.currentTimeMillis();
-  }
-
-  @Override
-  public String toString() {
-    return "Message{" +
-        "messageId=" + messageId +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        ", text='" + text + '\'' +
-        ", user=" + user +
-        ", channel=" + channel +
-        '}';
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
-  public void setChannel(Channel channel) {
-    this.channel = channel;
-  }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
+    }
 }

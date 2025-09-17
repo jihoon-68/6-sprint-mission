@@ -1,82 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-  private UUID userId;
-  private Long createdAt;
-  private Long updatedAt;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
+    private UUID profileId;     // BinaryContent
 
-  private String userName;
-  private String nickName;
-  private String passWord;
+    public User(String username, String email, String password, UUID profileId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.profileId = profileId;
+    }
 
-  public User(String userName, String nickName, String passWord) {
-    this.userId = UUID.randomUUID();
-    this.createdAt = System.currentTimeMillis();
-    this.updatedAt = System.currentTimeMillis();
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
+            anyValueUpdated = true;
+        }
 
-    this.userName = userName;
-    this.nickName = nickName;
-    this.passWord = passWord;
-  }
-  public UUID getUserId() {
-    return userId;
-  }
-
-
-  public Long getCreatedAt() {
-    return createdAt;
-  }
-
-  public Long getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
-
-  public String getNickName() {
-    return nickName;
-  }
-
-  public void setNickName(String nickName) {
-    this.nickName = nickName;
-  }
-
-  public String getPassWord() {
-    return passWord;
-  }
-
-  public void setPassWord(String passWord) {
-    this.passWord = passWord;
-  }
-  public void updateNickName(String newNickName){
-    this.nickName = newNickName;
-    this.updatedAt = System.currentTimeMillis();
-  }
-  public void updatePassWord(String newPassWord){
-    this.passWord = newPassWord;
-    this.updatedAt = System.currentTimeMillis();
-  }
-
-  @Override
-  public String toString() {
-    return "User{" +
-        "userId=" + userId +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        ", userName='" + userName + '\'' +
-        ", nickName='" + nickName + '\'' +
-        ", passWord='" + passWord + '\'' +
-        '}';
-  }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
+    }
 }
