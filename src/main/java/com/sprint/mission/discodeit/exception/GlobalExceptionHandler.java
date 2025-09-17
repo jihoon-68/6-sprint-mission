@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.NoSuchElementException;
 
 @ControllerAdvice
-public class globalExceptionHandler {
+public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<BaseErrorResponse> handleNotFoundException(IllegalArgumentException e, HttpServletRequest request) {
         BaseErrorResponse error = new BaseErrorResponse();
