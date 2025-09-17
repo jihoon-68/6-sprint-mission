@@ -10,6 +10,7 @@
 .idea/**/shelf
 .idea
 .gradle
+.gradle/**
 build/*
 
 # AWS User-specific
@@ -92,3 +93,6 @@ fabric.properties
 build/classes/java/main/com/sprint/mission/discodeit/Main.class
 build/tmp/compileJava/compileTransaction/stash-dir/Main.class.uniqueId0
 build/tmp/compileJava/previous-compilation-data.bin
+.idea/modules.xml
+.idea/modules/discodeit.iml
+.idea/modules/discodeit.test.iml

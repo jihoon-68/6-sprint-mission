@@ -2,72 +2,53 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
+    private final Map<UUID, User> data;
 
-    private final Map<UUID, User> users;
-
-    public  JCFUserRepository() {
-        users = new HashMap<UUID, User>();
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public boolean save(User user) {
-        if(users.containsKey(user.getId()))
-        {
-            System.out.println("User already exists");
-            return false;
-        }
-
-        Optional<User> temp = users.values().stream().filter(u -> u.getEmail().equals(user.getEmail())).findFirst();
-        if(temp.isPresent())
-        {
-            System.out.println("User already exists");
-            return false;
-        }
-
-        users.put(user.getId(), user);
-        return true;
+    public User save(User user) {
+        this.data.put(user.getId(), user);
+        return user;
     }
 
     @Override
-    public boolean delete(User user) {
-        if(users.containsKey(user.getId()) == false)
-        {
-            System.out.println("User does not exists");
-            return false;
-        }
-
-        users.remove(user.getId());
-        return true;
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public boolean update(User user) {
-        if(users.containsKey(user.getId()) == false)
-        {
-            System.out.println("User does not exists");
-            return false;
-        }
-
-        user.updateUpdatedAt();
-        users.put(user.getId(),user);
-        return true;
+    public Optional<User> findByUsername(String username) {
+        return data.values().stream().filter(u -> u.getUsername().equals(username)).findFirst();
     }
 
     @Override
-    public Map<UUID, User> getAllUsers() {
-        return users.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+    public Optional<User> findByEmail(String email) {
+        return data.values().stream().filter(u -> u.getEmail().equals(email)).findFirst();
     }
 
     @Override
-    public void deleteAll() {
-        users.clear();
+    public List<User> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }

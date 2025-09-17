@@ -1,60 +1,140 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.utils.FileProcessType;
-import com.sprint.mission.discodeit.utils.FileUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.Map;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-public class FileUserRepository implements UserRepository{
+@Repository
+@ConditionalOnProperty(name = "repository.type", havingValue = "file")
+public class FileUserRepository implements UserRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    private final String fileName = "user.ser";
-    @Override
-    public boolean save(User user) {
-        return FileUtil.getInstance().save(fileName,user.getId(),user);
-    }
-
-    @Override
-    public boolean delete(User user) {
-        return deleteUpdateProcess(user, FileProcessType.Delete);
-    }
-
-    @Override
-    public boolean update(User user) {
-        return deleteUpdateProcess(user, FileProcessType.Update);
-    }
-
-    private boolean deleteUpdateProcess(User user, FileProcessType type){
-        if(user == null){
-            System.out.println("user is null");
-            return false;
+    public FileUserRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+    }
 
-        if(type == FileProcessType.Delete)
-            return FileUtil.getInstance().updateDeleteProcess(fileName,user.getId(), type, User.class,null);
-        else
-            return FileUtil.getInstance().updateDeleteProcess(fileName,user.getId(),type,User.class,user);
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public Map<UUID, User> getAllUsers()
-    {
-        Map<UUID, User> map = FileUtil.getInstance().getDataFromFile(fileName, UUID.class, User.class);
-        if(map == null){
-            System.out.println("Error reading file");
-            return null;
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        return map.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        return user;
     }
 
     @Override
-    public void deleteAll() {
-        FileUtil.getInstance().deleteAll(fileName);
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(userNullable);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+
+        return findUser(username, null);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return findUser(null, email);
+    }
+
+    private Optional<User> findUser(String username, String email) {
+        boolean isEmail = false;
+
+        if(username == null || username.trim().isEmpty())
+            isEmail = true;
+
+        try
+        {
+            List<User> users = findAll();
+            if(users == null || users.isEmpty())
+            {
+                return Optional.empty();
+            }
+
+            if(isEmail == false)
+                return users.stream().filter(u -> u.getUsername().equals(username)).findFirst();
+
+            return users.stream().filter(u -> u.getEmail().equals(email)).findFirst();
+        }
+        catch (Exception e)
+        {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<User> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,53 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
-import java.util.Optional;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends Common implements Serializable {
-
-    private UUID toUserId;
-    private UUID ownerUserId;
-    private UUID channelId;
-    private String message;
-    //버전관리를 통해 호환성 확보
+@Getter
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public Message(String message, UUID ownerUserId, UUID toUserId, UUID channelId) {
-        super();
-        this.message = message;
-        this.ownerUserId = ownerUserId;
-        this.toUserId = toUserId;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.content = content;
         this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public String getMessage() {
-        return message;
-    }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    public void updateMessage(String message) {
-        this.message = message;
-    }
-
-    public UUID getToUserId() {
-        return toUserId;
-    }
-
-    public UUID getOwnerUserId() {
-        return ownerUserId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "message='" + message + '\'' +
-                ", id=" + id +
-                ", createAt=" + createAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
