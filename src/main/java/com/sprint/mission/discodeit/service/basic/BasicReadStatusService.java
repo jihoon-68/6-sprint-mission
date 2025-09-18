@@ -10,7 +10,9 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.DuplicateFormatFlagsException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -23,30 +25,29 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus create(CreateReadStatusDTO createReadStatusDTO) {
-        // 예외 처리 뭉처서 말고 개별처리
-        if(userRepository.findById(createReadStatusDTO.userId()).isEmpty()) {
-            throw new NullPointerException("User not found");
-        }
 
-        if(channelRepository.findById(createReadStatusDTO.channelId()).isEmpty()) {
-            throw new NullPointerException("Channel not found");
+
+        if(userRepository.existsById(createReadStatusDTO.userId())
+                ||channelRepository.existsById(createReadStatusDTO.channelId())){
+            throw new NoSuchElementException("User Or Channel channels are mandatory");
         }
 
         boolean isDuplication = readStatusRepository.findAll().stream()
-                .anyMatch(rs -> rs.getUserId().equals(createReadStatusDTO.userId())
-                && rs.getChannelId().equals(createReadStatusDTO.channelId()));
+                .anyMatch(rs ->
+                        rs.getUserId().equals(createReadStatusDTO.userId())
+                                && rs.getChannelId().equals(createReadStatusDTO.channelId()));
         if(isDuplication) {
-            throw new IllegalStateException("Duplicate Read Status");
+            throw new DuplicateFormatFlagsException("Duplicate Read Status");
         }
 
 
-        return readStatusRepository.save(new ReadStatus(createReadStatusDTO));
+        return readStatusRepository.save(new ReadStatus(createReadStatusDTO.userId(),createReadStatusDTO.channelId()));
     }
 
     @Override
     public ReadStatus findById(UUID id) {
         return  readStatusRepository.findById(id)
-                .orElseThrow(() -> new NullPointerException("ReadStatus not found") );
+                .orElseThrow(() -> new NoSuchElementException("ReadStatus not found") );
     }
 
 
@@ -60,7 +61,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void update(UpdateReadStatusDTO updateReadStatusDTO) {
-        ReadStatus readStatus = findById(updateReadStatusDTO.id());
+        ReadStatus readStatus = readStatusRepository.findById(updateReadStatusDTO.id())
+                .orElseThrow(() -> new NoSuchElementException("ReadStatus not found") );
+
         readStatus.update(updateReadStatusDTO);
         readStatusRepository.save(readStatus);
     }

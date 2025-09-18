@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -18,7 +17,6 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,7 +29,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPublic(CreatePublicChannelDTO createPublicChannelDTO) {
-        return channelRepository.save(new Channel(createPublicChannelDTO));
+        return channelRepository.save(new Channel(createPublicChannelDTO.channelName(), createPublicChannelDTO.description()));
     }
 
     @Override
@@ -40,7 +38,7 @@ public class BasicChannelService implements ChannelService {
 
         createPrivateChannelDTO.userIds()
                 .forEach(userId ->
-                        readStatusRepository.save(new ReadStatus(new CreateReadStatusDTO(userId,channel.getId()))));
+                        readStatusRepository.save(new ReadStatus(userId,channel.getId())));
 
         return channelRepository.save(channel);
     }
@@ -48,17 +46,17 @@ public class BasicChannelService implements ChannelService {
     @Override
     public FindChannelDTO find(UUID id) {
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new NullPointerException("Channel not found"));
+                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
 
         Message message = messageRepository.findAll().stream()
                 .filter(m -> m.getChannel().equals(id))
-                .findFirst().orElseThrow(() -> new NullPointerException("Channel not found"));
+                .findFirst().orElseThrow(() -> new NoSuchElementException("Channel not found"));
 
         if(channel.getType().equals(ChannelType.PRIVATE)){
             return new FindChannelDTO(channel,message.getCreated(),message.getSender());
         }
 
-        return new FindChannelDTO(channel,message.getCreated(),null);
+        return FindChannelDTO.createPublicChannelDto(channel, message.getCreated());
     }
 
     @Override
@@ -74,7 +72,7 @@ public class BasicChannelService implements ChannelService {
                 .filter(rs -> rs.getUserId().equals(userId))
                 .forEach(rs -> {
                    Channel channel1 = channelRepository.findById(rs.getChannelId())
-                           .orElseThrow(() -> new NullPointerException("Channel not found"));
+                           .orElseThrow(() -> new NoSuchElementException("Channel not found"));
                     channel.add(channel1);
                 });
         //채널별 최근채팅시간 연결
@@ -84,7 +82,7 @@ public class BasicChannelService implements ChannelService {
                             .filter(m -> m.getChannel().equals(channel1.getId()))
                             .findFirst().orElse(null);
                     if(message == null){
-                        return new FindChannelDTO(channel1,channel1.getCreated(),userId);
+                        return FindChannelDTO.createPublicChannelDto(channel1, channel1.getCreated());
                     }else {
                         return new FindChannelDTO(channel1,message.getCreated(),message.getSender());
                     }
@@ -98,7 +96,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void update(UpdateChannelDTO updateChannelDTO) {
         Channel channel = channelRepository.findById(updateChannelDTO.id())
-                .orElseThrow(() -> new NullPointerException("Channel not found"));
+                .orElseThrow(() -> new NoSuchElementException("Channel not found"));
         if(channel.getType().equals(ChannelType.PRIVATE)){
             return;
         }
