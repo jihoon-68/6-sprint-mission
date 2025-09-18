@@ -25,12 +25,9 @@ public class MessageController {
     }
 
     @PostMapping("/create")
-    public Message create(String content,
-                          @RequestParam(required = false) UUID channelId,
-                          @RequestParam(required = false) UUID authorId
+    public Message create(@RequestPart MessageCreateRequest request
                         , @RequestParam(required = false) List<MultipartFile> files) {
 
-        MessageCreateRequest request = new MessageCreateRequest(content,  channelId, authorId);
         return messageService.create(request,files);
     }
 

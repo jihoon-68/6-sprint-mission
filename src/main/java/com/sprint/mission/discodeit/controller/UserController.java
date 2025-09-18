@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,18 +28,16 @@ public class UserController {
         this.userStatusService = userStatusService;
     }
 
-    @PostMapping("/create")
-    public User createUser(String username, String email, String password, @RequestPart(required = false) MultipartFile profileCreateRequest) {
-        UserCreateRequest request = new UserCreateRequest(username, email, password);
+    @PostMapping(value="/create")
+    public User createUser(@RequestPart UserCreateRequest request, @RequestPart(required = false) MultipartFile profileCreateRequest) {
         return userService.create(request, Optional.ofNullable(profileCreateRequest));
     }
 
     @PostMapping("/update")
-    public User updateUser(@RequestParam String newUsername, @RequestParam String newEmail, @RequestParam String newPassword
+    public User updateUser(@RequestPart UserUpdateRequest request
                         , @RequestParam(value = "profileUpdateRequest", required = false) MultipartFile profileUpdateRequest
                         , @RequestParam UUID userId) {
 
-        UserUpdateRequest  request = new UserUpdateRequest(newUsername, newEmail, newPassword);
         return userService.update(userId, request, Optional.ofNullable(profileUpdateRequest));
 
     }
