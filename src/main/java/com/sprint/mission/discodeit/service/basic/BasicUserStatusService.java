@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.User.UpdateUserDTO;
 import com.sprint.mission.discodeit.DTO.UserStatus.CreateUserStatusDTO;
 import com.sprint.mission.discodeit.DTO.UserStatus.UpdateUserStatusDTO;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,9 +8,12 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.stereotype.Service;
 
+import java.util.DuplicateFormatFlagsException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -23,16 +25,17 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus create(CreateUserStatusDTO createUserStatusDTO) {
         User user = userRepository.findById(createUserStatusDTO.userId()).orElseThrow(
-                ()-> new NullPointerException("user not found"));
+                ()-> new NoSuchElementException("user not found"));
+
         if (userStatusRepository.findByUserId(createUserStatusDTO.userId()).isPresent()) {
-            throw new IllegalStateException("Duplicate UserStatus");
+            throw new DuplicateFormatFlagsException("Duplicate UserStatus");
         }
         return new UserStatus(user.getId());
     }
 
     @Override
     public UserStatus findById(UUID id) {
-        return userStatusRepository.findById(id).orElseThrow(()-> new NullPointerException("user not found"));
+        return userStatusRepository.findById(id).orElseThrow(()-> new NoSuchElementException("user not found"));
     }
 
     @Override
@@ -42,16 +45,21 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void update(UpdateUserStatusDTO  updateUserStatusDTO) {
-        UserStatus userStatus = findById(updateUserStatusDTO.userId());
+        UserStatus userStatus = userStatusRepository.findById(updateUserStatusDTO.userId())
+                .orElseThrow(()-> new NoSuchElementException("user not found"));
         userStatus.update(updateUserStatusDTO);
         userStatusRepository.save(userStatus);
     }
 
     @Override
-    public void updateByUserId(UpdateUserDTO  updateUserDTO) {
-        User user = userRepository.findById(updateUserDTO.id()).orElseThrow(()-> new NullPointerException("user not found"));
-        user.update(updateUserDTO);
-        userRepository.save(user);
+    public void updateByUserId(UpdateUserStatusDTO  updateUserStatusDTO) {
+        UserStatus userStatus = userStatusRepository.findByUserId(updateUserStatusDTO.id())
+                .orElseThrow(()-> new NoSuchElementException("user not found"));
+        if(userStatus.getId().equals(updateUserStatusDTO.userId())) {
+            return;
+        }
+        userStatus.update(updateUserStatusDTO);
+        userStatusRepository.save(userStatus);
     }
 
     @Override
