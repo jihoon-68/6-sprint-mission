@@ -16,10 +16,6 @@ public class FileUserRepository implements UserRepository {
     private static final Path directory = Paths.get("./src/main/resources/UserDate");
     private static final FileEdit instance = new  FileEdit();
 
-    private Path filePaths(UUID id) {
-        return directory.resolve( id + ".ser");
-    }
-
     public FileUserRepository() {
         instance.init(directory);
     }
@@ -35,8 +31,8 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        List<User> user = instance.loadAll(directory);
-        return user.stream()
+        List<User> users = instance.loadAll(directory);
+        return users.stream()
                 .filter(user1 -> user1.getEmail().equals(email))
                 .findFirst();
     }
