@@ -6,6 +6,5 @@ import java.util.UUID;
 public record CreateMessageDTO(
         UUID channelId,
         UUID userId,
-        String content,
-        List<byte[]> attachments
+        String content
 ) {}
