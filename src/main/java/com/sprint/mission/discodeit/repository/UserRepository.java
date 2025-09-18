@@ -3,11 +3,16 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+<<<<<<< HEAD
+=======
+import java.util.Optional;
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 import java.util.UUID;
 
 public interface UserRepository {
 
     //기존 CRUD
+<<<<<<< HEAD
     void createUser(User user);
     User findUserById(UUID id);
     User findUserByEmail(String userEmail);
@@ -25,4 +30,13 @@ public interface UserRepository {
     void addUserToFriend(User user, UUID id);
     void removeUserFromFriend(User user, UUID id);
      */
+=======
+    User save(User user);
+    Optional<User> findById(UUID id);
+    Optional<User> findByEmail(String email);
+    List<User> findAll();
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
+
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 }

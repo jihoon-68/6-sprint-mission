@@ -3,10 +3,16 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+<<<<<<< HEAD
+=======
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+<<<<<<< HEAD
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
@@ -17,10 +23,22 @@ public class FileMessageRepository implements MessageRepository {
 
         return directory.resolve(message.getMessageId().toString() + ".ser");
     }
+=======
+import java.util.Optional;
+import java.util.UUID;
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
+public class FileMessageRepository implements MessageRepository {
+    private final Path directory = Paths.get("./src/main/resources/MessagesDate");
+    private final FileEdit instance = new FileEdit();
+
+    private Path filePaths(UUID id) {return directory.resolve(id + ".ser");}
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
     public FileMessageRepository() {
         instance.init(directory);
     }
 
+<<<<<<< HEAD
     public void createMessage(Message message) {
         instance.save(filePaths(message), message);
     }
@@ -46,6 +64,31 @@ public class FileMessageRepository implements MessageRepository {
         boolean isDelete = instance.delete(filePaths(message));
         if(!isDelete){
             throw new NullPointerException(message.getMessageId()+" 유저 삭제 실패");
+=======
+    @Override
+    public Message save(Message message) {
+        instance.save(directory,message.getId(), message);
+        return message;
+    }
+    @Override
+    public Optional<Message> findById(UUID id) { return instance.load(directory,id); }
+
+    @Override
+    public List<Message> findAll() {
+        return instance.loadAll(directory);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return findById(id).isPresent();
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        boolean isDelete = instance.delete(directory,id);
+        if(!isDelete){
+            throw new NullPointerException(" 유저 삭제 실패");
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
         }
     }
 }

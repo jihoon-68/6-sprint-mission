@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+<<<<<<< HEAD
 import java.util.UUID;
 
 public interface ChannelRepository {
@@ -24,4 +25,15 @@ public interface ChannelRepository {
     void addUserToChannel(Channel channel, User user);
     void removeUserFromChannel(Channel channel, User user);
     */
+=======
+import java.util.Optional;
+import java.util.UUID;
+
+public interface ChannelRepository {
+    Channel save(Channel channel);
+    Optional<Channel> findById(UUID id);
+    List<Channel> findAll();
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 }
