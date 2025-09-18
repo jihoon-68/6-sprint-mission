@@ -36,6 +36,7 @@ public class UserStatus implements Serializable {
         }
 
         if (updateUserStatusDTO.AccessType() != null && updateUserStatusDTO.AccessType().getValue() != this.accessType.getValue()){
+
             this.accessType = updateUserStatusDTO.AccessType();
             anyValueUpdated = true;
         }

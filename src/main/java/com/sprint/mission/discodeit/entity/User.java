@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class User extends BaseEntity implements Serializable {
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Instant created;
@@ -21,14 +21,14 @@ public class User extends BaseEntity implements Serializable {
     private String username;
     private String email;
 
-    public User(CreateUserDTO createUserDTO) {
+    public User(String username, int age, String email, String password) {
         this.id = UUID.randomUUID();
-        this.profileId = createUserDTO.profileId() == null ? UUID.randomUUID() : profileId;
-        this.created = setTime();
-        this.username = createUserDTO.userName();
-        this.age = createUserDTO.age();
-        this.email = createUserDTO.email();
-        this.password = createUserDTO.password();
+        this.username = username;
+        this.age = age;
+        this.email = email;
+        this.password = password;
+        this.profileId = null;
+        this.created = Instant.now();
     }
 
 
@@ -55,7 +55,7 @@ public class User extends BaseEntity implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updated = setTime();
+            this.updated = Instant.now();
         }
     }
 

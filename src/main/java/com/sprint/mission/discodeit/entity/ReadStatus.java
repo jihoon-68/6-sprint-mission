@@ -20,10 +20,10 @@ public class ReadStatus implements Serializable {
     private UUID userId;
     private ReadType type;
 
-    public ReadStatus(CreateReadStatusDTO createReadStatusDTO) {
+    public ReadStatus(UUID channelId, UUID userId) {
         this.id = UUID.randomUUID();
-        this.userId = createReadStatusDTO.userId();
-        this.channelId = createReadStatusDTO.channelId();
+        this.userId = userId;
+        this.channelId = channelId;
         this.type = ReadType.UNREAD;
         this.created = Instant.now();
     }
