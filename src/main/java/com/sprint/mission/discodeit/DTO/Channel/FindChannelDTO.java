@@ -1,6 +1,4 @@
 package com.sprint.mission.discodeit.DTO.Channel;
-
-import com.sprint.mission.discodeit.DTO.User.FindUserDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 
 import java.time.Instant;

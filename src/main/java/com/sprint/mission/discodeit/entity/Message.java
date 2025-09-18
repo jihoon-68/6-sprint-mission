@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.entity;
-
 import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDTO;
-import lombok.Getter;
+
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import java.util.stream.Collectors;
 
 @Getter
@@ -28,6 +28,7 @@ public class Message implements Serializable {
         this.sender = sender;
         this.content = content;
         this.attachmentIds = new ArrayList<>();
+
         this.created = Instant.now();
     }
 

@@ -24,6 +24,7 @@ public class ReadStatus implements Serializable {
         this.id = UUID.randomUUID();
         this.userId = userId;
         this.channelId = channelId;
+
         this.type = ReadType.UNREAD;
         this.created = Instant.now();
     }
