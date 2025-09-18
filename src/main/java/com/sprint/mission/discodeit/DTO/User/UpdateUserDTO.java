@@ -8,4 +8,13 @@ public record UpdateUserDTO(
         String email,
         UUID profileId,
         String password
-) {}
+) {
+    static public UpdateUserDTO getFileInput(UUID profileId) {
+        return new UpdateUserDTO(
+                null,
+                null,
+                null,
+                profileId,
+               null);
+    }
+}
