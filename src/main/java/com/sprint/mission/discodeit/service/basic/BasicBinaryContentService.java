@@ -20,12 +20,12 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent createAttachmentImage(CreateAttachmentImageDto createAttachmentImageDto){
-        BinaryContent binaryContent = new BinaryContent(createAttachmentImageDto.messageId(), createAttachmentImageDto.imagePath(),true);
+        BinaryContent binaryContent = new BinaryContent(createAttachmentImageDto.bytes());
         return binaryContentRepository.save(binaryContent);
     }
     @Override
     public BinaryContent createProfileImage(CreateProfileImageDto createProfileImageDto){
-        BinaryContent binaryContent = new BinaryContent(createProfileImageDto.userId(), createProfileImageDto.imagePath());
+        BinaryContent binaryContent = new BinaryContent(createProfileImageDto.bytes());
         return binaryContentRepository.save(binaryContent);
     }
     @Override

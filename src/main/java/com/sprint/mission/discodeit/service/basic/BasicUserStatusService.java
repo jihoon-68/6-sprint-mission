@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -28,7 +29,7 @@ public class BasicUserStatusService implements UserStatusService {
         if(userStatusRepository.existsById(userStatusDto.userStatusDtoId())){
             throw new IllegalArgumentException("이미 유저상태 객체가 있습니다");
         }
-        UserStatus userStatus = new UserStatus(userStatusDto.userId());
+        UserStatus userStatus = new UserStatus(userStatusDto.userId(), Instant.now());
         return userStatusRepository.save(userStatus);
     }
 
@@ -44,18 +45,18 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UserStatusDto userStatusDto) {
-        UserStatus userStatus = userStatusRepository.findById(userStatusDto.userStatusDtoId())
+    public UserStatus update(UUID userStatusId, UserStatusDto userStatusDto) {
+        UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusDto.userId() + " not found"));
-        userStatus.update();
+        userStatus.update(Instant.now());
         return userStatusRepository.save(userStatus);
     }
 
     @Override
     public UserStatus updateByUserId(UUID userId){
-        UserStatus userStatus = userStatusRepository.findAll().stream().filter(status -> status.getUserid().equals(userId)).findAny()
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        userStatus.update();
+        UserStatus userStatus = userStatusRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저 없음"));
+        userStatus.update(Instant.now());
         return userStatusRepository.save(userStatus);
     }
 

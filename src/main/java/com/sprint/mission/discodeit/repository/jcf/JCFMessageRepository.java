@@ -33,8 +33,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        return this.messageMap.values().stream().toList();
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return this.messageMap.values().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
     }
 
     @Override
@@ -46,4 +46,11 @@ public class JCFMessageRepository implements MessageRepository {
     public void deleteById(UUID id) {
         this.messageMap.remove(id);
     }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
+    }
+
 }

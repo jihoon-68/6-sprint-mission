@@ -7,7 +7,7 @@ public record CreateMessageDto(
         String content,
         UUID channelId,
         UUID authorId,
-        List<String> imagePath
+        List<UUID> attachmentIds
 ) {
     public CreateMessageDto(String content, UUID channelId, UUID authorId) {
         this(content,channelId,authorId,null);

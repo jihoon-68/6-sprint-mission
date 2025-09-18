@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -10,33 +11,35 @@ import java.util.UUID;
 public class UserStatus implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
-    private UUID userid;
-    private String isOnline;
-    private Long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private UUID userId;
+    private Instant lastActiveAt;
 
-    public UserStatus(UUID userid) {
+
+    public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
-        this.userid = userid;
-        this.isOnline = "Offline";
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
+        //
+        this.userId = userId;
+        this.lastActiveAt = lastActiveAt;
     }
 
-    public boolean CheckOnline() {
-        if(this.updatedAt - Instant.now().getEpochSecond()<= 300){
-            this.isOnline = "Online";
-            return true;
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
+    }
+
+    public void update(Instant lastActiveAt) {
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
         }
-        return false;
-    }
 
-    public void update() {
-        boolean anyValueUpdated = CheckOnline();
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
-            System.out.println("유저가 온라인입니다");
-        } else{
-            this.isOnline= "Offline";
-            System.out.println("유저가 오프라인입니다");
+            this.updatedAt = Instant.now();
         }
     }
 }

@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -32,7 +33,8 @@ public class BasicReadStatusService implements ReadStatusService {
         if(readStatusRepository.existsById(createReadStatusDto.readStatusId())){
             throw new IllegalArgumentException("이미 읽기상태 객체가 있습니다");
         }
-        ReadStatus readStatus = new ReadStatus(createReadStatusDto.userId(),createReadStatusDto.channelId());
+        Instant now = Instant.now();
+        ReadStatus readStatus = new ReadStatus(createReadStatusDto.userId(),createReadStatusDto.channelId(),now);
         return readStatusRepository.save(readStatus);
     }
 
@@ -44,14 +46,15 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAll().stream().filter(readStatus -> readStatus.getUserId().equals(userId)).toList();
+        return readStatusRepository.findAllByUserId(userId);
     }
 
     @Override
-    public ReadStatus update(UpdateReadStatusDto updateReadStatusDto) {
-        ReadStatus readStatus = readStatusRepository.findById(updateReadStatusDto.userId())
+    public ReadStatus update(UUID readStatusId, UpdateReadStatusDto updateReadStatusDto) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + updateReadStatusDto.userId() + " not found"));
-        readStatus.updateLastReadAt(updateReadStatusDto.ReadAt());
+        Instant now = Instant.now();
+        readStatus.update(now);
         return readStatusRepository.save(readStatus);
     }
 

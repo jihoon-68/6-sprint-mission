@@ -39,15 +39,15 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Optional<Message> findById(UUID id) {
-        return findAll()
+        return FileInitSaveLoad.<Message>load(directory)
                 .stream()
                 .filter(msg->msg.getId().equals(id))
                 .findAny();
     }
 
     @Override
-    public List<Message> findAll() {
-        return FileInitSaveLoad.<Message>load(directory);
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return FileInitSaveLoad.<Message>load(directory).stream().filter(message -> message.getChannelId().equals(channelId)).toList();
     }
 
     @Override
@@ -64,5 +64,11 @@ public class FileMessageRepository implements MessageRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
     }
 }

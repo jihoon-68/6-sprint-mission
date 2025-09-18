@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public interface ChannelService {
     Channel create(CreateChannelDto createChannelDto);
-    Channel find(FindChannelDto findChannelDto);
-    List<Channel> findAllByUserId(FindAllChannelDto findAllChannelDto);
-    Channel update(UpdateChannelDto updatePublicChannelDto);
+    Channel find(UUID channelId);
+    List<Channel> findAllByUserId(UUID channelId);
+    Channel update(UUID channelId, UpdateChannelDto updatePublicChannelDto);
     void delete(UUID channelId);
 }

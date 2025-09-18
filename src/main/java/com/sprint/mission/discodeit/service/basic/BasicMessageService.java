@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binarycontent.CreateAttachmentImageDto;
 import com.sprint.mission.discodeit.dto.messagedto.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.messagedto.UpdateMessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -33,8 +34,7 @@ public class BasicMessageService implements MessageService {
         if (!userRepository.existsById(createMessageDto.authorId())) {
             throw new NoSuchElementException("해당 유저가 없습니다 " + createMessageDto.authorId());
         }
-
-        Message message = new Message(createMessageDto.content(), createMessageDto.channelId(), createMessageDto.authorId());
+        Message message = new Message(createMessageDto.content(), createMessageDto.channelId(), createMessageDto.authorId(), createMessageDto.attachmentIds());
         return messageRepository.save(message);
     }
 
@@ -46,13 +46,13 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAll().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
+        return messageRepository.findAllByChannelId(channelId);
     }
 
     @Override
-    public Message update(UpdateMessageDto updateMessageDto) {
-        Message message = messageRepository.findById(updateMessageDto.messageId())
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + updateMessageDto.messageId() + " not found"));
+    public Message update(UUID messageId, UpdateMessageDto updateMessageDto) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
         message.update(updateMessageDto.newContent());
         return messageRepository.save(message);
     }
@@ -63,10 +63,9 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
         // 메시지의 첨부파일들 객체 삭제
-        List<BinaryContent> binaryContentsInMessage = binaryContentRepository.findAll().stream().filter(binaryContent -> binaryContent.getMessageId().equals(messageId)).toList();
-        for(BinaryContent binaryContent: binaryContentsInMessage){
-            binaryContentRepository.deleteById(binaryContent.getId());
-        }
+        Message message = messageRepository.findById(messageId).orElseThrow(()->new NoSuchElementException("MessageService delete: 메시지 없음"));
+        message.getAttachmentIds()
+                .forEach(binaryContentRepository::deleteById);
         // 메시지 id로 삭제
         messageRepository.deleteById(messageId);
     }

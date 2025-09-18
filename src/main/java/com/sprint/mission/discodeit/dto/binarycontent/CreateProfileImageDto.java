@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public record CreateProfileImageDto (
         UUID userId,
-        String imagePath
+        byte[] bytes
 ){
 }
 

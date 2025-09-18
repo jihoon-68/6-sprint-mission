@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Slf4j
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -32,6 +34,7 @@ public class User implements Serializable {
         this.username = username;
         this.email = email;
         this.password = password;
+        log.info("유저 이름: " + this.username + ", id: " + this.id);
     }
 
     public User(String username, String email, String password, BinaryContent binaryContent){
@@ -40,7 +43,7 @@ public class User implements Serializable {
         this.binaryContent = binaryContent;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword, String imagePath) {
+    public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
