@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+<<<<<<< HEAD
 
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -12,6 +13,15 @@ import java.util.Optional;
 import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 @Repository
+=======
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+>>>>>>> 박지훈
 public class JCFMessageRepository implements MessageRepository {
     public final List<Message> MessageDate;
 
@@ -19,6 +29,7 @@ public class JCFMessageRepository implements MessageRepository {
         MessageDate = new ArrayList<Message>();
     }
 
+<<<<<<< HEAD
     @Override
     public Message save(Message message) {
         int idx = MessageDate.indexOf(message);
@@ -55,5 +66,36 @@ public class JCFMessageRepository implements MessageRepository {
     public void deleteById(UUID id) {
 
         MessageDate.removeIf(message -> message.getId().equals(id));
+=======
+    public void createMessage(Message message) {
+        MessageDate.add(message);
+    }
+
+
+    public Message findMessageById(UUID id) {
+        return MessageDate.stream()
+                .filter(message -> message.getMessageId().equals(id))
+                .findAny()
+                .orElse(null);
+    }
+
+    public List<Message> findAllMessages() {
+        return MessageDate;
+    }
+
+
+    public void updateMessage(Message message) {
+
+        int idx = MessageDate.indexOf(message);
+        if (idx == -1) {
+            throw new NullPointerException("해당 메시지 없습니다.");
+        }
+        MessageDate.set(idx, message);
+
+    }
+
+    public void deleteMessage(UUID id) {
+        MessageDate.remove(findMessageById(id));
+>>>>>>> 박지훈
     }
 }

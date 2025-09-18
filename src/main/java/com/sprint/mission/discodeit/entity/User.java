@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+<<<<<<< HEAD
 import com.sprint.mission.discodeit.DTO.User.CreateUserDTO;
 import com.sprint.mission.discodeit.DTO.User.UpdateUserDTO;
 import lombok.Getter;
@@ -62,6 +63,64 @@ public class User extends BaseEntity implements Serializable {
 
     //유져 본연에 속성이 변경 시에만 업데이트 갱신
     @Override
+=======
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private final UUID id;
+    private String username;
+    private final int age;
+    private String email;
+    private List<User> friends;
+    private List<Channel>  channels;
+    private final Long created;
+    private Long updated;
+
+    public User(String username, int age, String email) {
+        this.id = UUID.randomUUID();
+        this.username = username;
+        this.age = age;
+        this.email = email;
+        this.friends = new ArrayList<>();
+        this.channels = new ArrayList<>();
+        this.created = setTime();
+    }
+
+    //Getter 생성
+    public UUID getUserId() {return this.id;}
+    public String getUsername() {return this.username;}
+    public int getAge() {return this.age;}
+    public String getEmail() {return this.email;}
+    public List<User> getFriends() {return this.friends;}
+    public List<Channel> getChannels() {return this.channels;}
+    public Long getCreated() {return this.created;}
+    public Long getUpdated() {return this.updated;}
+
+    //update
+    public void updateedUsername(String username) {
+        this.username = username;
+        this.updated =setTime();
+    }
+
+    public  void updateEmail(String email) {
+        this.email = email;
+        this.updated =setTime();
+    }
+
+    //유져 본연에 속성이 변경 시에만 업데이트 갱신
+    public void updatedFriends(User friend) {
+        this.friends.add(friend);
+    }
+
+    public void updatedChannels(Channel channel) {
+        this.channels.add(channel);
+    }
+
+>>>>>>> 박지훈
     public String toString(){
         return "유저 정보: "+ "\n" +
                 "ID: " + this.id + "\n" +
@@ -69,6 +128,11 @@ public class User extends BaseEntity implements Serializable {
                 "나이: " + this.age + "\n" +
                 "이메일: " + this.email + "\n" +
                 "계정 생성일자: " + this.created + "\n" +
+<<<<<<< HEAD
+=======
+                "친구: " + this.friends + "\n" +
+                "입장 채널: " + this.channels + "\n" +
+>>>>>>> 박지훈
                 "계정 생성일자: " + this.updated + "\n";
     }
 }

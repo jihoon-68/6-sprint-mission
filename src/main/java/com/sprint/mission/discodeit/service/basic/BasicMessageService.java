@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+<<<<<<< HEAD
 import com.sprint.mission.discodeit.DTO.BinaryContent.CreateBinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.Message.CreateMessageDTO;
 import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDTO;
@@ -74,5 +75,28 @@ public class BasicMessageService implements MessageService {
                 .forEach(binaryContentDelete ->
                         binaryContentRepository.deleteById(binaryContentDelete.getId()));
         messageRepository.deleteById(id);
+=======
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+
+public class BasicMessageService {
+    private final MessageRepository messageRepository;
+    public final  ChannelRepository channelRepository;
+
+    public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository) {
+        this.messageRepository = messageRepository;
+        this.channelRepository = channelRepository;
+    }
+
+    public Message create(Channel channel, User user, String content){
+        Message message = new Message(user,content);
+        messageRepository.createMessage(message);
+        channelRepository.addMessageToChannel(channel, message);
+        return message;
+>>>>>>> 박지훈
     }
 }
