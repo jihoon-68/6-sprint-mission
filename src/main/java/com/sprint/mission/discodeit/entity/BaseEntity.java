@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.time.Instant;
+
 public abstract class BaseEntity {
-    public Long setTime() {
-        return System.currentTimeMillis();
+    public Instant setTime() {
+        return Instant.now();
     }
 }

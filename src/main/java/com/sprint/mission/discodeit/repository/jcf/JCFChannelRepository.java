@@ -1,57 +1,56 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
-    private final List<Channel> channels;
+    private final List<Channel> channelsDate;
 
     public JCFChannelRepository() {
 
-        channels = new ArrayList<>();
+        channelsDate = new ArrayList<>();
     }
 
-    public void createChannel(Channel channel) {
-        channels.add(channel);
-    }
-
-    public Channel findChannelById(UUID id) {
-
-        return channels.stream()
-                .filter(channel -> channel.getChannelId().equals(id))
-                .findAny()
-                .orElse(null);
-    }
-
-    public List<Channel> findAllChannels() {
-        return channels;
-    }
-
-    public void updateChannel(Channel channel) {
-        int idx = channels.indexOf(channel);
-        if (idx == -1) {
-            throw new NullPointerException("해당 채널을 없습니다");
+    @Override
+    public Channel save(Channel channel) {
+        int idx = channelsDate.indexOf(channel);
+        if (idx >=0) {
+            channelsDate.set(idx, channel);
+        }else {
+            channelsDate.add(channel);
         }
-        channels.set(idx, channel);
-
+        return channel;
     }
 
-    public void deleteChannel(UUID id) {
-        channels.remove(findChannelById(id));
+    @Override
+    public Optional<Channel> findById(UUID id) {
+
+        return channelsDate.stream()
+                .filter(channel -> channel.getId().equals(id))
+                .findAny();
     }
 
-    public void addMessageToChannel(Channel channel, Message message) {
-        channel.updateChanelMessages(message);
-        updateChannel(channel);
+    @Override
+    public List<Channel> findAll() {
+        return List.copyOf(channelsDate);
     }
 
-    public void removeMessageFromChannel(Channel channel, Message message) {
+    @Override
+    public boolean existsById(UUID id) {
+        return channelsDate.stream()
+                .anyMatch(channel -> channel.getId().equals(id));
+    }
 
+    @Override
+    public void deleteById(UUID id) {
+        channelsDate.removeIf(channel -> channel.getId().equals(id));
     }
 }
