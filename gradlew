@@ -16,9 +16,16 @@
 # limitations under the License.
 #
 <<<<<<< HEAD
+<<<<<<< HEAD
 # SPDX-License-Identifier: Apache-2.0
 #
 =======
+>>>>>>> 박지훈
+=======
+=======
+# SPDX-License-Identifier: Apache-2.0
+#
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
 
 ##############################################################################
@@ -61,9 +68,16 @@
 #
 #   (3) This script is generated from the Groovy template
 <<<<<<< HEAD
+<<<<<<< HEAD
 #       https://github.com/gradle/gradle/blob/HEAD/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
 =======
 #       https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+>>>>>>> 박지훈
+=======
+#       https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+=======
+#       https://github.com/gradle/gradle/blob/HEAD/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
 #       within the Gradle project.
 #
@@ -90,12 +104,15 @@ do
 done
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # This is normally unused
 # shellcheck disable=SC2034
 APP_BASE_NAME=${0##*/}
 # Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
 APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
 =======
+=======
+>>>>>>> 박지훈
 APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
 
 APP_NAME="Gradle"
@@ -103,6 +120,16 @@ APP_BASE_NAME=${0##*/}
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+<<<<<<< HEAD
+>>>>>>> 박지훈
+=======
+=======
+# This is normally unused
+# shellcheck disable=SC2034
+APP_BASE_NAME=${0##*/}
+# Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
+APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
@@ -132,9 +159,16 @@ case "$( uname )" in                #(
 esac
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 CLASSPATH="\\\"\\\""
 =======
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+>>>>>>> 박지훈
+=======
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+=======
+CLASSPATH="\\\"\\\""
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
 
 
@@ -155,6 +189,7 @@ location of your Java installation."
 else
     JAVACMD=java
 <<<<<<< HEAD
+<<<<<<< HEAD
     if ! command -v java >/dev/null 2>&1
     then
         die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
@@ -163,10 +198,24 @@ Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
     fi
 =======
+=======
+>>>>>>> 박지훈
     which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
+<<<<<<< HEAD
+>>>>>>> 박지훈
+=======
+=======
+    if ! command -v java >/dev/null 2>&1
+    then
+        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
 fi
 
@@ -175,9 +224,16 @@ if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
     case $MAX_FD in #(
       max*)
 <<<<<<< HEAD
+<<<<<<< HEAD
         # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
         # shellcheck disable=SC2039,SC3045
 =======
+>>>>>>> 박지훈
+=======
+=======
+        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
         MAX_FD=$( ulimit -H -n ) ||
             warn "Could not query maximum file descriptor limit"
@@ -186,9 +242,16 @@ if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
       '' | soft) :;; #(
       *)
 <<<<<<< HEAD
+<<<<<<< HEAD
         # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
         # shellcheck disable=SC2039,SC3045
 =======
+>>>>>>> 박지훈
+=======
+=======
+        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
         ulimit -n "$MAX_FD" ||
             warn "Could not set maximum file descriptor limit to $MAX_FD"
@@ -235,6 +298,7 @@ if "$cygwin" || "$msys" ; then
 fi
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
@@ -245,16 +309,33 @@ DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 #   * For example: A user cannot expect ${Hostname} to be expanded, as it is an environment variable and will be
 #     treated as '${Hostname}' itself on the command line.
 =======
+=======
+>>>>>>> 박지훈
 # Collect all arguments for the java command;
 #   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
 #     shell script including quotes and variable substitutions, so put them in
 #     double quotes to make sure that they get re-expanded; and
 #   * put everything else in single quotes, so that it's not re-expanded.
+<<<<<<< HEAD
+>>>>>>> 박지훈
+=======
+=======
+
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+
+# Collect all arguments for the java command:
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and optsEnvironmentVar are not allowed to contain shell fragments,
+#     and any embedded shellness will be escaped.
+#   * For example: A user cannot expect ${Hostname} to be expanded, as it is an environment variable and will be
+#     treated as '${Hostname}' itself on the command line.
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
 
 set -- \
         "-Dorg.gradle.appname=$APP_BASE_NAME" \
         -classpath "$CLASSPATH" \
+<<<<<<< HEAD
 <<<<<<< HEAD
         -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
         "$@"
@@ -269,6 +350,22 @@ fi
         org.gradle.wrapper.GradleWrapperMain \
         "$@"
 
+>>>>>>> 박지훈
+=======
+        org.gradle.wrapper.GradleWrapperMain \
+        "$@"
+
+=======
+        -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
+        "$@"
+
+# Stop when "xargs" is not available.
+if ! command -v xargs >/dev/null 2>&1
+then
+    die "xargs is not available"
+fi
+
+>>>>>>> ff6aee37135da2c11de96095adcd9502ced596ab
 >>>>>>> 박지훈
 # Use "xargs" to parse quoted args.
 #
