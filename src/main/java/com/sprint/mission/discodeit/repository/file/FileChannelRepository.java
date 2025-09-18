@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -44,7 +42,7 @@ public class FileChannelRepository implements ChannelRepository {
     public void deleteById(UUID id) {
         boolean isDelete = instance.delete(directory,id);
         if(!isDelete){
-            throw new NullPointerException(" 유저 삭제 실패");
+            throw new NullPointerException(" 체널 삭제 실패");
         }
     }
 
