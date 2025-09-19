@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ChannelService {
 
@@ -37,7 +39,7 @@ public class ChannelService {
         }
 
         channelRepository.save(channel);
-        System.out.println("채널 추가 완료: " + channel.getName());
+        log.info("채널 추가 완료: " + channel.getName());
         return new ChannelResponseDto(
                 channel.getId(),
                 null, // private 채널은 name이 없음.
@@ -57,7 +59,7 @@ public class ChannelService {
         }
 
         channelRepository.save(channel);
-        System.out.println("채널 추가 완료: " + channel.getName());
+        log.info("채널 추가 완료: " + channel.getName());
         return new ChannelResponseDto(
                 channel.getId(),
                 channel.getName(),
@@ -144,7 +146,7 @@ public class ChannelService {
         }
 
         channelRepository.save(channel);
-        System.out.println("수정 및 저장 완료");
+        log.info("수정 및 저장 완료");
 
         if (channel.getChannelType() == ChannelType.PRIVATE) {
             return new ChannelResponseDto(
@@ -188,7 +190,7 @@ public class ChannelService {
         }
 
         channelRepository.delete(channel);
-        System.out.println("채널 삭제 완료: " + id);
+        log.info("채널 삭제 완료: " + id);
     }
 
     public void clear() {

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileChannelRepository implements ChannelRepository {
 
     // 채널 저장 경로
@@ -97,7 +99,7 @@ public class FileChannelRepository implements ChannelRepository {
                             });
                 }
             }
-            System.out.println("Chanel 저장소 초기화 완료");
+            log.info("Chanel 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("Channel 저장소 초기화 실패", e);
         }

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -16,6 +17,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserStatusService {
 
@@ -89,7 +91,7 @@ public class UserStatusService {
             throw new NoSuchElementException("존재하지 않는 UserStatus입니다.");
         }
         userStatusRepository.delete(userStatus);
-        System.out.println("UserStatus 삭제 완료: " + id);
+        log.info("UserStatus 삭제 완료: " + id);
     }
 
     public void clear(){

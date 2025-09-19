@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MessageService {
 
@@ -36,7 +38,7 @@ public class MessageService {
         userRepository.findById(dto.userId()).getCreatedMessages().add(message.getId());
         channelRepository.findById(dto.channelId()).getMessages().add(message.getId());
 
-        System.out.println("메시지 추가 완료: " + message.getContent());
+        log.info("메시지 추가 완료: " + message.getContent());
         return new MessageResponseDto(
                 message.getId(),
                 message.getUserId(),
@@ -87,7 +89,7 @@ public class MessageService {
 
         message.setContent(dto.content());
         messageRepository.save(message);
-        System.out.println("내용 수정 완료 : " + dto.content());
+        log.info("내용 수정 완료 : " + dto.content());
         return new MessageResponseDto(
                 message.getId(),
                 message.getUserId(),
@@ -113,7 +115,7 @@ public class MessageService {
         }
 
         messageRepository.delete(message);
-        System.out.println("메시지 삭제 완료: " + id);
+        log.info("메시지 삭제 완료: " + id);
     }
 
     public void clear() {

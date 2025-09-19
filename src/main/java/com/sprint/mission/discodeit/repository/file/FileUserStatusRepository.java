@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileUserStatusRepository implements UserStatusRepository {
 
     private static final Path USER_STATUS_DIR = Paths.get("data","user-statuses");
@@ -96,7 +98,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
                             });
                 }
             }
-            System.out.println("UserStatus 저장소 초기화 완료");
+            log.info("UserStatus 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("UserStatus 저장소 초기화 실패", e);
         }

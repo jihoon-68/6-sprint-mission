@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -19,6 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
 
@@ -38,7 +40,7 @@ public class UserService {
         UserStatus userStatus = new UserStatus(user.getId());
 
         userRepository.save(user);
-        System.out.println("유저 추가 완료: " + user.getUsername());
+        log.info("유저 추가 완료: " + user.getUsername());
         return new UserResponseDto(
                 user.getId(),
                 user.getCreatedAt(),
@@ -140,7 +142,7 @@ public class UserService {
         UserStatus userStatus = userStatusRepository.findByUserId(id);
         boolean isUserOnline = (userStatus != null && userStatus.isOnline());
 
-        System.out.println("수정 및 저장 완료 : " + user.getUsername());
+        log.info("수정 및 저장 완료 : " + user.getUsername());
         return new UserResponseDto(
                 user.getId(),
                 user.getCreatedAt(),
@@ -164,7 +166,7 @@ public class UserService {
             userStatusRepository.delete(userStatus);
         }
         userRepository.delete(user);
-        System.out.println("유저 삭제 완료: " + id);
+        log.info("유저 삭제 완료: " + id);
     }
 
     // 유저 모두 삭제

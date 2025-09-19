@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileReadStatusRepository implements ReadStatusRepository {
 
     private static final Path READ_STATUS_DIR = Paths.get("data","read-statuses");
@@ -109,7 +111,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                             });
                 }
             }
-            System.out.println("ReadStatus 저장소 초기화 완료");
+            log.info("ReadStatus 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("ReadStatus 저장소 초기화 실패", e);
         }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileMessageRepository implements MessageRepository {
 
     // 메시지 저장 경로
@@ -128,7 +130,7 @@ public class FileMessageRepository implements MessageRepository {
                             }
                         });
             }
-            System.out.println("Message 저장소 초기화 완료");
+            log.info("Message 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("Message 저장소 초기화 실패", e);
         }

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ReadStatusService {
 
@@ -81,7 +83,7 @@ public class ReadStatusService {
 
     public void deleteById(UUID id){
         readStatusRepository.deleteById(id);
-        System.out.println("ReadStatus 삭제 완료: " + id);
+        log.info("ReadStatus 삭제 완료: " + id);
     }
 
     public void clear(){
