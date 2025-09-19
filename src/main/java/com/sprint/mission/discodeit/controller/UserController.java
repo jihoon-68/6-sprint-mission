@@ -33,7 +33,7 @@ public class UserController {
         return userService.create(request, Optional.ofNullable(profileCreateRequest));
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public User updateUser(@RequestPart UserUpdateRequest request
                         , @RequestParam(value = "profileUpdateRequest", required = false) MultipartFile profileUpdateRequest
                         , @RequestParam UUID userId) {
@@ -52,7 +52,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @PostMapping("/updateUserStatusByUserId")
+    @PutMapping("/updateUserStatusByUserId")
     public UserStatus updateUserStatusByUserId(@RequestParam UUID userId, @RequestBody UserStatusUpdateRequest request){
         return userStatusService.updateByUserId(userId, request);
     }

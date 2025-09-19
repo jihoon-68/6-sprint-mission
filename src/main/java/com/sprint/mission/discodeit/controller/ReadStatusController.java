@@ -23,7 +23,7 @@ public class ReadStatusController {
         return readStatusService.create(request);
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ReadStatus update(@RequestBody ReadStatusUpdateRequest request, @RequestParam UUID readStatusId){
         return readStatusService.update(readStatusId,  request);
     }

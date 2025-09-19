@@ -31,7 +31,7 @@ public class ChannelController {
         return channelService.create(request);
     }
 
-    @PostMapping("/updatePublic")
+    @PutMapping("/updatePublic")
     public Channel updatePublic(@RequestBody PublicChannelUpdateRequest request,
                                 @RequestParam UUID channelId){
         return channelService.update(channelId, request);

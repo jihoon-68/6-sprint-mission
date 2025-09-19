@@ -31,7 +31,7 @@ public class MessageController {
         return messageService.create(request,files);
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public Message update(@RequestParam UUID messageId, @RequestBody MessageUpdateRequest request)
     {
         return messageService.update(messageId,request);
