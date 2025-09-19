@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
@@ -53,7 +53,7 @@ public class JCFUserRepository implements UserRepository {
     public void delete(User user) {
         boolean removed = data.removeIf(u -> u.getId().equals(user.getId()));
         if (!removed) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다. id=" + user.getId());
+            throw new NotFoundException("존재하지 않는 유저입니다. id=" + user.getId());
         }
     }
 

@@ -5,13 +5,13 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -51,7 +51,7 @@ public class MessageService {
     public MessageResponseDto findById(UUID id) {
         Message message = messageRepository.findById(id);
         if (message == null) {
-            throw new NoSuchElementException("존재하지 않는 메시지입니다.");
+            throw new NotFoundException("존재하지 않는 메시지입니다.");
         }
         return new MessageResponseDto(
                 message.getId(),
@@ -65,7 +65,7 @@ public class MessageService {
     public List<MessageResponseDto> findByChannelId(UUID id) {
         List<Message> messages= messageRepository.findByChannelId(id);
         if (messages.isEmpty()) {
-            throw new NoSuchElementException("채널이 존재하지 않거나, 메세지가 하나도 없습니다.");
+            throw new NotFoundException("채널이 존재하지 않거나, 메세지가 하나도 없습니다.");
         }
 
         return messages.stream()
@@ -84,7 +84,7 @@ public class MessageService {
         // validateWriter(user, message);
         Message message = messageRepository.findById(id);
         if (message == null) {
-            throw new NoSuchElementException("존재하지 않는 메시지입니다.");
+            throw new NotFoundException("존재하지 않는 메시지입니다.");
         }
 
         message.setContent(dto.content());
@@ -104,7 +104,7 @@ public class MessageService {
         // validateWriter(user, message);
         Message message = messageRepository.findById(id);
         if (message == null) {
-            throw new NoSuchElementException("존재하지 않는 메시지입니다.");
+            throw new NotFoundException("존재하지 않는 메시지입니다.");
         }
 
         List<BinaryContent> binaryContents = message.getBinaryContents();

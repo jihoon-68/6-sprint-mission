@@ -24,5 +24,6 @@ public class BinaryContent implements Serializable {
         this.type = type;
         this.data = data;
     }
+
 }
 

@@ -6,14 +6,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.NoSuchElementException;
-
 @RestControllerAdvice // 전역 예외처리 구성
 public class GlobalExceptionHandler {
 
     // 존재하지 않는 리소스 예외처리
-    @ExceptionHandler(NoSuchElementException.class) // 괄호 안 예외클래스가 발생하면 아래 메서드 실행함.
-    public ResponseEntity<ErrorResponse> handleNoSuchElement(NoSuchElementException e) {
+    @ExceptionHandler(NotFoundException.class) // 괄호 안 예외클래스가 발생하면 아래 메서드 실행함.
+    public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException e) {
         ErrorResponse error = new ErrorResponse(HttpStatus.NOT_FOUND.value(), e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }

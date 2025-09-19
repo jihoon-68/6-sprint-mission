@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -72,7 +72,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     public void deleteById(UUID id) {
         BinaryContent binaryContent = findById(id);
         if (binaryContent == null) {
-            throw new NoSuchElementException("존재하지 않는 BinaryContent입니다. id=" + id);
+            throw new NotFoundException("존재하지 않는 BinaryContent입니다. id=" + id);
         }
         Path path = getFilePath(binaryContent);
         try {

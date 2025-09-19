@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
@@ -46,7 +46,7 @@ public class JCFMessageRepository implements MessageRepository {
     public void delete(Message message) {
         boolean removed = data.removeIf(m-> m.getId().equals(message.getId()));
         if (!removed) {
-            throw new NoSuchElementException("존재하지 않는 메시지입니다. id=" + message.getId());
+            throw new NotFoundException("존재하지 않는 메시지입니다. id=" + message.getId());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -88,7 +88,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         try {
             boolean deleted = Files.deleteIfExists(path);
             if (!deleted) {
-                throw new NoSuchElementException("존재하지 않는 ReadStatus입니다. id=" + id);
+                throw new NotFoundException("존재하지 않는 ReadStatus입니다. id=" + id);
             }
         } catch (IOException e) {
             e.printStackTrace();

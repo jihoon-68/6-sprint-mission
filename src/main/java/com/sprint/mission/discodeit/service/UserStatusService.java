@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -38,7 +38,7 @@ public class UserStatusService {
             );
         }
         else {
-            throw new NoSuchElementException("존재하지 않는 유저입니다.");
+            throw new NotFoundException("존재하지 않는 유저입니다.");
         }
     }
 
@@ -74,7 +74,7 @@ public class UserStatusService {
         UserStatus userStatus
                 = userStatusRepository.findByUserId(userId);
         if (userStatus == null) {
-            throw new NoSuchElementException("해당 유저의 상태 정보가 존재하지 않습니다.");
+            throw new NotFoundException("해당 유저의 상태 정보가 존재하지 않습니다.");
         }
         userStatus.setLastlyConnectedAt(lastlyConnectedAt);
         userStatusRepository.save(userStatus);
@@ -88,7 +88,7 @@ public class UserStatusService {
     public void deleteById(UUID id){
         UserStatus userStatus = userStatusRepository.findById(id);
         if (userStatus == null) {
-            throw new NoSuchElementException("존재하지 않는 UserStatus입니다.");
+            throw new NotFoundException("존재하지 않는 UserStatus입니다.");
         }
         userStatusRepository.delete(userStatus);
         log.info("UserStatus 삭제 완료: " + id);

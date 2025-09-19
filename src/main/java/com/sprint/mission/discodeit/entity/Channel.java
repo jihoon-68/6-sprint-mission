@@ -43,17 +43,4 @@ public class Channel implements Serializable {
         this.description = description;
         this.updatedAt = Instant.now();
     }
-
-    // toString()
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id='" + id + '\'' +
-                ", createdAt=" + createdAt +
-                // ", participants=" + participants +
-                // ", messages=" + messages +
-                ", updatedAt=" + updatedAt +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

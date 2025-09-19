@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -75,7 +75,7 @@ public class FileChannelRepository implements ChannelRepository {
         try {
             boolean deleted = Files.deleteIfExists(path);
             if (!deleted) {
-                throw new NoSuchElementException("존재하지 않는 채널입니다. id=" + channel.getId());
+                throw new NotFoundException("존재하지 않는 채널입니다. id=" + channel.getId());
             }
         } catch (IOException e) {
             e.printStackTrace();

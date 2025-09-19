@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -108,7 +109,7 @@ public class FileMessageRepository implements MessageRepository {
         try {
             boolean deleted = Files.deleteIfExists(path);
             if (!deleted) {
-                throw new NoSuchElementException("존재하지 않는 UserStatus입니다. id=" + message.getId());
+                throw new NotFoundException("존재하지 않는 UserStatus입니다. id=" + message.getId());
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
@@ -36,7 +36,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public void delete(Channel channel) {
         boolean removed = data.removeIf(c -> c.getId().equals(channel.getId()));
         if (!removed) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다. id=" + channel.getId());
+            throw new NotFoundException("존재하지 않는 채널입니다. id=" + channel.getId());
         }
     }
 

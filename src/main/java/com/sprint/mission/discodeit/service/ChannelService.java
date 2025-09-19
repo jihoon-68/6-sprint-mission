@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -73,7 +73,7 @@ public class ChannelService {
         Channel channel = channelRepository.findById(id);
 
         if (channel == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
 
         if (channel.getChannelType() == ChannelType.PRIVATE) {
@@ -130,7 +130,7 @@ public class ChannelService {
         Channel channel = channelRepository.findById(id);
 
         if (channel == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
 
         if (channel.getChannelType() == ChannelType.PRIVATE) {
@@ -174,7 +174,7 @@ public class ChannelService {
 
         Channel channel = channelRepository.findById(id);
         if (channel == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
 
         List<Message> messages = messageRepository.findByChannelId(id);
@@ -201,7 +201,7 @@ public class ChannelService {
     public Optional<Instant> latestMessageAddedAt(UUID id) {
         Channel channel = channelRepository.findById(id);
         if (channel == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
 
         List<UUID> messageIds = channel.getMessages();

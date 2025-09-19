@@ -4,13 +4,13 @@ import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -35,7 +35,7 @@ public class BinaryContentService {
     public BinaryContentResponseDto findById(UUID id){
         BinaryContent binaryContent = binaryContentRepository.findById(id);
         if (binaryContent == null) {
-            throw new NoSuchElementException("존재하지 않는 파일입니다.");
+            throw new NotFoundException("존재하지 않는 파일입니다.");
         }
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
@@ -49,7 +49,7 @@ public class BinaryContentService {
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> ids){
         List<BinaryContent> contents = binaryContentRepository.findAllByIdIn(ids);
         if (contents == null) {
-            throw new NoSuchElementException("존재하지 않는 파일입니다.");
+            throw new NotFoundException("존재하지 않는 파일입니다.");
         }
         return contents.stream()
                 .map(content -> new BinaryContentResponseDto(

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -13,9 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -117,7 +116,7 @@ public class UserService {
         User user = userRepository.findById(id);
 
         if (user == null) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다.");
+            throw new NotFoundException("존재하지 않는 유저입니다.");
         }
 
         if (dto.username() != null){
@@ -158,7 +157,7 @@ public class UserService {
 
         User user = userRepository.findById(id);
         if (user == null) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다.");
+            throw new NotFoundException("존재하지 않는 유저입니다.");
         }
 
         UserStatus userStatus = userStatusRepository.findByUserId(id);

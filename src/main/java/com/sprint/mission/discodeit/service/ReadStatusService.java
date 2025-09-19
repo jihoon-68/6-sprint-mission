@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -26,10 +26,10 @@ public class ReadStatusService {
 
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto dto){
         if (userRepository.findById(dto.userId()) == null) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다.");
+            throw new NotFoundException("존재하지 않는 유저입니다.");
         }
         if (channelRepository.findById(dto.channelId()) == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
         // 중복 체크
         List<ReadStatus> userReadStatuses = readStatusRepository.findAllByUserId(dto.userId());

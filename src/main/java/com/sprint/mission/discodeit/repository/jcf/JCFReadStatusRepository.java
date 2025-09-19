@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class JCFReadStatusRepository implements ReadStatusRepository {
@@ -44,7 +44,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     public void deleteById(UUID id) {
         boolean removed = data.removeIf(rs -> rs.getId().equals(id));
         if (!removed) {
-            throw new NoSuchElementException("존재하지 않는 ReadStatus입니다. id=" + id);
+            throw new NotFoundException("존재하지 않는 ReadStatus입니다. id=" + id);
         }
     }
 
