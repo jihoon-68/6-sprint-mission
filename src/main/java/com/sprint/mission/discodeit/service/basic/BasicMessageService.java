@@ -63,9 +63,10 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
         // 메시지의 첨부파일들 객체 삭제
-        Message message = messageRepository.findById(messageId).orElseThrow(()->new NoSuchElementException("MessageService delete: 메시지 없음"));
-        message.getAttachmentIds()
-                .forEach(binaryContentRepository::deleteById);
+        Message message = messageRepository.findById(messageId).orElse(null);
+        if(message.getAttachmentIds() != null){
+            message.getAttachmentIds().forEach(attachmentId -> binaryContentRepository.deleteById(attachmentId));
+        }
         // 메시지 id로 삭제
         messageRepository.deleteById(messageId);
     }

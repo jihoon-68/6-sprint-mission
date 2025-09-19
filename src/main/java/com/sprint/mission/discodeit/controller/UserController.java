@@ -6,12 +6,12 @@ import com.sprint.mission.discodeit.dto.userdto.FindUserDto;
 import com.sprint.mission.discodeit.dto.userdto.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,19 +21,17 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<User> readUser(
-            @PathVariable UUID userId) {
-        User user = userService.find(userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    @GetMapping
+    public ResponseEntity<List<User>> readUser() {
+        List<User> userList = userService.findAll();
+        return ResponseEntity.ok(userList);
     }
 
     @PostMapping
     public ResponseEntity<User> createUser(
-            @RequestBody CreateUserDto createUserDto,
-            @RequestBody CreateProfileImageDto createProfileImageDto
+            @RequestBody CreateUserDto createUserDto
     ) {
-        User user = userService.create(createUserDto,createProfileImageDto);
+        User user = userService.create(createUserDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
@@ -54,5 +52,13 @@ public class UserController {
         return ResponseEntity.ok(userId +" 삭제되었습니다");
     }
 
-
+    @PatchMapping("/{userId}")
+    public ResponseEntity<User> stateUser(
+            @PathVariable UUID userId,
+            @RequestParam boolean online
+    ){
+        User user = userService.find(userId);
+        user.update(online);
+        return ResponseEntity.ok(user);
+    }
 }

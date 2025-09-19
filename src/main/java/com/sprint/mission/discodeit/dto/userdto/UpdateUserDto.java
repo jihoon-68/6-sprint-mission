@@ -5,6 +5,7 @@ import java.util.UUID;
 public record UpdateUserDto (
         String newUsername,
         String newEmail,
-        String newPassword
+        String newPassword,
+        boolean online
 ) {
 }

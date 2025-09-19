@@ -27,16 +27,15 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(CreateUserDto createUserDto, CreateProfileImageDto createProfileImageDto) {
+    public User create(CreateUserDto createUserDto) {
         User user;
         User findUserByName  = userRepository.findAll().stream().filter(users -> users.getUsername().equals(createUserDto.username())).findAny().orElse(null);
         User findUserByEmail = userRepository.findAll().stream().filter(users->users.getEmail().equals(createUserDto.email())).findAny().orElse(null);
         if (findUserByName != null || findUserByEmail != null) {
             throw new IllegalArgumentException("유저네임 혹은 이메일이 같은 유저가 존재합니다.");
         }
-        user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password());
-        BinaryContent binaryContent = new BinaryContent(createProfileImageDto.bytes());
-        user.setBinaryContent(binaryContent);
+        BinaryContent binaryContent = new BinaryContent(createUserDto.bytes());
+        user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password(), binaryContent.getId());
         binaryContentRepository.save(binaryContent);
         Instant now = Instant.now();
         userStatusRepository.save(new UserStatus(user.getId(), now));
@@ -59,6 +58,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
         user.update(updateUserDto.newUsername(), updateUserDto.newEmail(), updateUserDto.newPassword());
+        user.update(updateUserDto.online());
         return userRepository.save(user);
     }
 

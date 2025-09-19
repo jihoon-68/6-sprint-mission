@@ -17,15 +17,6 @@ public class GlobalExceptionHandler {
         return "error/nullPointer";
     }
 
-//    @ExceptionHandler(MemberRegistException.class)
-//    public String userExceptionHandler(Model model, MemberRegistException exception) {
-//
-//        System.out.println("Global 레벨의 exception 처리");
-//        model.addAttribute("exception", exception);     //exception.getMessage()가 html에서 ${ exception.message }로 처리
-//
-//        return "error/memberRegist";
-//    }
-
     // default exception
     @ExceptionHandler(Exception.class)
     public String nullPointerExceptionHandler(Exception exception) {
