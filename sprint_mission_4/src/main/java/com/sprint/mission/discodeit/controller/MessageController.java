@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.domain.user.FileProcessingException;
 import com.sprint.mission.discodeit.service.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class MessageController {
     private final MessageService messageService;
 
+    @Autowired
     public MessageController(MessageService messageService) {
         this.messageService = messageService;
     }

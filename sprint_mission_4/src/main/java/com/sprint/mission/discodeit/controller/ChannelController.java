@@ -21,9 +21,9 @@ import java.util.List;
 @RequestMapping("/channel")
 public class ChannelController {
 
-    @Autowired
     private ChannelService channelService;
 
+    @Autowired
     public ChannelController(ChannelService channelService) {
         this.channelService = channelService;
     }
