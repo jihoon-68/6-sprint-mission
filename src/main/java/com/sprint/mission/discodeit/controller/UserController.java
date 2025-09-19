@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binarycontent.CreateProfileImageDto;
-import com.sprint.mission.discodeit.dto.userdto.CreateUserDto;
-import com.sprint.mission.discodeit.dto.userdto.FindUserDto;
-import com.sprint.mission.discodeit.dto.userdto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.userdto.CreateUser;
+import com.sprint.mission.discodeit.dto.userdto.UpdateUser;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +27,18 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(
-            @RequestBody CreateUserDto createUserDto
+            @RequestBody CreateUser createUser
     ) {
-        User user = userService.create(createUserDto);
+        User user = userService.create(createUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(
             @PathVariable UUID userId,
-            @RequestBody UpdateUserDto updateUserDto
+            @RequestBody UpdateUser updateUser
     ) {
-        User user = userService.update(userId, updateUserDto);
+        User user = userService.update(userId, updateUser);
         return ResponseEntity.ok(user);
     }
 

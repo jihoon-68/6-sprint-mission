@@ -1,18 +1,16 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.binarycontent.CreateProfileImageDto;
-import com.sprint.mission.discodeit.dto.userdto.CreateUserDto;
-import com.sprint.mission.discodeit.dto.userdto.FindUserDto;
-import com.sprint.mission.discodeit.dto.userdto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.userdto.CreateUser;
+import com.sprint.mission.discodeit.dto.userdto.UpdateUser;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User create(CreateUserDto createUserDto);
+    User create(CreateUser createUser);
     User find(UUID userId);
     List<User> findAll();
-    User update(UUID userId, UpdateUserDto updateUserDto);
+    User update(UUID userId, UpdateUser updateUser);
     void delete(UUID userId);
 }

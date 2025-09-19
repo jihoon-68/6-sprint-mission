@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.CreateProfileImageDto;
-import com.sprint.mission.discodeit.dto.userdto.CreateUserDto;
-import com.sprint.mission.discodeit.dto.userdto.FindUserDto;
-import com.sprint.mission.discodeit.dto.userdto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.userdto.CreateUser;
+import com.sprint.mission.discodeit.dto.userdto.UpdateUser;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -27,15 +25,15 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(CreateUserDto createUserDto) {
+    public User create(CreateUser createUser) {
         User user;
-        User findUserByName  = userRepository.findAll().stream().filter(users -> users.getUsername().equals(createUserDto.username())).findAny().orElse(null);
-        User findUserByEmail = userRepository.findAll().stream().filter(users->users.getEmail().equals(createUserDto.email())).findAny().orElse(null);
+        User findUserByName  = userRepository.findAll().stream().filter(users -> users.getUsername().equals(createUser.username())).findAny().orElse(null);
+        User findUserByEmail = userRepository.findAll().stream().filter(users->users.getEmail().equals(createUser.email())).findAny().orElse(null);
         if (findUserByName != null || findUserByEmail != null) {
             throw new IllegalArgumentException("유저네임 혹은 이메일이 같은 유저가 존재합니다.");
         }
-        BinaryContent binaryContent = new BinaryContent(createUserDto.bytes());
-        user = new User(createUserDto.username(), createUserDto.email(), createUserDto.password(), binaryContent.getId());
+        BinaryContent binaryContent = new BinaryContent(createUser.bytes());
+        user = new User(createUser.username(), createUser.email(), createUser.password(), binaryContent.getId());
         binaryContentRepository.save(binaryContent);
         Instant now = Instant.now();
         userStatusRepository.save(new UserStatus(user.getId(), now));
@@ -54,11 +52,11 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, UpdateUserDto updateUserDto) {
+    public User update(UUID userId, UpdateUser updateUser) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(updateUserDto.newUsername(), updateUserDto.newEmail(), updateUserDto.newPassword());
-        user.update(updateUserDto.online());
+        user.update(updateUser.newUsername(), updateUser.newEmail(), updateUser.newPassword());
+        user.update(updateUser.online());
         return userRepository.save(user);
     }
 

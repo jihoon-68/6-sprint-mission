@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.dto.userdto;
 
-import java.util.UUID;
-
-public record UpdateUserDto (
+public record UpdateUser(
         String newUsername,
         String newEmail,
         String newPassword,

@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import java.util.List;
 import java.util.UUID;
 
-public record CreateChannelDto(
+public record CreateChannel(
         ChannelType type,
         String name,
         String description,

@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.CreateAttachmentImageDto;
-import com.sprint.mission.discodeit.dto.messagedto.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.messagedto.UpdateMessageDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.messagedto.CreateMessage;
+import com.sprint.mission.discodeit.dto.messagedto.UpdateMessage;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -27,14 +25,14 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(CreateMessageDto createMessageDto) {
-        if (!channelRepository.existsById(createMessageDto.channelId())) {
-            throw new NoSuchElementException("채널이 없습니다 " + createMessageDto.channelId());
+    public Message create(CreateMessage createMessage) {
+        if (!channelRepository.existsById(createMessage.channelId())) {
+            throw new NoSuchElementException("채널이 없습니다 " + createMessage.channelId());
         }
-        if (!userRepository.existsById(createMessageDto.authorId())) {
-            throw new NoSuchElementException("해당 유저가 없습니다 " + createMessageDto.authorId());
+        if (!userRepository.existsById(createMessage.authorId())) {
+            throw new NoSuchElementException("해당 유저가 없습니다 " + createMessage.authorId());
         }
-        Message message = new Message(createMessageDto.content(), createMessageDto.channelId(), createMessageDto.authorId(), createMessageDto.attachmentIds());
+        Message message = new Message(createMessage.content(), createMessage.channelId(), createMessage.authorId(), createMessage.attachmentIds());
         return messageRepository.save(message);
     }
 
@@ -50,10 +48,10 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID messageId, UpdateMessageDto updateMessageDto) {
+    public Message update(UUID messageId, UpdateMessage updateMessage) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(updateMessageDto.newContent());
+        message.update(updateMessage.newContent());
         return messageRepository.save(message);
     }
 

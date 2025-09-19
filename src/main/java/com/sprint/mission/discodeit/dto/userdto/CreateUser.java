@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.dto.userdto;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public record CreateUserDto(
+public record CreateUser(
         @NotBlank String username,
         @Email String email,
         @NotBlank String password,

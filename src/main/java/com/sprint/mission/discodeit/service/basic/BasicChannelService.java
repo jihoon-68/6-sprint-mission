@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channeldto.CreateChannelDto;
-import com.sprint.mission.discodeit.dto.channeldto.FindAllChannelDto;
-import com.sprint.mission.discodeit.dto.channeldto.FindChannelDto;
-import com.sprint.mission.discodeit.dto.channeldto.UpdateChannelDto;
+import com.sprint.mission.discodeit.dto.channeldto.CreateChannel;
+import com.sprint.mission.discodeit.dto.channeldto.UpdateChannel;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -27,14 +25,14 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
 
     @Override
-    public Channel create(CreateChannelDto createChannelDto) {
+    public Channel create(CreateChannel createChannel) {
         Channel channel;
-        if(createChannelDto.type().equals(ChannelType.PUBLIC)){
-            channel = new Channel(ChannelType.PUBLIC, createChannelDto.name(), createChannelDto.description());
+        if(createChannel.type().equals(ChannelType.PUBLIC)){
+            channel = new Channel(ChannelType.PUBLIC, createChannel.name(), createChannel.description());
         }
         else {
-            channel = new Channel(createChannelDto.type(), null, null);
-            for (UUID userId : createChannelDto.userIds()) {
+            channel = new Channel(createChannel.type(), null, null);
+            for (UUID userId : createChannel.userIds()) {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("유저 없음: " + userId));
                 Instant now = Instant.now();
@@ -64,15 +62,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID channelId, UpdateChannelDto updateChannelDto) {
-        if (updateChannelDto.type().equals(ChannelType.PRIVATE)) {
+    public Channel update(UUID channelId, UpdateChannel updateChannel) {
+        if (updateChannel.type().equals(ChannelType.PRIVATE)) {
             System.out.println(" PRIVATE 채널은 수정할 수 없습니다.");
             return null;
         }
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
 
-        channel.update(updateChannelDto.newName(), updateChannelDto.newDescription());
+        channel.update(updateChannel.newName(), updateChannel.newDescription());
         return channelRepository.save(channel);
     }
 

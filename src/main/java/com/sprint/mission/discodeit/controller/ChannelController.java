@@ -1,13 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channeldto.CreateChannelDto;
-import com.sprint.mission.discodeit.dto.channeldto.UpdateChannelDto;
-import com.sprint.mission.discodeit.dto.userdto.CreateUserDto;
-import com.sprint.mission.discodeit.dto.userdto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.channeldto.CreateChannel;
+import com.sprint.mission.discodeit.dto.channeldto.UpdateChannel;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,18 +28,18 @@ public class ChannelController {
 
     @PostMapping
     public ResponseEntity<Channel> createChannel(
-            @RequestBody CreateChannelDto createChannelDto
+            @RequestBody CreateChannel createChannel
             ) {
-        Channel channel = channelService.create(createChannelDto);
+        Channel channel = channelService.create(createChannel);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @PutMapping("/{channelId}")
     public ResponseEntity<Channel> updatePublicChannel(
             @PathVariable UUID channelId,
-            @RequestBody UpdateChannelDto updateChannelDto
+            @RequestBody UpdateChannel updateChannel
             ) {
-        Channel channel = channelService.update(channelId,updateChannelDto);
+        Channel channel = channelService.update(channelId, updateChannel);
         return ResponseEntity.ok(channel);
     }
 

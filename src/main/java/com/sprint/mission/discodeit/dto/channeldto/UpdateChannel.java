@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.UUID;
 
-public record UpdateChannelDto(
+public record UpdateChannel(
         ChannelType type,       // public만 가능
         UUID channelId,
         String newName,

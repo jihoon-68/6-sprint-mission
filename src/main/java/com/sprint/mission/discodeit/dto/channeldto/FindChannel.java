@@ -5,9 +5,10 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import java.time.Instant;
 import java.util.UUID;
 
-public record FindAllChannelDto(
+public record FindChannel(
         ChannelType type,
-        UUID userId,                // PRIVATE 채널만 필요
+        UUID channelId,
+        UUID userId,                    // PRIVATE 채널만 필요
         Instant latestMessageTime
 ) {
 }

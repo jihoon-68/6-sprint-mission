@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.messagedto.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.messagedto.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.messagedto.CreateMessage;
+import com.sprint.mission.discodeit.dto.messagedto.UpdateMessage;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +29,18 @@ public class MessageController {
 
     @PostMapping
     public ResponseEntity<Message> createChannel(
-            @RequestBody CreateMessageDto createMessageDto
+            @RequestBody CreateMessage createMessage
             ) {
-        Message message = messageService.create(createMessageDto);
+        Message message = messageService.create(createMessage);
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
     @PutMapping("/{messageId}")
     public ResponseEntity<Message> updateMessage(
             @PathVariable UUID messageId,
-            @RequestBody UpdateMessageDto updateMessageDto
+            @RequestBody UpdateMessage updateMessage
             ) {
-        Message message = messageService.update(messageId,updateMessageDto);
+        Message message = messageService.update(messageId, updateMessage);
         return ResponseEntity.ok(message);
     }
 
