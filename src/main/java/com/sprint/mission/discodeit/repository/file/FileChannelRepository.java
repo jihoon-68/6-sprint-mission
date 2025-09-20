@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,10 +44,13 @@ public class FileChannelRepository implements ChannelRepository {
 
     // 채널 ID로 채널 객체 불러오기
     @Override
-    public Channel findById(UUID id) {
+    public Optional<Channel> findById(UUID id) {
         Path filePath = CHANNEL_DIR.resolve(id + ".ser");
-        if (!Files.exists(filePath)) return null;
-        return (Channel) FileLoader.loadOne(filePath);
+        if (!Files.exists(filePath)) {
+            return Optional.empty();
+        }
+        Channel channel = (Channel) FileLoader.loadOne(filePath);
+        return Optional.ofNullable(channel);
     }
 
     // 전체 채널 객체 불러오기

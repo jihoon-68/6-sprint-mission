@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,27 +39,28 @@ public class FileUserRepository implements UserRepository {
     }
 
     // 유저 단건 조회
+    // 파일 직접 찾아서 로딩
     @Override
-    public User findById(UUID id) {
+    public Optional<User> findById(UUID id) {
         Path filePath = USER_DIR.resolve(id + ".ser");
-        if (!Files.exists(filePath)) return null;
-        return (User) FileLoader.loadOne(filePath);
+        if (!Files.exists(filePath)) return Optional.empty();
+        User user = (User) FileLoader.loadOne(filePath);
+        return Optional.ofNullable(user);
     }
 
+    // finaAll() 이용
     @Override
-    public User findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         return findAll().stream()
                 .filter(user -> user.getUsername().equals(username))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return findAll().stream()
                 .filter(user -> user.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     // 모든 유저 객체 불러오기

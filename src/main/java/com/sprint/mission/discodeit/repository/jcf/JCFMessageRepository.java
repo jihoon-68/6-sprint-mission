@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
@@ -20,11 +21,10 @@ public class JCFMessageRepository implements MessageRepository {
 
     // 단건 조회 (ID로 조회, 관리자용)
     @Override
-    public Message findById(UUID id) {
+    public Optional<Message> findById(UUID id) {
         return data.stream()
                 .filter(message -> message.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     // 채널별 메시지 조회

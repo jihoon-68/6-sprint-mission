@@ -70,11 +70,8 @@ public class ChannelService {
     }
 
     public ChannelResponseDto findById(UUID id) {
-        Channel channel = channelRepository.findById(id);
-
-        if (channel == null) {
-            throw new NotFoundException("존재하지 않는 채널입니다.");
-        }
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         if (channel.getChannelType() == ChannelType.PRIVATE) {
             return new ChannelResponseDto(
@@ -127,11 +124,8 @@ public class ChannelService {
 
     public ChannelResponseDto update(UUID id, ChannelUpdateRequestDto dto) {
         // validateCreator(user, channel);
-        Channel channel = channelRepository.findById(id);
-
-        if (channel == null) {
-            throw new NotFoundException("존재하지 않는 채널입니다.");
-        }
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         if (channel.getChannelType() == ChannelType.PRIVATE) {
             throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
@@ -172,10 +166,8 @@ public class ChannelService {
     public void deleteById(UUID id) {
         // validateCreator(user, channel); // 만든사람만 삭제 가능
 
-        Channel channel = channelRepository.findById(id);
-        if (channel == null) {
-            throw new NotFoundException("존재하지 않는 채널입니다.");
-        }
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         List<Message> messages = messageRepository.findByChannelId(id);
         if (messages != null) {
@@ -199,10 +191,8 @@ public class ChannelService {
 
     // 메시지가 없을 수 있으므로 반환타입을 Optional로 감쌈
     public Optional<Instant> latestMessageAddedAt(UUID id) {
-        Channel channel = channelRepository.findById(id);
-        if (channel == null) {
-            throw new NotFoundException("존재하지 않는 채널입니다.");
-        }
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         List<UUID> messageIds = channel.getMessages();
         if (messageIds == null || messageIds.isEmpty()) {

@@ -22,4 +22,8 @@ public class ReadStatus implements Serializable {
         this.createdAt = Instant.now();
     }
 
+    public void setLastlyReadAt(Instant lastlyReadAt) {
+        this.lastlyReadAt = lastlyReadAt;
+        this.updatedAt = Instant.now();
+    }
 }

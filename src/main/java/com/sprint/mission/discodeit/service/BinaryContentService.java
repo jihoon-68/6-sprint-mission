@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,6 +24,7 @@ public class BinaryContentService {
     public BinaryContentResponseDto create(BinaryContentCreateRequestDto dto){
         BinaryContent binaryContent = new BinaryContent(dto.userId(), dto.messageId(), dto.type(), dto.byteBuffer());
         binaryContentRepository.save(binaryContent);
+
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
                 binaryContent.getUserId(),
@@ -33,10 +35,9 @@ public class BinaryContentService {
     }
 
     public BinaryContentResponseDto findById(UUID id){
-        BinaryContent binaryContent = binaryContentRepository.findById(id);
-        if (binaryContent == null) {
-            throw new NotFoundException("존재하지 않는 파일입니다.");
-        }
+        BinaryContent binaryContent = binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 BinaryContent입니다."));
+
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
                 binaryContent.getUserId(),
@@ -48,8 +49,8 @@ public class BinaryContentService {
 
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> ids){
         List<BinaryContent> contents = binaryContentRepository.findAllByIdIn(ids);
-        if (contents == null) {
-            throw new NotFoundException("존재하지 않는 파일입니다.");
+        if (contents.isEmpty()) {
+            throw new NotFoundException("해당하는 BinaryContent가 존재하지 않습니다.");
         }
         return contents.stream()
                 .map(content -> new BinaryContentResponseDto(

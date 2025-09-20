@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
@@ -20,27 +21,24 @@ public class JCFUserRepository implements UserRepository {
 
     // 유저 단건 조회
     @Override
-    public User findById(UUID id) {
+    public Optional<User> findById(UUID id) {
         return data.stream()
                 .filter(user -> user.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public User findByUsername(String userName) {
+    public Optional<User> findByUsername(String userName) {
         return data.stream()
                 .filter(user -> user.getUsername().equals(userName))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return data.stream()
                 .filter(user -> user.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     // 유저 전체 조회

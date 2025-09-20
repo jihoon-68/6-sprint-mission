@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFBinaryContentRepository implements BinaryContentRepository {
@@ -19,11 +20,10 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         return data.stream()
                 .filter(binaryContent -> binaryContent.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override

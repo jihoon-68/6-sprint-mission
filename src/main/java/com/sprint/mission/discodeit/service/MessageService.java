@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +32,19 @@ public class MessageService {
 
         Message message = new Message(dto.userId(), dto.channelId(), dto.content());
 
+        User user = userRepository.findById(dto.userId())
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+        user.getCreatedMessages().add(message.getId());
+
+        Channel channel = channelRepository.findById(dto.channelId())
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+        channel.getMessages().add(message.getId());
+
         if (dto.binaryContents() != null) {
             message.setBinaryContents(dto.binaryContents());
         }
 
         messageRepository.save(message);
-        userRepository.findById(dto.userId()).getCreatedMessages().add(message.getId());
-        channelRepository.findById(dto.channelId()).getMessages().add(message.getId());
 
         log.info("메시지 추가 완료: " + message.getContent());
         return new MessageResponseDto(
@@ -49,10 +57,9 @@ public class MessageService {
     }
 
     public MessageResponseDto findById(UUID id) {
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new NotFoundException("존재하지 않는 메시지입니다.");
-        }
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
+
         return new MessageResponseDto(
                 message.getId(),
                 message.getUserId(),
@@ -82,10 +89,8 @@ public class MessageService {
     // 내용 수정
     public MessageResponseDto update(UUID id, MessageUpdateRequestDto dto) {
         // validateWriter(user, message);
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new NotFoundException("존재하지 않는 메시지입니다.");
-        }
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
 
         message.setContent(dto.content());
         messageRepository.save(message);
@@ -102,10 +107,8 @@ public class MessageService {
     // 삭제
     public void delete(UUID id) {
         // validateWriter(user, message);
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new NotFoundException("존재하지 않는 메시지입니다.");
-        }
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
 
         List<BinaryContent> binaryContents = message.getBinaryContents();
         if (message.getBinaryContents() != null) {

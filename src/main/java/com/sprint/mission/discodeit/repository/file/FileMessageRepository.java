@@ -48,14 +48,13 @@ public class FileMessageRepository implements MessageRepository {
 
     // 메시지 단건 조회
     @Override
-    public Message findById(UUID messageId) {
+    public Optional<Message> findById(UUID messageId) {
         try {
             return Files.walk(MESSAGE_DIR)
                     .filter(path -> path.getFileName().toString().equals(messageId + ".ser"))
                     .findFirst()
                     .map(FileLoader::loadOne)
-                    .map(obj -> (Message) obj)
-                    .orElse(null);
+                    .map(obj -> (Message) obj);
         } catch (IOException e) {
             throw new RuntimeException("메시지 탐색 실패", e);
         }

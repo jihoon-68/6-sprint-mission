@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFReadStatusRepository implements ReadStatusRepository {
@@ -19,11 +21,10 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
+    public Optional<ReadStatus> findById(UUID id) {
         return data.stream()
                 .filter(readStatus -> readStatus.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -42,10 +43,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void deleteById(UUID id) {
-        boolean removed = data.removeIf(rs -> rs.getId().equals(id));
-        if (!removed) {
-            throw new NotFoundException("존재하지 않는 ReadStatus입니다. id=" + id);
-        }
+        ReadStatus readStatus = findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
+        data.remove(readStatus);
     }
 
     @Override

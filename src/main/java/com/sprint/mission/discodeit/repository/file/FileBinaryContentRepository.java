@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,10 +41,11 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         Path filePath = BINARY_CONTENT_DIR.resolve(id + ".ser");
         if (!Files.exists(filePath)) return null;
-        return (BinaryContent) FileLoader.loadOne(filePath);
+        BinaryContent binaryContent = (BinaryContent) FileLoader.loadOne(filePath);
+        return Optional.ofNullable(binaryContent);
     }
 
     @Override
@@ -70,10 +72,9 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void deleteById(UUID id) {
-        BinaryContent binaryContent = findById(id);
-        if (binaryContent == null) {
-            throw new NotFoundException("존재하지 않는 BinaryContent입니다. id=" + id);
-        }
+        BinaryContent binaryContent = findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 BinaryContent입니다. id=" + id));
+
         Path path = getFilePath(binaryContent);
         try {
             boolean deleted = Files.deleteIfExists(path);

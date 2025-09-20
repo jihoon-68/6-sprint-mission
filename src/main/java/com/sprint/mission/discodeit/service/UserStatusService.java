@@ -25,8 +25,8 @@ public class UserStatusService {
     private final UserRepository userRepository;
 
     public UserStatusResponseDto create(UserStatusCreateRequestDto dto){
-        if (userRepository.findById(dto.userId()) != null) {
-            if (userStatusRepository.findById(dto.userId()) != null){
+        if (userRepository.findById(dto.userId()).isPresent()) {
+            if (userStatusRepository.findById(dto.userId()).isPresent()){
                 throw new IllegalStateException("해당 유저에 대해 UserStatus가 이미 존재합니다.");
             }
             UserStatus userStatus = new UserStatus(dto.userId());
@@ -43,7 +43,8 @@ public class UserStatusService {
     }
 
     public UserStatusResponseDto findById(UUID id){
-        UserStatus userStatus = userStatusRepository.findById(id);
+        UserStatus userStatus = userStatusRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
         return new UserStatusResponseDto(
                 userStatus.getId(),
                 userStatus.getUserId(),
@@ -59,7 +60,8 @@ public class UserStatusService {
     }
 
     public UserStatusResponseDto update(UUID id, UserStatusUpdateRequestDto dto){
-        UserStatus userStatus = userStatusRepository.findById(id);
+        UserStatus userStatus = userStatusRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
         userStatus.setLastlyConnectedAt(dto.lastlyConnectedAt());
         userStatusRepository.save(userStatus);
         return new UserStatusResponseDto(
@@ -70,12 +72,11 @@ public class UserStatusService {
     }
 
     public UserStatusResponseDto updateByUserId(UUID userId, Instant lastlyConnectedAt) {
-        User user = userRepository.findById(userId);
-        UserStatus userStatus
-                = userStatusRepository.findByUserId(userId);
-        if (userStatus == null) {
-            throw new NotFoundException("해당 유저의 상태 정보가 존재하지 않습니다.");
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+
         userStatus.setLastlyConnectedAt(lastlyConnectedAt);
         userStatusRepository.save(userStatus);
         return new UserStatusResponseDto(
@@ -86,11 +87,7 @@ public class UserStatusService {
     }
 
     public void deleteById(UUID id){
-        UserStatus userStatus = userStatusRepository.findById(id);
-        if (userStatus == null) {
-            throw new NotFoundException("존재하지 않는 UserStatus입니다.");
-        }
-        userStatusRepository.delete(userStatus);
+        userStatusRepository.deleteById(id); // 존재하지 않는 경우의 예외처리는 리포지토리에 구현됨.
         log.info("UserStatus 삭제 완료: " + id);
     }
 

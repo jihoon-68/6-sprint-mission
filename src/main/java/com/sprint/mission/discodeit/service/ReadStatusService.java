@@ -25,10 +25,10 @@ public class ReadStatusService {
     private final ChannelRepository channelRepository;
 
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto dto){
-        if (userRepository.findById(dto.userId()) == null) {
+        if (userRepository.findById(dto.userId()).isEmpty()) {
             throw new NotFoundException("존재하지 않는 유저입니다.");
         }
-        if (channelRepository.findById(dto.channelId()) == null) {
+        if (channelRepository.findById(dto.channelId()).isEmpty()) {
             throw new NotFoundException("존재하지 않는 채널입니다.");
         }
         // 중복 체크
@@ -50,7 +50,8 @@ public class ReadStatusService {
     }
 
     public ReadStatusResponseDto findById(UUID id){
-        ReadStatus readStatus = readStatusRepository.findById(id);
+        ReadStatus readStatus = readStatusRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다"));
         return new ReadStatusResponseDto(
                 readStatus.getId(),
                 readStatus.getUserId(),
@@ -71,7 +72,9 @@ public class ReadStatusService {
     }
 
     public ReadStatusResponseDto update(ReadStatusUpdateRequestDto dto){
-        ReadStatus readStatus = readStatusRepository.findById(dto.id());
+        ReadStatus readStatus = readStatusRepository.findById(dto.id())
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
+        readStatus.setLastlyReadAt(dto.lastlyReadAt());
         readStatusRepository.save(readStatus);
         return new ReadStatusResponseDto(
                 readStatus.getId(),

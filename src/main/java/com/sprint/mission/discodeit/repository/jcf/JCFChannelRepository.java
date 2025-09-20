@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelRepository implements ChannelRepository {
@@ -19,11 +20,10 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID id) {
+    public Optional<Channel> findById(UUID id) {
         return data.stream()
                 .filter(channel -> channel.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     // 채널 전체 조회

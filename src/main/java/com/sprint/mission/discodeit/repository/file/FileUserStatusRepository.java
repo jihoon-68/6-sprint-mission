@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.FileLoader;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,18 +40,18 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findById(UUID id) {
+    public Optional<UserStatus> findById(UUID id) {
         Path filePath = USER_STATUS_DIR.resolve(id + ".ser");
         if (!Files.exists(filePath)) return null;
-        return (UserStatus) FileLoader.loadOne(filePath);
+        UserStatus userStatus = (UserStatus) FileLoader.loadOne(filePath);
+        return Optional.ofNullable(userStatus);
     }
 
     @Override
-    public UserStatus findByUserId(UUID userId) {
+    public Optional<UserStatus> findByUserId(UUID userId) {
         return findAll().stream()
                 .filter(user -> user.getUserId().equals(userId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -70,13 +72,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void delete(UserStatus userStatus) {
+    public void deleteById(UUID id) {
+        UserStatus userStatus = findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
         Path path = getFilePath(userStatus);
         try {
-            boolean deleted = Files.deleteIfExists(path);
-            if (!deleted) {
-                throw new NotFoundException("존재하지 않는 UserStatus입니다. id=" + userStatus.getId());
-            }
+            Files.delete(path);
         } catch (IOException e) {
             e.printStackTrace();
         }
