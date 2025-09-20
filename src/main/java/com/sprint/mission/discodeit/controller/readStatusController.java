@@ -16,7 +16,7 @@ public class readStatusController {
 
     public final ReadStatusService readStatusService;
 
-    @GetMapping("{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<List<ReadStatus>> readStatusByUserId(
             @PathVariable UUID userId
     ){

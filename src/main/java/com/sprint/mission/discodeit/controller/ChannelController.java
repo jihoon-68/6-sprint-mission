@@ -20,7 +20,7 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Channel>> readChannel(
+    public ResponseEntity<List<Channel>> readChannelByUserId(
             @PathVariable UUID userId) {
         List<Channel> channel = channelService.findAllByUserId(userId);
         return ResponseEntity.ok(channel);
