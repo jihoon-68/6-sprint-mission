@@ -32,7 +32,7 @@ public class ChannelService {
         Channel channel = new Channel(dto.userId());
 
         // ReadStatus 생성
-        if (dto.participants() != null) {
+        if (!dto.participants().isEmpty()) {
             dto.participants()
                     .forEach(userId ->
                             readStatusRepository.save(new ReadStatus(userId, channel.getId())));
@@ -40,13 +40,11 @@ public class ChannelService {
 
         channelRepository.save(channel);
         log.info("채널 추가 완료: " + channel.getName());
-        return new ChannelResponseDto(
+        return ChannelResponseDto.privateChannel( // private 채널은 name, description이 없음.
                 channel.getId(),
-                null, // private 채널은 name이 없음.
-                null, // private 채널은 description이 없음.
                 null,
                 channel.getParticipants()
-                );
+        );
     }
 
     public ChannelResponseDto createPublicChannel(PublicChannelCreateRequestDto dto) {
@@ -60,12 +58,11 @@ public class ChannelService {
 
         channelRepository.save(channel);
         log.info("채널 추가 완료: " + channel.getName());
-        return new ChannelResponseDto(
+        return ChannelResponseDto.publicChannel( // public 채널은 participants가 없음.
                 channel.getId(),
                 channel.getName(),
                 channel.getDescription(),
-                null,
-                null // public 채널은 participants가 없음.
+                null
         );
     }
 
@@ -74,19 +71,16 @@ public class ChannelService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         if (channel.getChannelType() == ChannelType.PRIVATE) {
-            return new ChannelResponseDto(
+            return ChannelResponseDto.privateChannel(
                     channel.getId(),
-                    null, // private 채널은 name이 없음.
-                    null, // private 채널은 description이 없음.
                     latestMessageAddedAt(id),
                     channel.getParticipants());
         }
-        else return new ChannelResponseDto(
+        else return ChannelResponseDto.publicChannel(
                 channel.getId(),
                 channel.getName(),
                 channel.getDescription(),
-                latestMessageAddedAt(id),
-                null // public 채널은 participants가 없음.
+                latestMessageAddedAt(id)
                 );
     }
 
@@ -189,21 +183,21 @@ public class ChannelService {
         channelRepository.clear();
     }
 
-    // 메시지가 없을 수 있으므로 반환타입을 Optional로 감쌈
-    public Optional<Instant> latestMessageAddedAt(UUID id) {
+    public Instant latestMessageAddedAt(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         List<UUID> messageIds = channel.getMessages();
         if (messageIds == null || messageIds.isEmpty()) {
-            return Optional.empty();
+            return null;
         }
 
         List<Message> messages = messageRepository.findAllByIdIn(channel.getMessages());
 
         return messages.stream()
                 .map(Message::getCreatedAt)
-                .max(Instant::compareTo);
+                .max(Instant::compareTo)
+                .orElse(null);
     }
 
     // TODO 추후 개선 필요
