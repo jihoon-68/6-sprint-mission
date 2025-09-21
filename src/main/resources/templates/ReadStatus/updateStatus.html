@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>읽음 상태 수정</title>
+</head>
+<body>
+<h2>읽음 상태 수정</h2>
+
+<form th:action="@{/readStatus}" th:method="put" th:object="${findReadStatus}">
+
+    <input type="hidden" id="id" name="id" th:field="*{id}">
+    <input type="hidden" id="userId" name="userId" th:field="*{userId}" >
+    <input type="hidden" id="channelId" name="channelId" th:field="*{channelId}" >
+
+    <div>
+        <label for="readStatus">현재 상태:</label><br>
+        <input type="text" id="readStatus" name="readStatus" placeholder="상태 입력 ( READ or UNREAD)" th:field="*{type}"><br><br>
+    </div>
+
+
+    <button type="submit">수정하기</button>
+</form>
+</body>
+</html>
