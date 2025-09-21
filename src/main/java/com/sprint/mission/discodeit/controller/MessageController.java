@@ -51,7 +51,7 @@ public class MessageController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public String getMessage(@RequestParam("userId") UUID id, Model model) {
+    public String getMessage(@RequestParam("channelId") UUID id, Model model) {
 
         List<FindMessageDTO> messageList =messageService.findAllByChannelId(id);
 

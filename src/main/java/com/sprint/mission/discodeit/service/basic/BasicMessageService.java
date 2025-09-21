@@ -92,6 +92,7 @@ public class BasicMessageService implements MessageService {
         List<Message> messages = messageRepository.findAll();
 
         return messages.stream()
+                .filter(message -> message.getChannel().equals(channelId))
                 .map(message -> {
                     List<String> fileAddress = message.getAttachmentIds().stream()
                             .map(address -> binaryContentRepository.findById(address)

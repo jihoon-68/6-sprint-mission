@@ -16,7 +16,7 @@ import javax.security.sasl.AuthenticationException;
 public class AuthController {
     private final AuthService authService;
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String login(@RequestParam LoginDTO loginDTO) throws AuthenticationException {
+    public String login(@ModelAttribute LoginDTO loginDTO) throws AuthenticationException {
        authService.login(loginDTO);
         return "redirect:/";
     }

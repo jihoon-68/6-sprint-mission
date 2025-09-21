@@ -36,7 +36,6 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPrivate(CreatePrivateChannelDTO createPrivateChannelDTO) {
-        System.out.println(createPrivateChannelDTO);
         Channel channel = new Channel(createPrivateChannelDTO.channelType());
 
         createPrivateChannelDTO.userIds()
