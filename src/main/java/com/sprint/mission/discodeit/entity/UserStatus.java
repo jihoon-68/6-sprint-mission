@@ -16,13 +16,16 @@ public class UserStatus implements Serializable {
     private UUID userId;
     private Instant lastActiveAt;
 
-
-    public UserStatus(UUID userId, Instant lastActiveAt) {
+    private UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         //
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
+    }
+
+    public static UserStatus fromUser(UUID userId, Instant lastActiveAt) {
+        return new UserStatus(userId, lastActiveAt);
     }
 
     public Boolean isOnline() {

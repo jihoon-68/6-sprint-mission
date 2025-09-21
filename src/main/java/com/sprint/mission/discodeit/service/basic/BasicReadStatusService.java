@@ -33,8 +33,7 @@ public class BasicReadStatusService implements ReadStatusService {
         if(readStatusRepository.existsById(createReadStatus.readStatusId())){
             throw new IllegalArgumentException("이미 읽기상태 객체가 있습니다");
         }
-        Instant now = Instant.now();
-        ReadStatus readStatus = new ReadStatus(createReadStatus.userId(), createReadStatus.channelId(),now);
+        ReadStatus readStatus = new ReadStatus(createReadStatus.userId(), createReadStatus.channelId(),Instant.now());
         return readStatusRepository.save(readStatus);
     }
 
@@ -53,8 +52,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatus update(UUID readStatusId, UpdateReadStatus updateReadStatus) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + updateReadStatus.userId() + " not found"));
-        Instant now = Instant.now();
-        readStatus.update(now);
+        readStatus.update(Instant.now());
         return readStatusRepository.save(readStatus);
     }
 

@@ -37,8 +37,7 @@ public class BasicChannelService implements ChannelService {
             for (UUID userId : createChannel.userIds()) {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("유저 없음: " + userId));
-                Instant now = Instant.now();
-                readStatusRepository.save(new ReadStatus(userId, channel.getId(),now));
+                readStatusRepository.save(new ReadStatus(userId, channel.getId(),Instant.now()));
             }
         }
         return channelRepository.save(channel);

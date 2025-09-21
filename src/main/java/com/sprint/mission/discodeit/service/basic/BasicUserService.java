@@ -27,16 +27,15 @@ public class BasicUserService implements UserService {
     @Override
     public User create(CreateUser createUser) {
         User user;
-        User findUserByName  = userRepository.findAll().stream().filter(users -> users.getUsername().equals(createUser.username())).findAny().orElse(null);
+        User findUserByName  = userRepository.findByUsername(createUser.username()).orElse(null);
         User findUserByEmail = userRepository.findAll().stream().filter(users->users.getEmail().equals(createUser.email())).findAny().orElse(null);
         if (findUserByName != null || findUserByEmail != null) {
             throw new IllegalArgumentException("유저네임 혹은 이메일이 같은 유저가 존재합니다.");
         }
-        BinaryContent binaryContent = new BinaryContent(createUser.bytes());
-        user = new User(createUser.username(), createUser.email(), createUser.password(), binaryContent.getId());
+        BinaryContent binaryContent = createUser.toBinaryContent();
+        user = createUser.toEntity(binaryContent);
         binaryContentRepository.save(binaryContent);
-        Instant now = Instant.now();
-        userStatusRepository.save(new UserStatus(user.getId(), now));
+        userStatusRepository.save(UserStatus.fromUser(user.getId(), Instant.now()));
         return userRepository.save(user);
     }
 
