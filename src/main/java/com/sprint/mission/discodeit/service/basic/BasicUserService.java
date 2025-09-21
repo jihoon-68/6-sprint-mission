@@ -60,6 +60,14 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    public User updateState(UUID userId, boolean online){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(online);
+        return userRepository.save(user);
+    }
+
+    @Override
     public void delete(UUID userId) {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("User with id " + userId + " not found");

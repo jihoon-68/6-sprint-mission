@@ -56,8 +56,7 @@ public class UserController {
             @PathVariable UUID userId,
             @RequestParam boolean online
     ){
-        User user = userService.find(userId);
-        user.update(online);
-        return ResponseEntity.ok(user);
+        User updated = userService.updateState(userId,online);
+        return ResponseEntity.ok(updated);
     }
 }

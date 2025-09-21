@@ -12,5 +12,6 @@ public interface UserService {
     User find(UUID userId);
     List<User> findAll();
     User update(UUID userId, UpdateUser updateUser);
+    User updateState(UUID userId, boolean online);
     void delete(UUID userId);
 }
