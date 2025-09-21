@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.DTO.ReadStatus.CreateReadStatusDTO;
+
 import com.sprint.mission.discodeit.DTO.ReadStatus.UpdateReadStatusDTO;
 import com.sprint.mission.discodeit.Enum.ReadType;
 import lombok.Getter;
@@ -39,8 +39,8 @@ public class ReadStatus implements Serializable {
             this.userId = updateReadStatusDTO.userId();
             anyValueUpdated = true;
         }
-        if (updateReadStatusDTO.readStatus() != null && !updateReadStatusDTO.readStatus().equals(this.type)) {
-            this.type = updateReadStatusDTO.readStatus();
+        if (updateReadStatusDTO.type() != null && !updateReadStatusDTO.type().equals(this.type)) {
+            this.type = updateReadStatusDTO.type();
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {

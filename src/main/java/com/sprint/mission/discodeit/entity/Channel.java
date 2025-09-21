@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.DTO.Channel.CreatePublicChannelDTO;
 import com.sprint.mission.discodeit.Enum.ChannelType;
 import lombok.Getter;
 

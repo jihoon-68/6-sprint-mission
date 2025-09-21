@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.DTO.User.CreateUserDTO;
 import com.sprint.mission.discodeit.DTO.User.UpdateUserDTO;
 import lombok.Getter;
 
@@ -34,17 +33,24 @@ public class User implements Serializable {
 
     public void update(UpdateUserDTO updateUserDTO) {
         boolean anyValueUpdated = false;
-        if (updateUserDTO.userName() != null && !updateUserDTO.userName().equals(this.username)) {
+
+        if ( updateUserDTO.userName() != null
+                && !updateUserDTO.userName().isEmpty()
+                && !updateUserDTO.userName().equals(this.username)) {
             this.username = updateUserDTO.userName();
             anyValueUpdated = true;
         }
 
-        if (updateUserDTO.email() != null && !updateUserDTO.email().equals(this.email)) {
+        if ( updateUserDTO.email() != null
+                && !updateUserDTO.email().isEmpty()
+                && !updateUserDTO.email().equals(this.email)) {
             this.email = updateUserDTO.email();
             anyValueUpdated = true;
         }
 
-        if (updateUserDTO.password() != null && !updateUserDTO.password().equals(this.password)) {
+        if (  updateUserDTO.password() != null
+                && !updateUserDTO.password().isEmpty()
+                && !updateUserDTO.password().equals(this.password)) {
             this.password = updateUserDTO.password();
             anyValueUpdated = true;
         }
