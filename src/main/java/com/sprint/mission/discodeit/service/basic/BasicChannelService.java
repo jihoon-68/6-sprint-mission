@@ -29,16 +29,19 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPublic(CreatePublicChannelDTO createPublicChannelDTO) {
-        return channelRepository.save(new Channel(createPublicChannelDTO.channelName(), createPublicChannelDTO.description()));
+        Channel channel = channelRepository.save(new Channel(createPublicChannelDTO.channelName(), createPublicChannelDTO.description()));
+        messageRepository.save(new Message(createPublicChannelDTO.userId(),channel.getId(),"대화를 시작해요"));
+        return channel;
     }
 
     @Override
     public Channel createPrivate(CreatePrivateChannelDTO createPrivateChannelDTO) {
+        System.out.println(createPrivateChannelDTO);
         Channel channel = new Channel(createPrivateChannelDTO.channelType());
 
         createPrivateChannelDTO.userIds()
                 .forEach(userId ->
-                        readStatusRepository.save(new ReadStatus(userId,channel.getId())));
+                        readStatusRepository.save(new ReadStatus(channel.getId(),userId)));
 
         return channelRepository.save(channel);
     }
@@ -49,8 +52,8 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
 
         Message message = messageRepository.findAll().stream()
-                .filter(m -> m.getChannel().equals(id))
-                .findFirst().orElseThrow(() -> new NoSuchElementException("Channel not found"));
+                .filter(m -> m.getChannel().equals(channel.getId()))
+                .findFirst().orElseThrow(() -> new NoSuchElementException("message not found"));
 
         if(channel.getType().equals(ChannelType.PRIVATE)){
             return new FindChannelDTO(channel,message.getCreated(),message.getSender());
@@ -88,15 +91,13 @@ public class BasicChannelService implements ChannelService {
                     }
                 })
                 .toList();
-
-
-
     }
 
     @Override
     public void update(UpdateChannelDTO updateChannelDTO) {
         Channel channel = channelRepository.findById(updateChannelDTO.id())
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
+
         if(channel.getType().equals(ChannelType.PRIVATE)){
             return;
         }

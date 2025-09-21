@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.BinaryContent.CreateBinaryContentDTO;
 import com.sprint.mission.discodeit.DTO.BinaryContent.FileDTO;
+import com.sprint.mission.discodeit.DTO.Channel.FindChannelDTO;
 import com.sprint.mission.discodeit.DTO.Message.CreateMessageDTO;
+import com.sprint.mission.discodeit.DTO.Message.FindMessageDTO;
 import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDTO;
 import com.sprint.mission.discodeit.utilit.FileUpload;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -13,10 +15,12 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.SchedulingException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -41,20 +45,17 @@ public class BasicMessageService implements MessageService {
 
         if(!multipartFiles.isEmpty()){
             List<FileDTO> files = fileUpload.upload(multipartFiles);
-            if(multipartFiles.isEmpty()){
+
+            if(files.isEmpty()){
                 throw new NullPointerException("Multipart files is empty");
             }
 
-            List<Path> filePaths = files.stream()
-                    .map(file -> file.file().toPath())
-                    .toList();
-
-            List<UUID> attachmentIds = filePaths.stream()
+            List<UUID> attachmentIds = files.stream()
                             .map(path -> binaryContentRepository.save(
                                     new BinaryContent(
                                             createMessageDTO.userId(),
                                             createMessageDTO.channelId(),
-                                            path.toString()
+                                            path.savedName()
                                     )).getId()
                             ).toList();
 
@@ -75,14 +76,31 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message find(UUID id) {
-        return messageRepository.findById(id).orElseThrow(() -> new  NoSuchElementException("Message not found"));
+    public FindMessageDTO find(UUID id) {
+        Message message = messageRepository.findById(id).orElseThrow(() -> new  NoSuchElementException("Message not found"));
+        List<String> address = message.getAttachmentIds().stream()
+                .map(adders -> binaryContentRepository.findById(adders)
+                        .orElseThrow(() -> new NoSuchElementException("binaryContent not found"))
+                        .getFilePath()
+                )
+                .toList();
+        return new FindMessageDTO(message, address);
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAll().stream()
-                .filter(message -> message.getChannel().equals(channelId))
+    public List<FindMessageDTO> findAllByChannelId(UUID channelId) {
+        List<Message> messages = messageRepository.findAll();
+
+        return messages.stream()
+                .map(message -> {
+                    List<String> fileAddress = message.getAttachmentIds().stream()
+                            .map(address -> binaryContentRepository.findById(address)
+                                    .orElseThrow(()->new NoSuchElementException("binaryContent not found"))
+                                    .getFilePath()
+                            )
+                            .toList();
+                    return new FindMessageDTO(message,fileAddress);
+                })
                 .toList();
     }
 
@@ -92,18 +110,24 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new  NoSuchElementException("Message not found"));
         if(!multipartFiles.isEmpty()){
             List<FileDTO> files = fileUpload.upload(multipartFiles);
-            List<UUID> attachmentIds = files.stream()
+
+            if(files.isEmpty()){
+                throw new NullPointerException("Multipart files is empty");
+            }
+
+            List<UUID> attachmentIds = new ArrayList<>(files.stream()
                     .map(file -> binaryContentRepository.save(
                             new BinaryContent(
                                     messageUpdated.getSender(),
                                     messageUpdated.getChannel(),
-                                    file.file().toString()
+                                    file.savedName()
                             )
                     ).getId())
-                    .toList();
+                    .toList());
+            attachmentIds.addAll(updateMessageDTO.attachmentIds());
             messageUpdated.update(updateMessageDTO.Content(), attachmentIds);
         }else{
-            messageUpdated.update(updateMessageDTO.Content(), null);
+            messageUpdated.update(updateMessageDTO.Content(), new ArrayList<>());
         }
         messageRepository.save(messageUpdated);
     }

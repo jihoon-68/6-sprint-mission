@@ -26,9 +26,11 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus create(CreateReadStatusDTO createReadStatusDTO) {
 
+        System.out.println(userRepository.existsById(createReadStatusDTO.userId()));
+        System.out.println(channelRepository.existsById(createReadStatusDTO.channelId()));
 
-        if(userRepository.existsById(createReadStatusDTO.userId())
-                ||channelRepository.existsById(createReadStatusDTO.channelId())){
+        if(!userRepository.existsById(createReadStatusDTO.userId())
+                ||!channelRepository.existsById(createReadStatusDTO.channelId())){
             throw new NoSuchElementException("User Or Channel channels are mandatory");
         }
 
@@ -41,7 +43,7 @@ public class BasicReadStatusService implements ReadStatusService {
         }
 
 
-        return readStatusRepository.save(new ReadStatus(createReadStatusDTO.userId(),createReadStatusDTO.channelId()));
+        return readStatusRepository.save(new ReadStatus(createReadStatusDTO.channelId(),createReadStatusDTO.userId()));
     }
 
     @Override

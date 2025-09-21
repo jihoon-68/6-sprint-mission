@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.DTO.BinaryContent.FileDTO;
 import com.sprint.mission.discodeit.DTO.User.CreateUserDTO;
 import com.sprint.mission.discodeit.DTO.User.FindUserDTO;
 import com.sprint.mission.discodeit.DTO.User.UpdateUserDTO;
@@ -15,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,12 +48,12 @@ public class BasicUserService implements UserService{
 
         //파일 있으면 파일 생성
         if(!multipartFile.isEmpty()){
-            List<Path> fileDTOS = fileUpload.upload(multipartFile).stream()
-                    .map(fileDTO -> fileDTO.file().toPath())
+            List<String> fileDTOS = fileUpload.upload(multipartFile).stream()
+                    .map(FileDTO::savedName)
                     .toList();
 
             BinaryContent binaryContent = binaryContentRepository.save(
-                    new BinaryContent(user.getId(),fileDTOS.get(0).toString()));
+                    new BinaryContent(user.getId(),fileDTOS.get(0)));
 
             user.update(UpdateUserDTO.getFileInput(binaryContent.getId()));
         }
@@ -104,10 +103,11 @@ public class BasicUserService implements UserService{
         }
 
         User user = userRepository.findById(updateUserDTO.id()).orElseThrow(()-> new NoSuchElementException("user not found"));
+
         if(!multipartFile.isEmpty()){
-            File profile = fileUpload.upload(multipartFile).get(0).file();
+            String profile = fileUpload.upload(multipartFile).get(0).savedName();
             UUID profileId = binaryContentRepository.save(
-                    new BinaryContent(updateUserDTO.id(),profile.toString())).getId();
+                    new BinaryContent(updateUserDTO.id(),profile)).getId();
 
             user.update(new UpdateUserDTO(
                     updateUserDTO.id(),
@@ -136,7 +136,7 @@ public class BasicUserService implements UserService{
 
     public boolean isDuplicate(String name,String email) {
         List<User> users = userRepository.findAll();
-        return users.stream().noneMatch(user -> user.getUsername().equals(name)) ||
-                users.stream().noneMatch(user -> user.getEmail().equals(email));
+        return users.stream().anyMatch(user -> user.getUsername().equals(name)) ||
+                users.stream().anyMatch(user -> user.getEmail().equals(email));
     }
 }
