@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDTO;
+import lombok.Getter;
 
 
 import java.io.Serializable;
@@ -18,7 +19,7 @@ public class Message implements Serializable {
     private final UUID channel;
     private final Instant created;
 
-    private final List<UUID> attachmentIds;
+    private List<UUID> attachmentIds;
     private String content;
     private Instant updated;
 
@@ -37,7 +38,7 @@ public class Message implements Serializable {
         this.id = UUID.randomUUID();
         this.sender = sender;
         this.content = content;
-        this.attachmentIds = attachmentIds;
+        this.attachmentIds = new ArrayList<>(attachmentIds);
         this.created = Instant.now();
     }
 
@@ -48,11 +49,9 @@ public class Message implements Serializable {
             anyValueUpdated = true;
         }
 
-        if (attachmentIds != null && !attachmentIds.equals(this.attachmentIds)) {
-            attachmentIds.stream()
-                    .filter(id -> this.attachmentIds.stream()
-                            .noneMatch(thisId-> thisId.equals(id)))
-                    .forEach(this.attachmentIds::add);
+        if (attachmentIds != null && !attachmentIds.isEmpty() && !attachmentIds.equals(this.attachmentIds)) {
+            this.attachmentIds = new ArrayList<>(attachmentIds);
+
             anyValueUpdated = true;
         }
 
