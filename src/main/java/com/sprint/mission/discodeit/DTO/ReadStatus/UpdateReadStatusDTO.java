@@ -9,5 +9,5 @@ public record UpdateReadStatusDTO(
         UUID id,
         UUID userId,
         UUID channelId,
-        ReadType readStatus
+        ReadType type
 ) {}
