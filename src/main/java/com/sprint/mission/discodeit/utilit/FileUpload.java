@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.utilit;
 
 import com.sprint.mission.discodeit.DTO.BinaryContent.FileDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
@@ -15,32 +16,23 @@ import java.util.UUID;
 @Component
 @Slf4j
 public class FileUpload {
-    private final ResourceLoader resourceLoader;
 
-    public FileUpload(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-    }
+    @Value("${file.upload.mac.path}")
+    private String uploadPath;
 
     public List<FileDTO> upload(List<MultipartFile> multipartFile){
         List<FileDTO> fileDTOS = new ArrayList<>();
 
-        Resource resource = resourceLoader.getResource("classpath:static/uploadedFiles/img/single");
-        String filePath = null;
 
         try{
             //밑에 에러나는 부눈 내일 글로벌 에러 처리 함수 작성 하고 try-catch 밖으로 빼기
-            if (!resource.exists()) {
+            File directory = new File(uploadPath);
+            if (!directory.exists()) {
                 // 경로가 존재하지 않을 때
-                String root = "src/main/resources/static/uploadedFiles/img/single";
-
-                File file = new File(root);
-                file.mkdirs();
-
-                /* Note. getAbsolutePath()는 IOException 처리해야 함. */
-                filePath = file.getAbsolutePath();
-            } else {
-                // 이미 경로가 존재할 때
-                filePath = resourceLoader.getResource("classpath:static/uploadedFiles/img/single").getFile().getAbsolutePath();
+                boolean ok= directory.mkdirs();
+                if(!ok){
+                    System.out.println("디랙토리 생성 안됨");
+                }
             }
 
             for(MultipartFile file : multipartFile){
@@ -59,7 +51,7 @@ public class FileUpload {
                 String ext = fileName.substring(fileName.lastIndexOf("."));
                 String saveName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-                File destFile = new File(filePath+"/"+saveName);
+                File destFile = new File(directory+"/"+saveName);
                 file.transferTo(destFile);
                 fileDTOS.add(new FileDTO(fileName,saveName,destFile));
             }
