@@ -8,8 +8,11 @@ spring:
       max-request-size: 10MB
       file-size-threshold: 1MB
   mvc:
-    # 정적 자원의 URL 경로 패턴을 /static/**로 설정 (파일업로드 위치 설정용)
     static-path-pattern: /static/**
+    hiddenmethod:
+      filter:
+        enabled: true
+
 discodeit:
   repository:
     type: file # jcf | file
@@ -23,4 +26,5 @@ file:
       path: C:/myWs/uploadedFiles
     mac:
       # macOS용 파일 업로드 기본 경로
-      path: /myWs/uploadedFiles
+      # /Users/mac/ 이부분이 각자 컴퓨터 맞게
+      path: /Users/mac/myWs/uploadedFilesimg
