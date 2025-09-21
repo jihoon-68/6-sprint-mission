@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>사용자 목록</title>
+</head>
+<body>
+<h2>사용자 목록</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>사용자 이름</th>
+        <th>이메일</th>
+        <th>나이</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${users == null or users.isEmpty()}">
+        <td colspan="4">조회된 유저가 없습니다.</td>
+    </tr>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.age}"></td>
+        <td>
+            <form th:action="@{/user/find:{id}(id=${user.id})}" th:method="get" style="display:inline;">
+                <button type="submit" >수정</button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/user/{id}(id=${user.id})}" th:method="delete" style="display:inline;">
+                <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

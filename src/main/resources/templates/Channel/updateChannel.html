@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>메시지 수정</title>
+</head>
+<body>
+
+<div>
+    <h3>수정할 현재 내용</h3>
+    <p><strong>현재 채널 이름:</strong><span th:text="${channel.getName()}"></span></p>
+    <p><strong>현재 소개:</strong> <span th:text="${channel.getDescription()}">현재 소개</span></p>
+    <p><strong>최근 메시지:</strong> <span th:text="${recentMessage}"></span></p>
+    <p><strong>사용자 ID:</strong> <span th:text="${userId}"></span></p>
+</div>
+
+<h2>채널 수정</h2>
+<form th:action="@{/channel}" th:object="${channel}" th:method="put">
+    <input type="hidden" id="id" name="id" th:field="*{id}" />
+    <div>
+        <label for="name">채널 이름</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+        <label for="description">최근 메시지</label>
+        <input type="text" id="description" name="description">
+    </div>
+    <br>
+    <button type="submit">채널 수정</button>
+</form>
+</body>
+</html>
