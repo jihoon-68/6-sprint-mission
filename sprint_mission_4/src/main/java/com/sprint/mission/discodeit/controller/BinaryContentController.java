@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "content")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
@@ -19,10 +18,16 @@ public class BinaryContentController {
         this.binaryContentService = binaryContentService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(path = "/content", method = RequestMethod.GET)
     public ResponseEntity<List<BinaryContent>> getBinaryContent(@RequestParam("ids") List<UUID> ids) {
         var result = binaryContentService.findAllByIdIn(ids);
 
+        return ResponseEntity.ok(result);
+    }
+
+    @RequestMapping(path = "/api/binaryContent/find", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContent> findBinaryContent(@RequestParam("binaryContentId") UUID id) {
+        var result = binaryContentService.find(id);
         return ResponseEntity.ok(result);
     }
 }
