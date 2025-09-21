@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.security.sasl.AuthenticationException;
 
 @RequestMapping("/login")
-@RestController
+@Controller
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-    @RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/json")
-    public FindUserDTO login(@RequestBody LoginDTO loginDTO) throws AuthenticationException {
-       return  authService.login(loginDTO);
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public String login(@RequestParam LoginDTO loginDTO) throws AuthenticationException {
+       authService.login(loginDTO);
+        return "redirect:/";
     }
 }
