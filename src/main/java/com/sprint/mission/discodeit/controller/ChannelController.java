@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.channeldto.CreateChannel;
 import com.sprint.mission.discodeit.dto.channeldto.UpdateChannel;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class ChannelController {
 
     @PostMapping
     public ResponseEntity<Channel> createChannel(
-            @RequestBody CreateChannel createChannel
+            @RequestBody @Valid CreateChannel createChannel
             ) {
         Channel channel = channelService.create(createChannel);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
@@ -37,7 +38,7 @@ public class ChannelController {
     @PutMapping("/{channelId}")
     public ResponseEntity<Channel> updatePublicChannel(
             @PathVariable UUID channelId,
-            @RequestBody UpdateChannel updateChannel
+            @RequestBody @Valid UpdateChannel updateChannel
             ) {
         Channel channel = channelService.update(channelId, updateChannel);
         return ResponseEntity.ok(channel);

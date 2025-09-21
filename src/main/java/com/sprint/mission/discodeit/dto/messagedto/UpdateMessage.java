@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.dto.messagedto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record UpdateMessage(
-        String newContent
+        @NotBlank String newContent
 ) {
 }

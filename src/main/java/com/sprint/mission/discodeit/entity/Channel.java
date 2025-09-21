@@ -19,7 +19,7 @@ public class Channel implements Serializable {
     private String name;
     private String description;
 
-    public Channel(ChannelType type, String name, String description) {
+    private Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         //
@@ -28,13 +28,23 @@ public class Channel implements Serializable {
         this.description = description;
     }
 
+    // 정적 팩토리 메서드
+    public static Channel createPublic(String name, String description) {
+        return new Channel(ChannelType.PUBLIC, name, description);
+    }
+
+    public static Channel createPrivate(String name, String description) {
+        return new Channel(ChannelType.PRIVATE, name, description);
+    }
+
+
     public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
-        if (newName != null && !newName.equals(this.name)) {
+        if (!newName.equals(this.name)) {
             this.name = newName;
             anyValueUpdated = true;
         }
-        if (newDescription != null && !newDescription.equals(this.description)) {
+        if (!newDescription.equals(this.description)) {
             this.description = newDescription;
             anyValueUpdated = true;
         }

@@ -34,7 +34,7 @@ public class Message implements Serializable {
 
     public void update(String newContent) {
         boolean anyValueUpdated = false;
-        if (newContent != null && !newContent.equals(this.content)) {
+        if (!newContent.equals(this.content)) {
             this.content = newContent;
             anyValueUpdated = true;
         }

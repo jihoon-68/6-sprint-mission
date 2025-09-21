@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.messagedto.CreateMessage;
 import com.sprint.mission.discodeit.dto.messagedto.UpdateMessage;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class MessageController {
 
     @PostMapping
     public ResponseEntity<Message> createChannel(
-            @RequestBody CreateMessage createMessage
+            @RequestBody @Valid CreateMessage createMessage
             ) {
         Message message = messageService.create(createMessage);
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
@@ -38,7 +39,7 @@ public class MessageController {
     @PutMapping("/{messageId}")
     public ResponseEntity<Message> updateMessage(
             @PathVariable UUID messageId,
-            @RequestBody UpdateMessage updateMessage
+            @RequestBody @Valid UpdateMessage updateMessage
             ) {
         Message message = messageService.update(messageId, updateMessage);
         return ResponseEntity.ok(message);

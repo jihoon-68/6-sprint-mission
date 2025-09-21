@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.userdto.CreateUser;
 import com.sprint.mission.discodeit.dto.userdto.UpdateUser;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(
-            @RequestBody CreateUser createUser
+            @RequestBody @Valid CreateUser createUser
     ) {
         User user = userService.create(createUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -36,7 +37,7 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(
             @PathVariable UUID userId,
-            @RequestBody UpdateUser updateUser
+            @RequestBody @Valid UpdateUser updateUser
     ) {
         User user = userService.update(userId, updateUser);
         return ResponseEntity.ok(user);
