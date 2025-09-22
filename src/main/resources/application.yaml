@@ -11,5 +11,5 @@ logging:
 
 discodeit:
   repository:
-    type: jcf   # jcf | file
+    type: file   # jcf | file
     file-directory: ${DISCODEIT_DATA_DIR:.discodeit}
