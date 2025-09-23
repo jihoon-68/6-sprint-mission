@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public record CreateMessageRequest(
     @NotBlank String content,
-    @NotBlank UUID channelId,
-    @NotBlank UUID authorId,
+    UUID channelId,
+    UUID authorId,
     List<UUID> attachmentIds
 ) {
 

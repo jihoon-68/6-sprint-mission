@@ -38,8 +38,6 @@ public class BasicChannelService implements ChannelService {
   public Channel createPrivate(CreatePrivateChannelRequest createPrivateChannelRequest) {
     Channel channel = Channel.createPrivate();
     for (UUID userId : createPrivateChannelRequest.participantIds()) {
-      User user = userRepository.findById(userId)
-          .orElseThrow(() -> new IllegalArgumentException("참가자 id가 실제 유저에 있지 않음: " + userId));
       readStatusRepository.save(new ReadStatus(userId, channel.getId(), Instant.now()));
     }
     return channelRepository.save(channel);

@@ -32,11 +32,10 @@ public class MessageController {
   // todo 첨부파일 업로드 가능?
   @PostMapping
   public ResponseEntity<Message> createMessage(
-      @RequestPart @Valid CreateMessageRequest request,
-      @RequestPart List<MultipartFile> attachments
+      @RequestPart("messageCreateRequest") @Valid CreateMessageRequest request,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-
-    Message message = messageService.create(request);
+    Message message = messageService.create(request, attachments);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 

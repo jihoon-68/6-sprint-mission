@@ -2,19 +2,26 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.messagedto.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.messagedto.UpdateMessageRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -26,15 +33,33 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public Message create(CreateMessageRequest createMessageRequest) {
+  public Message create(CreateMessageRequest createMessageRequest,
+      List<MultipartFile> attachments) {
     if (!channelRepository.existsById(createMessageRequest.channelId())) {
       throw new NoSuchElementException("채널이 없습니다 " + createMessageRequest.channelId());
     }
     if (!userRepository.existsById(createMessageRequest.authorId())) {
       throw new NoSuchElementException("해당 유저가 없습니다 " + createMessageRequest.authorId());
     }
+
+    List<MultipartFile> attachmentsNotNull =
+        attachments != null ? attachments : Collections.emptyList();
+
+    List<UUID> binaryContentIds = attachmentsNotNull.stream().map(
+        file -> {
+          try {
+            BinaryContent bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
+                file.getContentType(),
+                file.getBytes());
+            return binaryContentRepository.save(bc);
+          } catch (IOException e) {
+            log.error("첨부파일 처리 실패", e);
+            throw new RuntimeException("첨부파일 처리 실패");
+          }
+        }
+    ).map(BinaryContent::getId).toList();
     Message message = new Message(createMessageRequest.content(), createMessageRequest.channelId(),
-        createMessageRequest.authorId(), createMessageRequest.attachmentIds());
+        createMessageRequest.authorId(), binaryContentIds);
     return messageRepository.save(message);
   }
 

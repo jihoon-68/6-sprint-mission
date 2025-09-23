@@ -29,7 +29,7 @@ public class UserController {
     return ResponseEntity.ok(userList);
   }
 
-  @PostMapping
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<User> createUser(
       // js 파일에서 맞는 변수명을 찾아 넣어야함
       // 멀티파일과 dto를 함께 쓸 경우 @RequestPart 사용, postman 테스트할때는 form-data로  { "request" : { "username" : "test" , ... } }
@@ -46,7 +46,8 @@ public class UserController {
       @RequestPart("userUpdateRequest") @Valid UpdateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    User user = userService.update(userId, request, Optional.ofNullable(profile));
+    User user = userService.update(userId, request,
+        Optional.ofNullable(profile));
     return ResponseEntity.ok(user);
   }
 

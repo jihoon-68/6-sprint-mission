@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -20,6 +21,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -46,7 +48,8 @@ public class BasicUserService implements UserService {
                 file.getBytes());
             return binaryContentRepository.save(bc);
           } catch (IOException e) {
-            throw new RuntimeException("이미지 가져오는데 실패");
+            log.error("유저 프로필 사진 처리 실패", e);
+            throw new RuntimeException("유저 프로필 사진 처리 실패");
           }
         }
     );

@@ -20,15 +20,17 @@ public class Channel implements Serializable {
   private String name;
   private String description;
 
-  private Channel(ChannelType type, String name, String description) {
+  //공개 채널 생성자
+  private Channel(String name, String description) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
     //
-    this.type = type;
+    this.type = ChannelType.PUBLIC;
     this.name = name;
     this.description = description;
   }
 
+  //비공개 채널 생성자
   private Channel() {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
@@ -37,7 +39,7 @@ public class Channel implements Serializable {
 
   // 정적 팩토리 메서드
   public static Channel createPublic(String name, String description) {
-    return new Channel(ChannelType.PUBLIC, name, description);
+    return new Channel(name, description);
   }
 
   public static Channel createPrivate() {
