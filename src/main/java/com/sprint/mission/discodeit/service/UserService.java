@@ -17,7 +17,7 @@ public interface UserService {
 
   List<User> findAll();
 
-  User update(UUID userId, UpdateUserRequest updateUserRequest);
+  User update(UUID userId, UpdateUserRequest updateUserRequest, Optional<MultipartFile> profile);
 
   User updateState(UUID userId, boolean online);
 

@@ -69,19 +69,35 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public User update(UUID userId, UpdateUserRequest updateUserRequest) {
+  public User update(UUID userId, UpdateUserRequest updateUserRequest,
+      Optional<MultipartFile> profile) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-    user.update(
-        updateUserRequest.newUsername(), updateUserRequest.newEmail(),
+    user.update(updateUserRequest.newUsername(), updateUserRequest.newEmail(),
         updateUserRequest.newPassword());
     user.update(updateUserRequest.online());
-    BinaryContent binaryContent = binaryContentRepository.findById(user.getProfileId())
-        .orElse(null);
-    if (binaryContent != null) {
-      binaryContent.update(updateUserRequest.profile());
-      binaryContentRepository.save(binaryContent);
-    }
+
+    Optional<BinaryContent> binaryContent = profile.map(
+        file -> {
+          try {
+            BinaryContent bc = binaryContentRepository.findById(user.getProfileId())
+                .orElse(null);
+            if (bc == null) {
+              bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
+                  file.getContentType(),
+                  file.getBytes());
+            } else {
+              bc.update(file.getOriginalFilename(), file.getSize(), file.getContentType(),
+                  file.getBytes());
+            }
+            return binaryContentRepository.save(bc);
+          } catch (IOException e) {
+            throw new RuntimeException("이미지 가져오는데 실패");
+          }
+        }
+    );
+    UUID profileId = binaryContent.map(BinaryContent::getId).orElse(null);
+    user.update(profileId);
     return userRepository.save(user);
   }
 

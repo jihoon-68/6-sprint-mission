@@ -31,10 +31,10 @@ public class UserController {
 
   @PostMapping
   public ResponseEntity<User> createUser(
-      @RequestPart("userCreateRequest") @Valid CreateUserRequest request,
       // js 파일에서 맞는 변수명을 찾아 넣어야함
-      @RequestPart(value = "profile", required = false) MultipartFile profile
       // 멀티파일과 dto를 함께 쓸 경우 @RequestPart 사용, postman 테스트할때는 form-data로  { "request" : { "username" : "test" , ... } }
+      @RequestPart("userCreateRequest") @Valid CreateUserRequest request,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     User user = userService.create(request, Optional.ofNullable(profile));
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -43,9 +43,10 @@ public class UserController {
   @PatchMapping("/{userId}")
   public ResponseEntity<User> updateUser(
       @PathVariable UUID userId,
-      @RequestBody @Valid UpdateUserRequest request
+      @RequestPart("userUpdateRequest") @Valid UpdateUserRequest request,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    User user = userService.update(userId, request);
+    User user = userService.update(userId, request, Optional.ofNullable(profile));
     return ResponseEntity.ok(user);
   }
 

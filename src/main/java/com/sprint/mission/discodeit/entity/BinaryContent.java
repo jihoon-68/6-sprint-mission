@@ -34,9 +34,10 @@ public class BinaryContent implements Serializable {
     this.bytes = bytes;
   }
 
-  public void update(byte[] bytes) {
-    if (bytes != null) {
-      this.bytes = bytes;
-    }
+  public void update(String fileName, Long size, String contentType, byte[] bytes) {
+    this.fileName = fileName;
+    this.size = size;
+    this.contentType = contentType;
+    this.bytes = bytes;
   }
 }

@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.dto.userdto;
 
+import com.sprint.mission.discodeit.entity.User;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record UpdateUserRequest(
-    @NotBlank String newUsername,
-    @NotBlank String newEmail,
-    @NotBlank String newPassword,
+    String newUsername,
+    String newEmail,
+    String newPassword,
     byte[] profile,
     boolean online
 ) {
