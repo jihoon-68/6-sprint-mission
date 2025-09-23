@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.DTO.Channel;
 
-import com.sprint.mission.discodeit.Enum.ChannelType;
-
+import java.util.UUID;
 public record CreatePublicChannelDTO(
+        UUID userId,
         String channelName,
-        String description,
-        ChannelType channelType
+        String description
 ) {
 
 }

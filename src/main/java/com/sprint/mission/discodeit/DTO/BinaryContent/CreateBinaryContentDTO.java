@@ -5,5 +5,5 @@ import java.util.UUID;
 public record CreateBinaryContentDTO(
         UUID userId,
         UUID channelID,
-        byte[] content
+        String filePath
 ) {}
