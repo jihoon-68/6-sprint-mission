@@ -23,19 +23,17 @@ public class BasicReadStatusService implements ReadStatusService {
   public final UserRepository userRepository;
   public final ChannelRepository channelRepository;
 
+
   @Override
   public ReadStatus create(CreateReadStatusRequest createReadStatusRequest) {
-    if (userRepository.existsById(createReadStatusRequest.userId())) {
+    if (!userRepository.existsById(createReadStatusRequest.userId())) {
       throw new NoSuchElementException("유저가 없습니다: " + createReadStatusRequest.userId());
     }
-    if (channelRepository.existsById(createReadStatusRequest.channelId())) {
+    if (!channelRepository.existsById(createReadStatusRequest.channelId())) {
       throw new NoSuchElementException("채널이 없습니다: " + createReadStatusRequest.channelId());
     }
-//    if (readStatusRepository.existsById(createReadStatusRequest.readStatusId())) {
-//      throw new IllegalArgumentException("이미 읽기상태 객체가 있습니다");
-//    }
     ReadStatus readStatus = new ReadStatus(createReadStatusRequest.userId(),
-        createReadStatusRequest.channelId(), Instant.now());
+        createReadStatusRequest.channelId(), createReadStatusRequest.lastReadAt());
     return readStatusRepository.save(readStatus);
   }
 

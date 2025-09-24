@@ -55,9 +55,10 @@ public class BasicUserService implements UserService {
     );
     UUID profileId = binaryContent.map(BinaryContent::getId).orElse(null);
     user = createUserRequest.toEntity(profileId);
+    User createdUser = userRepository.save(user);
 
-    userStatusRepository.save(UserStatus.fromUser(user.getId(), Instant.now()));
-    return userRepository.save(user);
+    userStatusRepository.save(UserStatus.fromUser(createdUser.getId(), Instant.now()));
+    return createdUser;
   }
 
   @Override
@@ -66,11 +67,22 @@ public class BasicUserService implements UserService {
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
   }
 
+  // 유저 목록 새로고침할때마다 상태 업데이트
   @Override
   public List<User> findAll() {
-    return userRepository.findAll();
+    List<User> userList = userRepository.findAll();
+
+    userList.forEach(user -> {
+          userStatusRepository.findByUserId(user.getId())
+              .ifPresent(userStatus -> user.update(userStatus.isOnline()));
+          userRepository.save(user);
+        }
+    );
+
+    return userList;
   }
 
+  // 유저 이름, 이메일, 비밀번호, 사진, 온라인 상태 업데이트
   @Override
   public User update(UUID userId, UpdateUserRequest updateUserRequest,
       Optional<MultipartFile> profile) {
@@ -78,7 +90,6 @@ public class BasicUserService implements UserService {
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     user.update(updateUserRequest.newUsername(), updateUserRequest.newEmail(),
         updateUserRequest.newPassword());
-    user.update(updateUserRequest.online());
 
     Optional<BinaryContent> binaryContent = profile.map(
         file -> {
@@ -101,6 +112,13 @@ public class BasicUserService implements UserService {
     );
     UUID profileId = binaryContent.map(BinaryContent::getId).orElse(null);
     user.update(profileId);
+
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new NoSuchElementException("유저 상태 업데이트 도중에 유저 아이디를 찾지 못했습니다"));
+    userStatus.update(Instant.now());
+    userStatusRepository.save(userStatus);
+    user.update(userStatus.isOnline());
+
     return userRepository.save(user);
   }
 

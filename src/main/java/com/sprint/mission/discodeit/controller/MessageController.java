@@ -29,7 +29,6 @@ public class MessageController {
     return ResponseEntity.ok(messageList);
   }
 
-  // todo 첨부파일 업로드 가능?
   @PostMapping
   public ResponseEntity<Message> createMessage(
       @RequestPart("messageCreateRequest") @Valid CreateMessageRequest request,

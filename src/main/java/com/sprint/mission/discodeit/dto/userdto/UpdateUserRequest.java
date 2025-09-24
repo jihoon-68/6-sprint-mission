@@ -7,9 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public record UpdateUserRequest(
     String newUsername,
     String newEmail,
-    String newPassword,
-    byte[] profile,
-    boolean online
+    String newPassword
 ) {
 
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -19,8 +20,8 @@ public class User implements Serializable {
 
   private UUID id;
   private UUID profileId;
-  private Long createdAt;
-  private Long updatedAt;
+  private Instant createdAt;
+  private Instant updatedAt;
   //
   private String username;
   private String email;
@@ -29,7 +30,7 @@ public class User implements Serializable {
 
   public User(String username, String email, String password) {
     this.id = UUID.randomUUID();
-    this.createdAt = Instant.now().getEpochSecond();
+    this.createdAt = Instant.now();
     //
     this.username = username;
     this.email = email;
@@ -60,7 +61,7 @@ public class User implements Serializable {
     }
 
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now().getEpochSecond();
+      this.updatedAt = Instant.now();
     }
 
   }

@@ -26,7 +26,6 @@ public class BasicChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
-  private final UserRepository userRepository;
 
   @Override
   public Channel createPublic(CreatePublicChannelRequest createPublicChannelRequest) {
@@ -38,7 +37,7 @@ public class BasicChannelService implements ChannelService {
   public Channel createPrivate(CreatePrivateChannelRequest createPrivateChannelRequest) {
     Channel channel = Channel.createPrivate();
     for (UUID userId : createPrivateChannelRequest.participantIds()) {
-      readStatusRepository.save(new ReadStatus(userId, channel.getId(), Instant.now()));
+      readStatusRepository.save(new ReadStatus(userId, channel.getId(), Instant.MIN));
     }
     return channelRepository.save(channel);
   }
@@ -49,7 +48,7 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(
             () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
   }
-
+  
   @Override
   public List<Channel> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
