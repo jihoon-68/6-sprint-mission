@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -12,15 +13,18 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
-@ConditionalOnProperty(name = "repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+    public FileUserRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, User.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -66,42 +70,16 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return findUser(null, email);
+    public Optional<User> findByUsername(String username) {
+        return this.findAll().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
-
-    @Override
-    public Optional<User> findByUserName(String userName) {
-        return findUser(userName, null);
-    }
-
-    private Optional<User> findUser(String username, String email) {
-        boolean isEmail = false;
-
-        if (username == null || username.trim().isEmpty())
-            isEmail = true;
-
-        try {
-            List<User> users = findAll();
-            if (users == null || users.isEmpty()) {
-                return Optional.empty();
-            }
-
-            if (isEmail == false)
-                return users.stream().filter(u -> u.getUsername().equals(username)).findFirst();
-            return users.stream().filter(u -> u.getEmail().equals(email)).findFirst();
-        }
-        catch (Exception e)
-        {
-            return Optional.empty();
-        }
-    }
-
 
     @Override
     public List<User> findAll() {
-        try {
-            return Files.list(DIRECTORY)
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
@@ -133,5 +111,17 @@ public class FileUserRepository implements UserRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.findAll().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return this.findAll().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
     }
 }

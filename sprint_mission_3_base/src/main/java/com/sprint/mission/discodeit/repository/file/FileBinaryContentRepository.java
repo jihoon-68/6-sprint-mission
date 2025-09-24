@@ -2,121 +2,108 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
-@ConditionalOnProperty(name = "repository.type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
-    private final String filePath = "binaryContent.ser";
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
+
+    public FileBinaryContentRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, BinaryContent.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-
-        Map<UUID, BinaryContent> map = findAll();
-        if(map == null){
-            map =  new HashMap<>();
+        Path path = resolvePath(binaryContent.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(binaryContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        map.put(binaryContent.getId(), binaryContent);
-        saveAll(map);
-
         return binaryContent;
     }
 
     @Override
-    public Optional<BinaryContent> find(UUID id) {
-        Map<UUID, BinaryContent> map = findAll();
-        if(map == null){
-            map =  new HashMap<>();
+    public Optional<BinaryContent> findById(UUID id) {
+        BinaryContent binaryContentNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                binaryContentNullable = (BinaryContent) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
-
-        return Optional.ofNullable(map.get(id));
+        return Optional.ofNullable(binaryContentNullable);
     }
 
-    private void saveAll(Map<UUID, BinaryContent> map) {
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath);
-                BufferedOutputStream b = new BufferedOutputStream(fos);
-                ObjectOutputStream oos = new ObjectOutputStream(b)
-        ) {
-            oos.writeObject(map);
+    @Override
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (BinaryContent) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .filter(content -> ids.contains(content.getId()))
+                    .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Optional<BinaryContent> findByUserId(UUID userId) {
-        Map<UUID, BinaryContent> map = findAll();
-        if(map == null || map.isEmpty() || map.containsKey(userId) == false){
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(map.get(userId));
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
     @Override
-    public Map<UUID, BinaryContent> findAll() {
-        if(Files.exists(Path.of(filePath)) == false)
-            return null;
-
-        try (FileInputStream f = new FileInputStream(filePath);
-             BufferedInputStream b = new BufferedInputStream(f);
-             ObjectInputStream o = new ObjectInputStream(b)
-        ) {
-            Map<UUID, BinaryContent> map = new HashMap<>();
-
-            Object obj = o.readObject();
-            Map<Object,Object> temp = (Map<Object, Object>) obj;
-            for (Map.Entry<Object,Object> entry : temp.entrySet()) {
-                UUID key = (UUID) entry.getKey();
-                BinaryContent value = (BinaryContent) entry.getValue();
-                map.put(key, value);
-            }
-
-            return map;
-        }catch (IOException | ClassNotFoundException e) {
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        HashMap<UUID, BinaryContent> map = (HashMap<UUID, BinaryContent>) findAll();
-        if(map == null || map.isEmpty())
-            return;
-
-        map.entrySet().removeIf(entry -> entry.getValue().getProfileId().equals(userId));
-        saveAll(map);
-    }
-
-    @Override
-    public void deleteByMessageId(UUID messageId) {
-        HashMap<UUID, BinaryContent> map = (HashMap<UUID, BinaryContent>) findAll();
-        if(map == null || map.isEmpty())
-            return;
-
-        map.entrySet().removeIf(entry -> entry.getValue().getMessageId().equals(messageId));
-        saveAll(map);
-    }
-
-    @Override
-    public void delete(UUID id) {
-        Map<UUID, BinaryContent> map = findAll();
-        if(map == null){
-            map =  new HashMap<>();
-        }
-
-        map.remove(id);
-        saveAll(map);
     }
 }

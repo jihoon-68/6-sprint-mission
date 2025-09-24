@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.Message.CreateMessageRequest;
-import com.sprint.mission.discodeit.DTO.Message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -11,40 +12,61 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    //
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
 
-
     @Override
-    public Message create(CreateMessageRequest request) {
-        if (!channelRepository.existsById(request.channelId())) {
-            throw new NoSuchElementException("Channel not found with id " + request.channelId());
-        }
-        if (!userRepository.existsById(request.authorId())) {
-            throw new NoSuchElementException("Author not found with id " + request.authorId());
-        }
+    public Message create(MessageCreateRequest messageCreateRequest, List<MultipartFile> binaryContentCreateRequests) {
+        UUID channelId = messageCreateRequest.channelId();
+        UUID authorId = messageCreateRequest.authorId();
 
-        Message message = new Message(request.content(), request.channelId(), request.authorId());
-
-        if(request.attachments() != null) {
-            for (String attachment : request.attachments()) {
-                BinaryContent binaryContent = new BinaryContent(null, message.getId(), attachment);
-                binaryContentRepository.save(binaryContent);
-            }
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
+        }
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("Author with id " + authorId + " does not exist");
         }
 
+        List<UUID> attachmentIds = null;
+        if (binaryContentCreateRequests != null) {
+            attachmentIds = binaryContentCreateRequests.stream()
+                    .map(attachmentRequest -> {
+                        try {
+                            String fileName = attachmentRequest.getName();
+                            String contentType = attachmentRequest.getContentType();
+                            byte[] bytes = attachmentRequest.getBytes();
+
+                            BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                            BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+                            return createdBinaryContent.getId();
+                        } catch (IOException e) {
+                            throw new RuntimeException("Invalid attachment request", e);
+                        }
+
+                    })
+                    .toList();
+        }
+
+        String content = messageCreateRequest.content();
+        Message message = new Message(
+                content,
+                channelId,
+                authorId,
+                attachmentIds
+        );
         return messageRepository.save(message);
     }
 
@@ -56,31 +78,29 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        List<Message> messages = messageRepository.findAll();
-
-        if(messages == null || messages.isEmpty()) {
-            throw new NoSuchElementException("Messages not found with channel id " + channelId);
-        }
-
-        return messages.stream()
-                .filter(x->x.getChannelId().equals(channelId))
+        return messageRepository.findAllByChannelId(channelId).stream()
                 .toList();
     }
 
     @Override
-    public Message update(UpdateMessageRequest request) {
-        Message message = messageRepository.findById(request.messageId())
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + request.messageId() + " not found"));
-        message.update(request.content());
+    public Message update(UUID messageId, MessageUpdateRequest request) {
+        String newContent = request.newContent();
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
         return messageRepository.save(message);
     }
 
     @Override
     public void delete(UUID messageId) {
-        if (!messageRepository.existsById(messageId)) {
-            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+
+        if( message.getAttachmentIds() != null && !message.getAttachmentIds().isEmpty() ) {
+            message.getAttachmentIds()
+                    .forEach(binaryContentRepository::deleteById);
         }
+
         messageRepository.deleteById(messageId);
-        binaryContentRepository.deleteByMessageId(messageId);
     }
 }
