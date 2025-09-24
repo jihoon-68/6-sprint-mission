@@ -11,33 +11,31 @@ import java.util.UUID;
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final Instant created;
-    private final int age;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
-    private UUID profileId;
-    private Instant updated;
-    private String password;
     private String username;
     private String email;
+    private String password;
+    private UUID profileId;
 
-    public User(String username, int age, String email, String password) {
+    public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
         this.username = username;
-        this.age = age;
         this.email = email;
         this.password = password;
         this.profileId = null;
-        this.created = Instant.now();
+        this.createdAt = Instant.now();
     }
 
 
     public void update(UpdateUserDTO updateUserDTO) {
         boolean anyValueUpdated = false;
 
-        if ( updateUserDTO.userName() != null
-                && !updateUserDTO.userName().isEmpty()
-                && !updateUserDTO.userName().equals(this.username)) {
-            this.username = updateUserDTO.userName();
+        if ( updateUserDTO.username() != null
+                && !updateUserDTO.username().isEmpty()
+                && !updateUserDTO.username().equals(this.username)) {
+            this.username = updateUserDTO.username();
             anyValueUpdated = true;
         }
 
@@ -61,7 +59,7 @@ public class User implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updated = Instant.now();
+            this.updatedAt = Instant.now();
         }
     }
 
@@ -72,9 +70,8 @@ public class User implements Serializable {
         return "유저 정보: "+ "\n" +
                 "ID: " + this.id + "\n" +
                 "아름: " + this.username + "\n" +
-                "나이: " + this.age + "\n" +
                 "이메일: " + this.email + "\n" +
-                "계정 생성일자: " + this.created + "\n" +
-                "계정 생성일자: " + this.updated + "\n";
+                "계정 생성일자: " + this.createdAt + "\n" +
+                "계정 생성일자: " + this.updatedAt + "\n";
     }
 }
