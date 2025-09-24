@@ -5,6 +5,6 @@ import java.io.File;
 public record FileDTO (
         String FileName,
         String savedName,
-        File file               // 저장 경로
+        File file
 ){
 }
