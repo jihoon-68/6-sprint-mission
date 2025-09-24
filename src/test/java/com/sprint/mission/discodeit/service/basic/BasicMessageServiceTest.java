@@ -9,9 +9,11 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class BasicMessageServiceTest {
 
     @Mock
@@ -33,13 +36,8 @@ class BasicMessageServiceTest {
     @InjectMocks
     private BasicMessageService basicMessageService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-    private MessageDTO.CreateMessageRequest createReq(UUID userId, UUID channelId, String content) {
-        return MessageDTO.CreateMessageRequest.builder()
+    private MessageDTO.CreateMessageCommand createReq(UUID userId, UUID channelId, String content) {
+        return MessageDTO.CreateMessageCommand.builder()
                 .userId(userId)
                 .channelId(channelId)
                 .content(content)
@@ -74,7 +72,7 @@ class BasicMessageServiceTest {
         when(userRepository.existById(userId)).thenReturn(false);
 
         //when
-        MessageDTO.CreateMessageRequest request = createReq(userId, channelId, "hi");
+        MessageDTO.CreateMessageCommand request = createReq(userId, channelId, "hi");
 
         //then
         Assertions.assertThrows(IllegalArgumentException.class, () -> basicMessageService.createMessage(request));
@@ -90,7 +88,7 @@ class BasicMessageServiceTest {
         when(channelRepository.existById(channelId)).thenReturn(false);
 
         //when
-        MessageDTO.CreateMessageRequest request = createReq(userId, channelId, "hi");
+        MessageDTO.CreateMessageCommand request = createReq(userId, channelId, "hi");
 
         //then
         Assertions.assertThrows(IllegalArgumentException.class, () -> basicMessageService.createMessage(request));
@@ -280,7 +278,7 @@ class BasicMessageServiceTest {
         when(messageRepository.findById(existing.getId())).thenReturn(Optional.of(existing));
 
         //when
-        MessageDTO.UpdateMessageRequest request = MessageDTO.UpdateMessageRequest.builder()
+        MessageDTO.UpdateMessageCommand request = MessageDTO.UpdateMessageCommand.builder()
                 .id(existing.getId())
                 .content("new")
                 .isReply(false)
@@ -301,7 +299,7 @@ class BasicMessageServiceTest {
         when(messageRepository.existById(id)).thenReturn(false);
 
         //when
-        MessageDTO.UpdateMessageRequest request = MessageDTO.UpdateMessageRequest.builder()
+        MessageDTO.UpdateMessageCommand request = MessageDTO.UpdateMessageCommand.builder()
                 .id(id)
                 .content("x")
                 .isReply(false)
@@ -321,7 +319,7 @@ class BasicMessageServiceTest {
         when(messageRepository.existById(id)).thenReturn(true);
 
         //when
-        MessageDTO.UpdateMessageRequest request = MessageDTO.UpdateMessageRequest.builder()
+        MessageDTO.UpdateMessageCommand request = MessageDTO.UpdateMessageCommand.builder()
                 .id(id)
                 .content("x")
                 .isReply(true)
@@ -341,7 +339,7 @@ class BasicMessageServiceTest {
         when(messageRepository.existById(id)).thenReturn(true);
 
         //when
-        MessageDTO.UpdateMessageRequest request = MessageDTO.UpdateMessageRequest.builder()
+        MessageDTO.UpdateMessageCommand request = MessageDTO.UpdateMessageCommand.builder()
                 .id(id)
                 .content("x")
                 .isReply(false)

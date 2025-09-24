@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NoSuchDataException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -24,14 +25,14 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public void createMessage(MessageDTO.CreateMessageRequest request) {
+    public void createMessage(MessageDTO.CreateMessageCommand request) {
 
         if (!userRepository.existById(request.userId())) {
-            throw new IllegalArgumentException("No such user.");
+            throw new NoSuchDataException("No such user.");
         }
 
         if (!channelRepository.existById(request.channelId())) {
-            throw new IllegalArgumentException("No such channel.");
+            throw new NoSuchDataException("No such channel.");
         }
 
         Message message = new Message.Builder()
@@ -54,7 +55,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Optional<MessageDTO.FindMessageResult> findMessageById(UUID id) {
 
-        Message message = messageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such message."));
+        Message message = messageRepository.findById(id).orElseThrow(() -> new NoSuchDataException("No such message."));
 
         return Optional.ofNullable(MessageDTO.FindMessageResult.builder()
                 .id(message.getId())
@@ -65,7 +66,6 @@ public class BasicMessageService implements MessageService {
                 .parentMessageId(message.getParentMessageId())
                 .createdAt(message.getCreatedAt())
                 .updatedAt(message.getUpdatedAt())
-                .binaryContentList(message.getBinaryContentIdList().stream().toList())
                 .build());
     }
 
@@ -73,7 +73,7 @@ public class BasicMessageService implements MessageService {
     public List<MessageDTO.FindMessageResult> findChildMessagesById(UUID id) {
 
         if (!messageRepository.existById(id)) {
-            throw new IllegalArgumentException("No such message.");
+            throw new NoSuchDataException("No such message.");
         }
 
         return messageRepository.findChildById(id).stream().map(message -> MessageDTO.FindMessageResult.builder()
@@ -93,7 +93,7 @@ public class BasicMessageService implements MessageService {
     public List<MessageDTO.FindMessageResult> findMessagesByUserId(UUID userId) {
 
         if (!userRepository.existById(userId)) {
-            throw new IllegalArgumentException("No such user.");
+            throw new NoSuchDataException("No such user.");
         }
 
         return messageRepository.findByUserId(userId).stream().map(message -> MessageDTO.FindMessageResult.builder()
@@ -114,7 +114,7 @@ public class BasicMessageService implements MessageService {
     public List<MessageDTO.FindMessageResult> findMessagesByChannelId(UUID channelId) {
 
         if (!channelRepository.existById(channelId)) {
-            throw new IllegalArgumentException("No such channel.");
+            throw new NoSuchDataException("No such channel.");
         }
 
         return messageRepository.findByChannelId(channelId).stream().map(message -> MessageDTO.FindMessageResult.builder()
@@ -147,22 +147,22 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(MessageDTO.UpdateMessageRequest request) {
+    public void updateMessage(MessageDTO.UpdateMessageCommand request) {
 
         if (!messageRepository.existById(request.id())) {
-            throw new IllegalArgumentException("No such message.");
+            throw new NoSuchDataException("No such message.");
         }
 
         if (request.isReply() && (request.parentMessageId() == null || !messageRepository.existById(request.parentMessageId()))) {
-            throw new IllegalArgumentException("No such parent message.");
+            throw new NoSuchDataException("No such parent message.");
         }
 
         if (request.parentMessageId() != null && !request.isReply()) {
-            throw new IllegalArgumentException("No reply message.");
+            throw new NoSuchDataException("No reply message.");
         }
 
         Message updatedMessage = messageRepository.findById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException("No such message."));
+                .orElseThrow(() -> new NoSuchDataException("No such message."));
         updatedMessage.update(request.content(), request.isReply(), request.parentMessageId());
         messageRepository.save(updatedMessage);
 
@@ -172,7 +172,7 @@ public class BasicMessageService implements MessageService {
     public void deleteMessageById(UUID id) {
 
         binaryContentRepository.deleteAllByIdIn(messageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No such message."))
+                .orElseThrow(() -> new NoSuchDataException("No such message."))
                 .getBinaryContentIdList().stream().toList());
         messageRepository.deleteById(id);
 

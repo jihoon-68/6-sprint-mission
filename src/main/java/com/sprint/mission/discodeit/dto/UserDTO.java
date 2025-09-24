@@ -9,12 +9,12 @@ public class UserDTO {
 
     //login request DTO
     @Builder
-    public record LoginRequest(String nickname, String password) {
+    public record LoginCommand(String nickname, String password) {
 
     }
 
     @Builder
-    public record CreateUserRequest(
+    public record CreateUserCommand(
             String nickname,
             String email,
             String password,
@@ -31,7 +31,7 @@ public class UserDTO {
             return password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$");
         }
 
-        public CreateUserRequest {
+        public CreateUserCommand {
 
             if (!isPasswordValid(password) || !isEmailValid(email) || nickname.isBlank()) {
                 throw new IllegalArgumentException("Invalid user data.");
@@ -58,7 +58,7 @@ public class UserDTO {
 
     //user update를 위한 Request DTO
     @Builder
-    public record UpdateUserRequest(
+    public record UpdateUserCommand(
             UUID id,
             String nickname,
             String email,
@@ -79,7 +79,7 @@ public class UserDTO {
             return password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$");
         }
 
-        public UpdateUserRequest {
+        public UpdateUserCommand {
 
             if (!isPasswordValid(newPassword) || !isEmailValid(email) || nickname.isBlank()) {
                 throw new IllegalArgumentException("Invalid user data.");

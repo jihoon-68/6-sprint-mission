@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.enums.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -11,11 +10,12 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class BasicChannelServiceTest {
 
     @Mock
@@ -34,11 +35,6 @@ class BasicChannelServiceTest {
 
     @InjectMocks
     private BasicChannelService basicChannelService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     private Channel publicChannel() {
         return new Channel.Builder()
@@ -52,7 +48,7 @@ class BasicChannelServiceTest {
     void createChannel_success() {
         
         //given
-        ChannelDTO.CreatePublicChannelRequest request = ChannelDTO.CreatePublicChannelRequest.builder()
+        ChannelDTO.CreatePublicChannelCommand request = ChannelDTO.CreatePublicChannelCommand.builder()
                 .channelName("general")
                 .category(ChannelType.TEXT)
                 .isVoiceChannel(false)
@@ -70,7 +66,7 @@ class BasicChannelServiceTest {
     void createChannel_invalid_throws() {
         
         //given
-        ChannelDTO.CreatePublicChannelRequest request = ChannelDTO.CreatePublicChannelRequest.builder()
+        ChannelDTO.CreatePublicChannelCommand request = ChannelDTO.CreatePublicChannelCommand.builder()
                 .channelName("")
                 .category(null)
                 .isVoiceChannel(false)
@@ -87,7 +83,7 @@ class BasicChannelServiceTest {
         //given
         UUID u1 = UUID.randomUUID();
         UUID u2 = UUID.randomUUID();
-        ChannelDTO.CreatePrivateChannelRequest request = ChannelDTO.CreatePrivateChannelRequest.builder()
+        ChannelDTO.CreatePrivateChannelCommand request = ChannelDTO.CreatePrivateChannelCommand.builder()
                 .category(ChannelType.TEXT)
                 .userIdList(List.of(u1, u2))
                 .build();
@@ -104,7 +100,7 @@ class BasicChannelServiceTest {
     void createPrivateChannel_invalid_throws() {
 
         //given
-        ChannelDTO.CreatePrivateChannelRequest request = ChannelDTO.CreatePrivateChannelRequest.builder()
+        ChannelDTO.CreatePrivateChannelCommand request = ChannelDTO.CreatePrivateChannelCommand.builder()
                 .category(null)
                 .userIdList(new ArrayList<>())
                 .build();
@@ -197,7 +193,7 @@ class BasicChannelServiceTest {
         when(channelRepository.findById(channel.getId())).thenReturn(Optional.of(channel));
 
         //when
-        ChannelDTO.UpdateChannelRequest request = ChannelDTO.UpdateChannelRequest.builder()
+        ChannelDTO.UpdateChannelCommand request = ChannelDTO.UpdateChannelCommand.builder()
                 .id(channel.getId())
                 .channelName("general-2")
                 .category(ChannelType.TEXT)
@@ -221,7 +217,7 @@ class BasicChannelServiceTest {
         when(channelRepository.findById(privateChannel.getId())).thenReturn(Optional.of(privateChannel));
 
         //when
-        ChannelDTO.UpdateChannelRequest request = ChannelDTO.UpdateChannelRequest.builder()
+        ChannelDTO.UpdateChannelCommand request = ChannelDTO.UpdateChannelCommand.builder()
                 .id(privateChannel.getId())
                 .channelName("x")
                 .category(ChannelType.TEXT)
@@ -240,7 +236,7 @@ class BasicChannelServiceTest {
         when(channelRepository.existById(id)).thenReturn(false);
 
         //when
-        ChannelDTO.UpdateChannelRequest reqMissing = ChannelDTO.UpdateChannelRequest.builder()
+        ChannelDTO.UpdateChannelCommand reqMissing = ChannelDTO.UpdateChannelCommand.builder()
                 .id(id)
                 .channelName("name")
                 .category(ChannelType.TEXT)
@@ -248,7 +244,7 @@ class BasicChannelServiceTest {
                 .build();
         Assertions.assertThrows(IllegalArgumentException.class, () -> basicChannelService.updateChannel(reqMissing));
 
-        ChannelDTO.UpdateChannelRequest invalid = ChannelDTO.UpdateChannelRequest.builder()
+        ChannelDTO.UpdateChannelCommand invalid = ChannelDTO.UpdateChannelCommand.builder()
                 .id(UUID.randomUUID())
                 .channelName("")
                 .category(null)

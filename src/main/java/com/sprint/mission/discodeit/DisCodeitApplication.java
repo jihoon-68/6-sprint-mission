@@ -3,9 +3,6 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.enums.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -13,7 +10,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 @RequiredArgsConstructor
@@ -23,15 +19,16 @@ public class DisCodeitApplication {
 
 	public static void main(String[] args) {
 
-        ConfigurableApplicationContext context = SpringApplication.run(DisCodeitApplication.class, args);
+        SpringApplication.run(DisCodeitApplication.class, args);
+        //ConfigurableApplicationContext context = SpringApplication.run(DisCodeitApplication.class, args);
 
-        UserService userService = context.getBean(UserService.class);
-        ChannelService channelService = context.getBean(ChannelService.class);
-        MessageService messageService = context.getBean(MessageService.class);
+        //UserService userService = context.getBean(UserService.class);
+        //ChannelService channelService = context.getBean(ChannelService.class);
+        //MessageService messageService = context.getBean(MessageService.class);
 
-        testUserService(userService);
-        testChannelService(channelService);
-        testMessageService(userService, channelService, messageService);
+        //testUserService(userService);
+        //testChannelService(channelService);
+        //testMessageService(userService, channelService, messageService);
 
 	}
 
@@ -39,13 +36,13 @@ public class DisCodeitApplication {
 
         //유저 등록
         System.out.println("유저 등록");
-        UserDTO.CreateUserRequest userOne = UserDTO.CreateUserRequest.builder()
+        UserDTO.CreateUserCommand userOne = UserDTO.CreateUserCommand.builder()
                 .nickname("Kim")
                 .email("kimjaewon@gmail.com")
                 .password(strongPassword)
                 .description("Hi")
                 .build();
-        UserDTO.CreateUserRequest userTwo = UserDTO.CreateUserRequest.builder()
+        UserDTO.CreateUserCommand userTwo = UserDTO.CreateUserCommand.builder()
                 .nickname("Kim2")
                 .email("kimjaewon2@gmail.com")
                 .password(strongPassword)
@@ -66,7 +63,7 @@ public class DisCodeitApplication {
 
         //유저 수정
         System.out.println("유저 수정");
-        UserDTO.UpdateUserRequest requestOne = UserDTO.UpdateUserRequest.builder()
+        UserDTO.UpdateUserCommand requestOne = UserDTO.UpdateUserCommand.builder()
                 .id(userService.findUserByEmail(userOne.email())
                         .orElseThrow((IllegalArgumentException::new)).id())
                 .nickname(userOne.nickname())
@@ -116,12 +113,12 @@ public class DisCodeitApplication {
                 .category(ChannelType.VOICE)
                 .isVoiceChannel(true)
                 .build();*/
-        ChannelDTO.CreatePublicChannelRequest channelOne = ChannelDTO.CreatePublicChannelRequest.builder()
+        ChannelDTO.CreatePublicChannelCommand channelOne = ChannelDTO.CreatePublicChannelCommand.builder()
                 .channelName("channelOne")
                 .category(ChannelType.TEXT)
                 .isVoiceChannel(false)
                 .build();
-        ChannelDTO.CreatePublicChannelRequest channelTwo = ChannelDTO.CreatePublicChannelRequest.builder()
+        ChannelDTO.CreatePublicChannelCommand channelTwo = ChannelDTO.CreatePublicChannelCommand.builder()
                 .channelName("channelTwo")
                 .category(ChannelType.VOICE)
                 .isVoiceChannel(true)
@@ -143,7 +140,7 @@ public class DisCodeitApplication {
 
         //채널 수정
         System.out.println("채널 수정");
-        ChannelDTO.UpdateChannelRequest requestTwo = ChannelDTO.UpdateChannelRequest.builder()
+        ChannelDTO.UpdateChannelCommand requestTwo = ChannelDTO.UpdateChannelCommand.builder()
                 .id(channelService.findAllChannels().stream()
                         .filter(channel -> channel.channelName().equals(channelTwo.channelName()))
                         .findFirst().orElseThrow(() -> new IllegalArgumentException("No such channels")).id())
@@ -187,13 +184,13 @@ public class DisCodeitApplication {
 
         //메시지 등록
         System.out.println("메시지 등록");
-        UserDTO.CreateUserRequest userOne = UserDTO.CreateUserRequest.builder()
+        UserDTO.CreateUserCommand userOne = UserDTO.CreateUserCommand.builder()
                 .nickname("Kim")
                 .email("kimjaewon@gmail.com")
                 .password(strongPassword)
                 .description("Hi")
                 .build();
-        UserDTO.CreateUserRequest userTwo = UserDTO.CreateUserRequest.builder()
+        UserDTO.CreateUserCommand userTwo = UserDTO.CreateUserCommand.builder()
                 .nickname("Kim2")
                 .email("kimjaewon2@gmail.com")
                 .password(strongPassword)
@@ -201,13 +198,13 @@ public class DisCodeitApplication {
                 .build();
         userService.createUser(userOne);
         userService.createUser(userTwo);
-        ChannelDTO.CreatePublicChannelRequest channelOne = ChannelDTO.CreatePublicChannelRequest.builder()
+        ChannelDTO.CreatePublicChannelCommand channelOne = ChannelDTO.CreatePublicChannelCommand.builder()
                 .channelName("channelOne")
                 .category(ChannelType.DM)
                 .isVoiceChannel(false)
                 .build();
         channelService.createChannel(channelOne);
-        ChannelDTO.CreatePublicChannelRequest channelTwo = ChannelDTO.CreatePublicChannelRequest.builder()
+        ChannelDTO.CreatePublicChannelCommand channelTwo = ChannelDTO.CreatePublicChannelCommand.builder()
                 .channelName("channelTwo")
                 .category(ChannelType.VOICE)
                 .isVoiceChannel(true)
@@ -233,7 +230,7 @@ public class DisCodeitApplication {
                 .isReply(true)
                 .parentMessageId(messageOne.getId())
                 .build();*/
-        MessageDTO.CreateMessageRequest messageOne = MessageDTO.CreateMessageRequest.builder()
+        MessageDTO.CreateMessageCommand messageOne = MessageDTO.CreateMessageCommand.builder()
                 .userId(userService.findUserByEmail(userOne.email())
                         .orElseThrow((IllegalArgumentException::new)).id())
                 .channelId(channelService.findAllChannels().stream()
@@ -244,7 +241,7 @@ public class DisCodeitApplication {
                 .parentMessageId(null)
                 .build();
         messageService.createMessage(messageOne);
-        MessageDTO.CreateMessageRequest messageTwo = MessageDTO.CreateMessageRequest.builder()
+        MessageDTO.CreateMessageCommand messageTwo = MessageDTO.CreateMessageCommand.builder()
                 .userId(userService.findUserByEmail(userTwo.email())
                         .orElseThrow((IllegalArgumentException::new)).id())
                 .channelId(channelService.findAllChannels().stream()
@@ -269,7 +266,7 @@ public class DisCodeitApplication {
         MessageDTO.FindMessageResult findMessageResult = messageService.findMessagesByChannelId(channelService.findAllChannels().stream()
                 .filter(channel -> channel.channelName().equals(channelOne.channelName()))
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("No such channels")).id()).get(0);
-        MessageDTO.UpdateMessageRequest requestOne = MessageDTO.UpdateMessageRequest.builder()
+        MessageDTO.UpdateMessageCommand requestOne = MessageDTO.UpdateMessageCommand.builder()
                 .id(findMessageResult.id())
                 .content("messageOne edited")
                 .isReply(messageOne.isReply())
