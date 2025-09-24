@@ -44,12 +44,12 @@ public class BasicUserStatusService implements UserStatusService {
   public List<UserStatus> findAll() {
     return userStatusRepository.findAll();
   }
-  
+
   @Override
   public UserStatus update(UUID userId, UpdateUserStatus updateUserStatus) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NoSuchElementException(
-            "UserStatus with userId " + userId + "not found"));
+            "UserStatus with userId " + userId + " not found"));
     userStatus.update(updateUserStatus.newLastActiveAt());
     return userStatusRepository.save(userStatus);
   }

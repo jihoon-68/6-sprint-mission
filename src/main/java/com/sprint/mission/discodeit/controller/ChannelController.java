@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.channeldto.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channeldto.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channeldto.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channeldto.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +24,12 @@ public class ChannelController {
   private final ChannelService channelService;
 
   @GetMapping
-  public ResponseEntity<List<Channel>> readChannelByUserId(
+  public ResponseEntity<List<ChannelResponse>> readChannelByUserId(
       @RequestParam UUID userId) {
-    List<Channel> channel = channelService.findAllByUserId(userId);
-    return ResponseEntity.ok(channel);
+    List<ChannelResponse> responses = channelService.findAllByUserId(userId);
+    return ResponseEntity.ok(responses);
   }
 
-  //todo public,private 생성
   @PostMapping("/public")
   public ResponseEntity<Channel> createPublicChannel(
       @RequestBody CreatePublicChannelRequest request
@@ -42,6 +43,7 @@ public class ChannelController {
       @RequestBody @Valid CreatePrivateChannelRequest request
   ) {
     Channel channel = channelService.createPrivate(request);
+
     return ResponseEntity.status(HttpStatus.CREATED).body(channel);
   }
 

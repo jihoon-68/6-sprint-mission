@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.userdto.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.userdto.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.userdto.UserResponse;
 import com.sprint.mission.discodeit.dto.userstatusdto.UpdateUserStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -28,9 +29,13 @@ public class UserController {
   private final UserStatusService userStatusService;
 
   @GetMapping
-  public ResponseEntity<List<User>> readUser() {
+  public ResponseEntity<List<UserResponse>> readUser() {
     List<User> userList = userService.findAll();
-    return ResponseEntity.ok(userList);
+    List<UserResponse> response = userList.stream()
+        .map(UserResponse::fromEntity)
+        .toList();
+    return ResponseEntity.ok(response);
+
   }
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
@@ -44,7 +49,8 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
-  @PatchMapping("/{userId}")
+  @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+      MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<User> updateUser(
       @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") @Valid UpdateUserRequest request,
@@ -68,6 +74,7 @@ public class UserController {
       @PathVariable UUID userId,
       @RequestBody UpdateUserStatus updateUserStatus
   ) {
+    System.out.println(userId);
     UserStatus updated = userStatusService.update(userId, updateUserStatus);
     return ResponseEntity.ok(updated);
   }

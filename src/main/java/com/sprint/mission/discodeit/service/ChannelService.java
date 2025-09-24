@@ -14,7 +14,7 @@ public interface ChannelService {
 
   Channel find(UUID channelId);
 
-  List<Channel> findAllByUserId(UUID channelId);
+  List<ChannelResponse> findAllByUserId(UUID channelId);
 
   Channel update(UUID channelId, UpdateChannelRequest updatePublicChannelDto);
 
