@@ -1,5 +1,8 @@
-package com.sprint.mission.discodeit.dto.Message;
+package com.sprint.mission.discodeit.DTO.Message;
 
-public record MessageUpdateRequest(
-        String newContent
+import java.util.List;
+import java.util.UUID;
+
+public record UpdateMessageDTO(
+        String Content
 ) {}

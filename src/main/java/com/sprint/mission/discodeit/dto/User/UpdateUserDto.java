@@ -9,7 +9,7 @@ public record UpdateUserDTO(
         UUID profileId,
         String password
 ) {
-    static public UpdateUserDTO getFileInput(UUID profileId) {
+    public static UpdateUserDTO getFileInput(UUID profileId) {
         return new UpdateUserDTO(
                 null,
                 null,
