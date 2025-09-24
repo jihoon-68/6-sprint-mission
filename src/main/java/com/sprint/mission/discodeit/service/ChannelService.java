@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    Channel create(CreateChannelDto createChannelDto);
-    Channel find(FindChannelDto findChannelDto);
-    List<Channel> findAllByUserId(FindAllChannelDto findAllChannelDto);
-    Channel update(UpdateChannelDto updatePublicChannelDto);
+    Channel create(CreateChannel createChannel);
+    Channel find(UUID channelId);
+    List<Channel> findAllByUserId(UUID channelId);
+    Channel update(UUID channelId, UpdateChannel updatePublicChannelDto);
     void delete(UUID channelId);
 }

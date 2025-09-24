@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Repository
 @ConditionalOnProperty(
         prefix = "discodeit.repository",
@@ -29,7 +31,8 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        System.out.println("File*Repository 실행");
+
+        log.info("File*Repository 실행");
 
         FileInitSaveLoad.init(directory);
 
@@ -45,6 +48,13 @@ public class FileUserRepository implements UserRepository {
                 .stream()
                 .filter(u->u.getId().equals(id))
                 .findAny();
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return this.findAll().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
     @Override

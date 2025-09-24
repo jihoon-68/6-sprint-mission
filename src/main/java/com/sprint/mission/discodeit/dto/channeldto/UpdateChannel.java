@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.dto.channeldto;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.UUID;
 
-public record UpdateChannelDto(
+public record UpdateChannel(
         ChannelType type,       // public만 가능
-        UUID channelId,
-        String newName,
-        String newDescription
+        @NotBlank UUID channelId,
+        @NotBlank String newName,
+        @NotBlank String newDescription
 ) {}

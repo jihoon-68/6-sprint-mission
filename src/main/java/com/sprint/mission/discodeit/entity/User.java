@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.Serializable;
@@ -23,7 +24,7 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
-    private BinaryContent binaryContent;
+    private boolean online;
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
@@ -32,25 +33,25 @@ public class User implements Serializable {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.online = true;
     }
 
-    public User(String username, String email, String password, BinaryContent binaryContent){
+    public User(String username, String email, String password, UUID profileId){
         this(username, email, password);
-        this.profileId = binaryContent.getId();
-        this.binaryContent = binaryContent;
+        this.profileId = profileId;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword, String imagePath) {
+    public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
+        if (!newUsername.equals(this.username)) {
             this.username = newUsername;
             anyValueUpdated = true;
         }
-        if (newEmail != null && !newEmail.equals(this.email)) {
+        if (!newEmail.equals(this.email)) {
             this.email = newEmail;
             anyValueUpdated = true;
         }
-        if (newPassword != null && !newPassword.equals(this.password)) {
+        if (!newPassword.equals(this.password)) {
             this.password = newPassword;
             anyValueUpdated = true;
         }
@@ -59,5 +60,9 @@ public class User implements Serializable {
             this.updatedAt = Instant.now().getEpochSecond();
         }
 
+    }
+
+    public void update(boolean online){
+        this.online = online;
     }
 }

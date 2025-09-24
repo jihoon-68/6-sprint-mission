@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
+@Slf4j
 @ConditionalOnProperty(
         prefix = "discodeit.repository",
         name = "type",
@@ -23,7 +25,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        System.out.println("JCF*Repository 실행");
+        log.info("JCF*Repository 실행");
 
         this.userMap.put(user.getId(), user);
         return user;
@@ -33,6 +35,14 @@ public class JCFUserRepository implements UserRepository {
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(this.userMap.get(id));
     }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return this.findAll().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
 
     @Override
     public List<User> findAll() {

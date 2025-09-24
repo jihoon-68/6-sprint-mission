@@ -34,8 +34,17 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public List<ReadStatus> findAll() {
-        return this.readStatusMap.values().stream().toList();
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return this.readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .toList();
+    }
+
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return this.readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
@@ -46,5 +55,11 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     @Override
     public void deleteById(UUID id) {
         this.readStatusMap.remove(id);
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 }

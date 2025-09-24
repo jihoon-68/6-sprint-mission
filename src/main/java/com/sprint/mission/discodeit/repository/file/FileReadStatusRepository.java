@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,16 +39,19 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public Optional<ReadStatus> findById(UUID id) {
-        return findAll()
-                .stream()
-                .filter(readStatus -> readStatus.getId().equals(id))
-                .findAny();
+    public Optional<ReadStatus> findById(UUID Id) {
+        return FileInitSaveLoad.<ReadStatus>load(directory).stream().filter(readStatus -> readStatus.getId().equals(Id)).findAny();
+    }
+
+
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return FileInitSaveLoad.<ReadStatus>load(directory).stream().filter(readStatus -> readStatus.getChannelId().equals(userId)).toList();
     }
 
     @Override
-    public List<ReadStatus> findAll() {
-        return FileInitSaveLoad.<ReadStatus>load(directory);
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return FileInitSaveLoad.<ReadStatus>load(directory).stream().filter(readStatus -> readStatus.getChannelId().equals(channelId)).toList();
     }
 
     @Override
@@ -64,5 +68,11 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(readStatus -> this.deleteById(readStatus.getId()));
     }
 }

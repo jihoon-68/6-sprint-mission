@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.CreateAttachmentImageDto;
-import com.sprint.mission.discodeit.dto.binarycontent.CreateProfileImageDto;
+import com.sprint.mission.discodeit.dto.binarycontent.CreateAttachmentImage;
+import com.sprint.mission.discodeit.dto.binarycontent.CreateProfileImage;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -19,13 +19,13 @@ public class BasicBinaryContentService implements BinaryContentService {
     public final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContent createAttachmentImage(CreateAttachmentImageDto createAttachmentImageDto){
-        BinaryContent binaryContent = new BinaryContent(createAttachmentImageDto.messageId(), createAttachmentImageDto.imagePath(),true);
+    public BinaryContent createAttachmentImage(CreateAttachmentImage createAttachmentImage){
+        BinaryContent binaryContent = new BinaryContent(createAttachmentImage.bytes());
         return binaryContentRepository.save(binaryContent);
     }
     @Override
-    public BinaryContent createProfileImage(CreateProfileImageDto createProfileImageDto){
-        BinaryContent binaryContent = new BinaryContent(createProfileImageDto.userId(), createProfileImageDto.imagePath());
+    public BinaryContent createProfileImage(CreateProfileImage createProfileImage){
+        BinaryContent binaryContent = new BinaryContent(createProfileImage.bytes());
         return binaryContentRepository.save(binaryContent);
     }
     @Override

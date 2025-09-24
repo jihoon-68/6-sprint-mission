@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.dto.binarycontent;
 
 import java.util.UUID;
 
-public record CreateProfileImageDto (
+public record CreateProfileImage(
         UUID userId,
-        String imagePath
+        byte[] bytes
 ){
 }
 

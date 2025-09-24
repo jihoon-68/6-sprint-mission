@@ -13,8 +13,8 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     //
     private String content;
     //
@@ -22,29 +22,25 @@ public class Message implements Serializable {
     private UUID authorId;
     private List<UUID> attachmentIds;
 
-    public Message(String content, UUID channelId, UUID authorId) {
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
         //
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
-    }
-
-    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds){
-        this(content, channelId, authorId);
         this.attachmentIds = attachmentIds;
     }
 
     public void update(String newContent) {
         boolean anyValueUpdated = false;
-        if (newContent != null && !newContent.equals(this.content)) {
+        if (!newContent.equals(this.content)) {
             this.content = newContent;
             anyValueUpdated = true;
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            this.updatedAt = Instant.now();
         }
     }
 }
