@@ -29,7 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600); // 6. Pre-flight 요청의 결과를 캐시할 시간을 초 단위로 지정합니다.
     }
 
-	/* 설명. 파일 업로드 경로를 설정하는 메서드 
+	/* 설명. 파일 업로드 경로를 설정하는 메서드
 	 *  WebMvcConfigurer 인터페이스의 addResourceHandlers 메서드를 오버라이딩하여 파일 업로드 경로를 설정한다.
 	 * */
     @Override
