@@ -17,7 +17,7 @@ public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping()
+    @GetMapping()
     public ResponseEntity<Object> findAll(@RequestBody List<UUID> ids) {
         try {
             return ResponseEntity.ok().body(binaryContentService.findAllByIdIn(ids));
@@ -28,7 +28,7 @@ public class BinaryContentController {
         }
     }
 
-    @RequestMapping("/{binaryContentId}")
+    @GetMapping("/{binaryContentId}")
     public ResponseEntity<Object> findById(@PathVariable UUID binaryContentId) {
         try {
             return ResponseEntity.ok().body(binaryContentService.find(binaryContentId));
