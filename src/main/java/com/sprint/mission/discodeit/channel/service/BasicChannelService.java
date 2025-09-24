@@ -49,8 +49,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Response getChannelByChannelTypeAndId(ChannelType channelType, UUID id) {
-        return switch (channelType) {
+    public Response getChannelByChannelTypeAndId(String type, UUID id) {
+        return switch (Enum.valueOf(ChannelType.class, type)) {
             case PUBLIC -> {
                 Channel channel = channelRepository.findPublicById(id);
                 Instant lastMessageAt = messageRepository.maxCreatedAtByChannelId(channel.getId());
@@ -64,8 +64,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Set<Response> getChannelsByChannelType(ChannelType channelType) {
-        return switch (channelType) {
+    public Set<Response> getChannelsByChannelType(String type) {
+        return switch (Enum.valueOf(ChannelType.class, type)) {
             case PUBLIC -> {
                 Iterable<Channel> channels = channelRepository.findAllPublic();
                 yield StreamSupport.stream(channels.spliterator(), false)

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.channel.controller;
 
+import com.sprint.mission.discodeit.channel.ChannelDto.Request;
 import com.sprint.mission.discodeit.channel.ChannelDto.Request.PublicRequest;
 import com.sprint.mission.discodeit.channel.ChannelDto.Response;
-import com.sprint.mission.discodeit.channel.domain.Channel.ChannelType;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -13,35 +13,35 @@ import java.util.Set;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/public-channels")
-public class PublicChannelController {
+@RequestMapping("/channels")
+public class ChannelController {
 
     private final ChannelService channelService;
 
-    public PublicChannelController(ChannelService channelService) {
+    public ChannelController(ChannelService channelService) {
         this.channelService = channelService;
     }
 
     @PostMapping
-    public ResponseEntity<Response> createPublicChannel(@RequestBody @Valid PublicRequest request) {
+    public ResponseEntity<Response> createChannel(@RequestBody @Valid Request request) {
         Response body = channelService.createChannel(request);
         return new ResponseEntity<>(body, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<Set<Response>> getPublicChannels() {
-        Set<Response> body = channelService.getChannelsByChannelType(ChannelType.PUBLIC);
+    public ResponseEntity<Set<Response>> getChannels(@RequestParam String type) {
+        Set<Response> body = channelService.getChannelsByChannelType(type);
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response> getPublicChannelById(@PathVariable UUID id) {
-        Response body = channelService.getChannelByChannelTypeAndId(ChannelType.PUBLIC, id);
+    public ResponseEntity<Response> getChannelById(@PathVariable UUID id, @RequestParam String type) {
+        Response body = channelService.getChannelByChannelTypeAndId(type, id);
         return ResponseEntity.ok(body);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Response> updatePublicChannelById(
+    public ResponseEntity<Response> updateChannelById(
             @PathVariable UUID id,
             @RequestBody @Valid PublicRequest request
     ) {
@@ -50,7 +50,7 @@ public class PublicChannelController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePublicChannelById(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteChannelById(@PathVariable UUID id) {
         channelService.deleteChannelById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

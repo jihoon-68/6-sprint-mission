@@ -9,7 +9,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = {PublicChannelController.class, PrivateChannelController.class})
+@RestControllerAdvice(assignableTypes = ChannelController.class)
 public class ChannelExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ChannelExceptionHandler.class);

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.channel;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,6 +15,15 @@ public final class ChannelDto {
     private ChannelDto() {
     }
 
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.PROPERTY,
+            property = "type"
+    )
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = Request.PublicRequest.class, name = "PUBLIC"),
+            @JsonSubTypes.Type(value = Request.PrivateRequest.class, name = "PRIVATE")
+    })
     public sealed interface Request {
 
         record PublicRequest(@NotBlank String channelName, @NotNull String description) implements Request {
