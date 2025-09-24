@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.ChannelDto.ChannelCreatePublicDto;
-import com.sprint.mission.discodeit.dto.UserDto.UserCreateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;

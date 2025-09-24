@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.ChannelDto.ChannelCreatePrivateDto;
-import com.sprint.mission.discodeit.dto.ChannelDto.ChannelCreatePublicDto;
-import com.sprint.mission.discodeit.dto.MessageDto.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.MessageDto.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.MessageDto.ReadStatusCreateDto;
-import com.sprint.mission.discodeit.dto.UserDto.LoginDto;
-import com.sprint.mission.discodeit.dto.UserDto.UserCreateDto;
-import com.sprint.mission.discodeit.dto.UserDto.UserStatusCreateDto;
-import com.sprint.mission.discodeit.dto.UserDto.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
+import com.sprint.mission.discodeit.dto.message.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.ReadStatusCreateDto;
+import com.sprint.mission.discodeit.dto.user.LoginDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserStatusCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -122,7 +122,7 @@ public class JavaApplication {
         Message msg2 = messageService.create("반갑습니다", privateChannel.getId(), user2.getId());
         System.out.println("메시지 2개 생성 완료");
 
-        //첨부파일 포함 메시지(사용자가 실제파일을 업로드 했다고 가정하고 테스트할때, 여기에 첨부파일 설정 하는 방법 해결못함)
+        //첨부파일 포함 메시지
         BinaryContentDto attachmentDto = new BinaryContentDto(user1.getId(), "attach.jpeg", "첨부파일",new byte[200000]);
         CreateMessageRequest requestAttachment = new CreateMessageRequest(publicChannel.getId(), user1.getId(), "첨부파일 있는 메세지", List.of(attachmentDto));
         Message attachment = messageService.create(requestAttachment);

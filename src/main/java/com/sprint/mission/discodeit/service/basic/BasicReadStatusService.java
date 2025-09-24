@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.MessageDto.ReadStatusCreateDto;
-import com.sprint.mission.discodeit.dto.MessageDto.ReadStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.message.ReadStatusCreateDto;
+import com.sprint.mission.discodeit.dto.message.ReadStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
