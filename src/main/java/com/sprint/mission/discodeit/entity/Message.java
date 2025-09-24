@@ -1,46 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-/**
- * 객체 클래스 Message
- * content: String
- * user: User
- * channel: Channel
- * type: MessageType(TEXT, VIDEO, IMAGE, FILE)
- */
-public class Message extends Common {
-    private String content;
-    private UUID userId;
-    private UUID channelId;
-    private MessageType type;
+@Getter
+public class Message implements Serializable {
 
-    // Constructor
-    public Message(String content, UUID userId, UUID channelId, MessageType type) {
-        super();
-        this.content = content;
-        this.userId = userId;
-        this.channelId = channelId;
-        this.type = type;
+  private static final long serialVersionUID = 1L;
+
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private String content;
+  //
+  private UUID channelId;
+  private UUID authorId;
+  private List<UUID> attachmentIds;
+
+  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.content = content;
+    this.channelId = channelId;
+    this.authorId = authorId;
+    this.attachmentIds = attachmentIds;
+  }
+
+  public void update(String newContent) {
+    boolean anyValueUpdated = false;
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
+      anyValueUpdated = true;
     }
 
-    // Getter
-    public String getContent() { return content; }
-    public UUID getUser() { return userId; }
-    public UUID getChannel() { return channelId; }
-    public MessageType getType() { return type; }
-
-    // MessageType enum
-    public enum MessageType {
-        TEXT,
-        VIDEO,
-        IMAGE,
-        FILE
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    // Update
-    public void update(String content) {
-        this.content = content != null ? content : this.content;
-        this.setUpdatedAt(System.currentTimeMillis());
-    }
+  }
 }

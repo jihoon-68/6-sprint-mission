@@ -1,39 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-/**
- * 객체 클래스 Channel
- * title: String
- * description: String
- * type: ChannelType(TEXT, VOICE)
- */
-public class Channel extends Common {
-    private String title;
-    private String description;
-    private ChannelType type;
+import lombok.Getter;
 
-    // Constructor
-    public Channel(String title, String description, ChannelType type) {
-        super();
-        this.title = title;
-        this.description = description;
-        this.type = type;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+public class Channel implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private ChannelType type;
+  private String name;
+  private String description;
+
+  public Channel(ChannelType type, String name, String description) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
+
+  public void update(String newName, String newDescription) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+      anyValueUpdated = true;
     }
 
-    // Getter
-    public String getTitle() { return title; }
-    public String getDescription() { return description; }
-    public ChannelType getType() { return type; }
-
-    // enum
-    public enum ChannelType {
-        TEXT,
-        VOICE
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    // Update
-    public void update(String title, String description) {
-        this.title = title != null ? title : this.title;
-        this.description = description != null ? description : this.description;
-        this.setUpdatedAt(System.currentTimeMillis());
-    }
+  }
 }

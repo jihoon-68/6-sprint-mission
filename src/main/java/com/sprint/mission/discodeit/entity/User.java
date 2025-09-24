@@ -1,45 +1,56 @@
 package com.sprint.mission.discodeit.entity;
 
-/**
- * 객체 클래스 User
- * username: String
- * email: String
- * status: UserStatus(ONLINE, OFFLINE, AWAY, DO_NOT_DISTURB)
- */
-public class User extends Common {
-    private String username;
-    private String email;
-    private String password;
-    private UserStatus status;
+import lombok.Getter;
 
-    // Constructor
-    public User(String username, String email, String password) {
-        super();
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.status = UserStatus.ONLINE;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+public class User implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private String username;
+  private String email;
+  private String password;
+  private UUID profileId;     // BinaryContent
+
+  public User(String username, String email, String password, UUID profileId) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profileId = profileId;
+  }
+
+  public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+    boolean anyValueUpdated = false;
+    if (newUsername != null && !newUsername.equals(this.username)) {
+      this.username = newUsername;
+      anyValueUpdated = true;
+    }
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
+      anyValueUpdated = true;
+    }
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
+      anyValueUpdated = true;
+    }
+    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+      this.profileId = newProfileId;
+      anyValueUpdated = true;
     }
 
-    // Getter
-    public String getUsername() { return username; }
-    public String getEmail() { return email; }
-    public String getPassword() { return password; }
-    public UserStatus getStatus() { return status; }
-
-    // UserStatus Enum
-    public enum UserStatus {
-        ONLINE,
-        OFFLINE,
-        AWAY,
-        DO_NOT_DISTURB
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    // Update
-    public void update(String username, String email, String password) {
-        this.username = username != null ? username : this.username;
-        this.email = email != null ? email : this.email;
-        this.password = password != null ? password : this.password;
-        this.setUpdatedAt(System.currentTimeMillis());
-    }
+  }
 }
