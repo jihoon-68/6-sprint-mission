@@ -6,26 +6,35 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-//Channel별 마지막 들어간 시간
 @Getter
 public class ReadStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private UUID userId;
-    private Instant updateAt;
-    private Instant createAt;
-    private Instant readAt;
     private UUID channelId;
-    private static final long serializableId = 1L;
+    private Instant lastReadAt;
 
-    public ReadStatus(UUID userId, UUID channelId) {
-        this.createAt = Instant.now();
-        id =  UUID.randomUUID();
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.userId = userId;
         this.channelId = channelId;
+        this.lastReadAt = lastReadAt;
     }
 
-    public void updateReadAt() {
-        this.readAt = Instant.now();
-        updateAt = Instant.now();
+    public void update(Instant newLastReadAt) {
+        boolean anyValueUpdated = false;
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
