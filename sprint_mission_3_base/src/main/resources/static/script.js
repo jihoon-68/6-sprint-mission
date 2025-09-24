@@ -1,8 +1,8 @@
 // API endpoints
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = '/api';
 const ENDPOINTS = {
-    USERS: `${API_BASE_URL}/users/findAll`,
-    BINARY_CONTENT: `${API_BASE_URL}/binary-content/find`
+    USERS: `${API_BASE_URL}/user/findAll`,
+    BINARY_CONTENT: `${API_BASE_URL}/binaryContent/find`
 };
 
 // Initialize the application
