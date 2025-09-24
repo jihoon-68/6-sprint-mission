@@ -17,13 +17,6 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContent create(CreateBinaryContentUserDTO createBinaryContentUserDTO) {
-
-        BinaryContent binaryContent = new BinaryContent(createBinaryContentUserDTO.userId(),createBinaryContentUserDTO.filePath());
-        return binaryContentRepository.save(binaryContent);
-    }
-
-    @Override
     public BinaryContent findById(UUID id) {
         return binaryContentRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException("BinaryContent with id: " + id + " not found"));
