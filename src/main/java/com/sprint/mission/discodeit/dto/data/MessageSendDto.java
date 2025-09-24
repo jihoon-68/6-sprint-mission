@@ -10,18 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
+@AllArgsConstructor
 public class MessageSendDto {
+
     private MessageCreateRequest messageCreateRequest;
     private List<BinaryContentCreateRequest> binaryContentCreateRequests;
 
-    public MessageSendDto(MessageCreateRequest messageCreateRequest){
-        this.messageCreateRequest = messageCreateRequest;
-        this.binaryContentCreateRequests = new ArrayList<>();
-    }
-
-    public MessageSendDto(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests){
-        this.messageCreateRequest = messageCreateRequest;
-        this.binaryContentCreateRequests = binaryContentCreateRequests;
-    }
 }

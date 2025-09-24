@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
+
     private final BinaryContentService binaryContentService;
 
-    @RequestMapping("/binary/find")
+    @RequestMapping()
     public ResponseEntity<Object> findAll(@RequestBody List<UUID> ids) {
         try {
             return ResponseEntity.ok().body(binaryContentService.findAllByIdIn(ids));
@@ -26,11 +28,11 @@ public class BinaryContentController {
         }
     }
 
-    @RequestMapping("/api/binaryContent/find")
-    public ResponseEntity<Object> findById(@RequestParam UUID id) {
+    @RequestMapping("/{binaryContentId}")
+    public ResponseEntity<Object> findById(@PathVariable UUID binaryContentId) {
         try {
-            return ResponseEntity.ok().body(binaryContentService.find(id));
-        } catch (NoSuchElementException e){
+            return ResponseEntity.ok().body(binaryContentService.find(binaryContentId));
+        } catch (NoSuchElementException e) {
             return ResponseEntity.badRequest().body("Not found: " + e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
