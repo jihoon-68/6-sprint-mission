@@ -2,13 +2,13 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.DTO.UserStatus.CreateUserStatusDTO;
 import com.sprint.mission.discodeit.DTO.UserStatus.UpdateUserStatusDTO;
+import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.stereotype.Service;
 
 import java.util.DuplicateFormatFlagsException;
@@ -52,14 +52,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void updateByUserId(UpdateUserStatusDTO  updateUserStatusDTO) {
-        UserStatus userStatus = userStatusRepository.findByUserId(updateUserStatusDTO.id())
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(()-> new NoSuchElementException("user not found"));
-        if(userStatus.getId().equals(updateUserStatusDTO.userId())) {
-            return;
-        }
-        userStatus.update(updateUserStatusDTO);
-        userStatusRepository.save(userStatus);
+        userStatus.update(UpdateUserStatusDTO.getUserStatus(userId,userStatusUpdateRequest.newLastActiveAt()));
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
