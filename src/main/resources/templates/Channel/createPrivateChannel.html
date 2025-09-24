@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>비공개 채널 생성</title>
+</head>
+<body>
+<h2>비공개 채널 생성</h2>
+<form th:action="@{/channel/private}" method="post" >
+    <div>
+        <label for="userIds">참여 시킬 사용자 ID 목록:</label>
+        <textarea id="userIds" name="userIds" rows="4" cols="50" placeholder="쉼표(,)로 구분하여 ID를 입력하세요."></textarea>
+        <p>예: 9572ae9b-...,d4d7e865-...,0c67c654-...</p>
+    </div>
+    <input type="hidden" name="channelType" value="PRIVATE">
+    <br>
+    <button type="submit">비공개 채널 생성</button>
+</form>
+</body>
+</html>

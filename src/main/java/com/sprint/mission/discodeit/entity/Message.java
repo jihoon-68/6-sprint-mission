@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
-
+import com.sprint.mission.discodeit.DTO.Message.UpdateMessageDTO;
 import lombok.Getter;
+
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -8,15 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import java.util.stream.Collectors;
+
 @Getter
-public class Message extends BaseEntity implements Serializable {
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private final UUID sender;
     private final UUID channel;
     private final Instant created;
 
-    private final List<UUID> attachmentIds;
+    private List<UUID> attachmentIds;
     private String content;
     private Instant updated;
 
@@ -26,18 +29,34 @@ public class Message extends BaseEntity implements Serializable {
         this.sender = sender;
         this.content = content;
         this.attachmentIds = new ArrayList<>();
-        this.created = setTime();
+
+        this.created = Instant.now();
     }
 
-    public void update(String newContent) {
+    public Message(UUID sender, UUID channel, String content,List<UUID> attachmentIds) {
+        this.channel = channel;
+        this.id = UUID.randomUUID();
+        this.sender = sender;
+        this.content = content;
+        this.attachmentIds = new ArrayList<>(attachmentIds);
+        this.created = Instant.now();
+    }
+
+    public void update(String content, List<UUID> attachmentIds) {
         boolean anyValueUpdated = false;
-        if (newContent != null && !newContent.equals(this.content)) {
-            this.content = newContent;
+        if (content != null && !content.equals(this.content)){
+            this.content = content;
+            anyValueUpdated = true;
+        }
+
+        if (attachmentIds != null && !attachmentIds.isEmpty() && !attachmentIds.equals(this.attachmentIds)) {
+            this.attachmentIds = new ArrayList<>(attachmentIds);
+
             anyValueUpdated = true;
         }
 
         if (anyValueUpdated) {
-            this.updated = setTime();
+            this.updated = Instant.now();
         }
     }
 

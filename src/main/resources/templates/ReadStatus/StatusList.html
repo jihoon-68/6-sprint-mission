@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>읽음 상태 조회</title>
+</head>
+<body>
+<h2>읽음 상태 조회 (GET)</h2>
+
+<form th:action="@{/readStatus}" method="GET">
+    <label for="userId">사용자 ID:</label>
+    <input type="text" id="userId" name="userId" placeholder="사용자 ID 입력">
+
+    <button type="submit">조회하기</button>
+</form>
+
+<h3>조회 결과</h3>
+<table>
+    <thead>
+    <tr>
+        <th>readStatu ID</th>
+        <th>||</th>
+        <th>채널 이름</th>
+        <th>||</th>
+        <th>유저 이름</th>
+        <th>||</th>
+        <th>상태</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${readStatus == null or readStatus.isEmpty()}">
+        <td colspan="4">조회된 채널이 없습니다.</td>
+    </tr>
+    <tr th:each="readStatu : ${readStatus}">
+        <td th:text="${readStatu.getId()}"></td>
+        <td>||</td>
+        <td th:text="${readStatu.getChannelId()}"></td>
+        <td>||</td>
+        <td th:text="${readStatu.getUserId()}"></td>
+        <td>||</td>
+        <td th:text="${readStatu.getType()}"></td>
+        <td>
+            <form th:action="@{/readStatus/find:{id}(id=${readStatu.id})}" th:method="get" style="display:inline;">
+                <button type="submit">수정</button>
+            </form>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+
+</body>
+</html>

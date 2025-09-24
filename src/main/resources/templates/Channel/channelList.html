@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>채널 목록</title>
+</head>
+<body>
+<h2>사용자의 채널 목록 조회</h2>
+
+<form th:action="@{/channel}" method="GET">
+    <div>
+        <label for="channelId"></label>
+        <input type="text" id="channelId" name="channelId" placeholder="조회할 채널 ID를 입력하세요">
+        <button type="submit">조회</button>
+    </div>
+</form>
+
+<hr>
+
+<h3>조회 결과</h3>
+<table>
+    <thead>
+    <tr>
+        <th>채널 ID</th>
+        <th>채널 이름</th>
+        <th>설명</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${channels == null or channels.isEmpty()}">
+        <td colspan="4">조회된 채널이 없습니다.</td>
+    </tr>
+    <tr th:each="channel : ${channels}">
+        <td th:text="${channel.channel().getId()}"></td>
+        <td th:text="${channel.channel().getName()}"></td>
+        <td th:text="${channel.channel().getDescription()}"></td>
+        <td th:text="${channel.channel().getType()}"></td>
+        <td>
+            <form th:action="@{/channel/find/{id}(id=${channel.channel().getId()})}" th:method="get" style="display:inline;">
+                <button type="submit" >수정</button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/channel/{id}(id=${channel.channel().getId()})}" th:method="delete" style="display:inline;">
+                <button type="submit" onclick="return confirm('채널을 삭제하시겠습니까?');">삭제</button>
+            </form>
+        </td>
+
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

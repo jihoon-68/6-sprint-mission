@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.DTO.User.CreateUserDTO;
 import com.sprint.mission.discodeit.DTO.User.UpdateUserDTO;
 import lombok.Getter;
 
@@ -9,7 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class User extends BaseEntity implements Serializable {
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Instant created;
@@ -21,30 +20,37 @@ public class User extends BaseEntity implements Serializable {
     private String username;
     private String email;
 
-    public User(CreateUserDTO createUserDTO) {
+    public User(String username, int age, String email, String password) {
         this.id = UUID.randomUUID();
-        this.profileId = createUserDTO.profileId() == null ? UUID.randomUUID() : profileId;
-        this.created = setTime();
-        this.username = createUserDTO.userName();
-        this.age = createUserDTO.age();
-        this.email = createUserDTO.email();
-        this.password = createUserDTO.password();
+        this.username = username;
+        this.age = age;
+        this.email = email;
+        this.password = password;
+        this.profileId = null;
+        this.created = Instant.now();
     }
 
 
     public void update(UpdateUserDTO updateUserDTO) {
         boolean anyValueUpdated = false;
-        if (updateUserDTO.userName() != null && !updateUserDTO.userName().equals(this.username)) {
+
+        if ( updateUserDTO.userName() != null
+                && !updateUserDTO.userName().isEmpty()
+                && !updateUserDTO.userName().equals(this.username)) {
             this.username = updateUserDTO.userName();
             anyValueUpdated = true;
         }
 
-        if (updateUserDTO.email() != null && !updateUserDTO.email().equals(this.email)) {
+        if ( updateUserDTO.email() != null
+                && !updateUserDTO.email().isEmpty()
+                && !updateUserDTO.email().equals(this.email)) {
             this.email = updateUserDTO.email();
             anyValueUpdated = true;
         }
 
-        if (updateUserDTO.password() != null && !updateUserDTO.password().equals(this.password)) {
+        if (  updateUserDTO.password() != null
+                && !updateUserDTO.password().isEmpty()
+                && !updateUserDTO.password().equals(this.password)) {
             this.password = updateUserDTO.password();
             anyValueUpdated = true;
         }
@@ -55,7 +61,7 @@ public class User extends BaseEntity implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updated = setTime();
+            this.updated = Instant.now();
         }
     }
 
