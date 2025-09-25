@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 1. 애플리케이션의 모든 API 경로에 대해 CORS 설정을 적용합니다.
-                .allowedOrigins("https://editor.swagger.io", "http://localhost:3000") // 2. 요청을 허용할 출처(Origin)를 지정합니다. Swagger Editor와 일반적인 프론트엔드 개발 환경(localhost:3000)을 추가했습니다.
+                .allowedOrigins("https://editor.swagger.io", "http://localhost:3000", "https://6-sprint-mission-production-3129.up.railway.app/") // 2. 요청을 허용할 출처(Origin)를 지정합니다. Swagger Editor와 일반적인 프론트엔드 개발 환경(localhost:3000)을 추가했습니다.
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PACT") // 3. 허용할 HTTP 메서드를 지정합니다.
                 .allowedHeaders("*") // 4. 허용할 요청 헤더를 지정합니다.
                 .allowCredentials(true) // 5. 쿠키 등 자격 증명을 포함한 요청을 허용합니다.
@@ -34,9 +34,6 @@ public class WebConfig implements WebMvcConfigurer {
 	 * */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/");
 
         // OS별 업로드 경로 설정 (현재 OS에 따라 경로를 다르게 설정)
         String osName = System.getProperty("os.name").toLowerCase();
