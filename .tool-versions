@@ -1,5 +1,1 @@
 java 17
-[phases.build]
-cmds = ["./gradlew clean build", "echo '--- JAR file location ---'", "ls -R /app/build/libs"]
-[start]
-cmd = "java -jar -Dserver.port=$PORT /app/build/libs/*.jar"
