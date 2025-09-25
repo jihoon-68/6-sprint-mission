@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +55,7 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(
             () -> new NotFoundException("Channel with id " + channelId + " not found"));
   }
-
-  // todo 좀 더 간단하게 쓰는 방법?
+  
   @Override
   public List<ChannelResponse> findAllByUserId(UUID userId) {
 
@@ -70,21 +70,23 @@ public class BasicChannelService implements ChannelService {
                 channel.getId()))
         .toList();
 
-    // todo 채널별 읽기상태 시간
     return channelInUser.stream().map(channel -> {
-//      Instant lastReadAt = readStatusRepository.findAllByUserId(userId).stream()
-//          .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
-      Instant lastReadAt = readStatusRepository.findAllByChannelId(channel.getId()).stream()
-          .map(ReadStatus::getLastReadAt)
-          .findFirst()
-          .orElse(Instant.MIN);
+      // 생성 시간 역순에서 첫번째가 마지막 메시지 시간
+      Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
+          .map(Message::getCreatedAt)
+          .sorted(Comparator.reverseOrder())
+          .limit(1)
+          .findFirst().orElse(Instant.MIN);
 
-      // 해당 채널의 모든 participantIds
-      List<UUID> participantIds = readStatusRepository.findAllByChannelId(channel.getId()).stream()
-          .map(ReadStatus::getUserId).distinct().collect(Collectors.toList());
+      // 해당 private 채널의 모든 participantIds
+      List<UUID> participantIds = new ArrayList<>();
+      if (channel.getType().equals(ChannelType.PRIVATE)) {
+        participantIds = readStatusRepository.findAllByChannelId(channel.getId()).stream()
+            .map(ReadStatus::getUserId).distinct().collect(Collectors.toList());
+      }
 
       return new ChannelResponse(channel.getId(), channel.getType(), channel.getName(),
-          channel.getDescription(), participantIds, lastReadAt);
+          channel.getDescription(), participantIds, lastMessageAt);
 
     }).toList();
   }

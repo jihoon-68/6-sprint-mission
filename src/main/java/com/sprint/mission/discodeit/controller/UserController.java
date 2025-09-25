@@ -74,7 +74,6 @@ public class UserController {
       @PathVariable UUID userId,
       @RequestBody UpdateUserStatusRequest request
   ) {
-    System.out.println(userId);
     UserStatus updated = userStatusService.update(userId, request);
     return ResponseEntity.ok(updated);
   }
