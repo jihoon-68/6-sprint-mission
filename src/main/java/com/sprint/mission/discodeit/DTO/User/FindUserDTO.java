@@ -9,22 +9,22 @@ import java.util.UUID;
 
 public record FindUserDTO(
         UUID id,
-        String name,
+        Instant createdAt,
+        Instant updatedAt,
+        String username,
         String email,
-        Integer age,
         UUID profileId,
-        Instant lastAccessAt,
-        UserStatusType userStatus
+        boolean online
 ) {
     public FindUserDTO(User user, UserStatus userStatus) {
         this(
                 user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getAge(),
                 user.getProfileId(),
-                userStatus.getLastAccessAt(),
-                userStatus.getAccessType()
+                userStatus.getAccessType().getValue()
         );
     }
 }

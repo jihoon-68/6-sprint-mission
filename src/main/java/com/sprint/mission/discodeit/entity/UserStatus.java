@@ -16,7 +16,7 @@ public class UserStatus implements Serializable {
     private final UUID userId;
     private final Instant createdAt;
     private Instant updatedAt;
-    private Instant LastAccessAt;
+    private Instant lastAccessAt;
     private UserStatusType accessType;
 
     public UserStatus(UUID userId) {
@@ -24,20 +24,19 @@ public class UserStatus implements Serializable {
         this.createdAt = Instant.now();
         this.accessType = UserStatusType.OFFLINE;
         this.userId = userId;
-        this.LastAccessAt = Instant.now();
+        this.lastAccessAt = Instant.now();
     }
 
     public void update(UpdateUserStatusDTO updateUserStatusDTO) {
         boolean anyValueUpdated = false;
 
-        if (updateUserStatusDTO.LastAccessAt() != null && !updateUserStatusDTO.LastAccessAt().equals(this.LastAccessAt)){
-            this.LastAccessAt = updateUserStatusDTO.LastAccessAt();
+        if (updateUserStatusDTO.lastActiveAt() != null && !updateUserStatusDTO.lastActiveAt().equals(this.lastAccessAt)){
+            this.lastAccessAt = updateUserStatusDTO.lastActiveAt();
             anyValueUpdated = true;
         }
 
-        if (updateUserStatusDTO.AccessType() != null && updateUserStatusDTO.AccessType().getValue() != this.accessType.getValue()){
-
-            this.accessType = updateUserStatusDTO.AccessType();
+        if (updateUserStatusDTO.online() != this.accessType.getValue()){
+            this.accessType = updateUserStatusDTO.online()?UserStatusType.ONLINE:UserStatusType.OFFLINE;
             anyValueUpdated = true;
         }
 
@@ -46,10 +45,21 @@ public class UserStatus implements Serializable {
         }
     }
 
+    public void connect() {
+        this.lastAccessAt = Instant.now();
+        this.accessType = UserStatusType.ONLINE;
+        this.updatedAt = Instant.now();
+    }
+
+    public void disconnect() {
+        this.accessType = UserStatusType.OFFLINE;
+        this.updatedAt = Instant.now();
+    }
+
     public UserStatusType isConnecting() {
-        Duration duration = Duration.between(this.LastAccessAt, Instant.now());
+        Duration duration = Duration.between(this.lastAccessAt, Instant.now());
         if (duration.toSeconds() >= 300) {
-            LastAccessAt = Instant.now();
+            lastAccessAt = Instant.now();
             return UserStatusType.ONLINE;
         }
         return UserStatusType.OFFLINE;
