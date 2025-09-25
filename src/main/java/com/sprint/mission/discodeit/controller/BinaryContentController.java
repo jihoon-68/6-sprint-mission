@@ -29,7 +29,7 @@ public class BinaryContentController {
     @Operation(summary = "첨부 파일 조회")
     @ApiResponse(responseCode = "200", description = "첨부 파일 조회 성공")
     @ApiResponse(responseCode = "404", description = "첨부 파일을 찾을 수 없음")
-    @GetMapping(value = "/{binaryContentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{binaryContentId}")
     public ResponseEntity<BinaryContent> getBinaryContent(
             @Schema(description = "조회할 첨부 파일 ID")
             @PathVariable UUID binaryContentId) {

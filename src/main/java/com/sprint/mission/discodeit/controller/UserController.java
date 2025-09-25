@@ -42,8 +42,6 @@ public class UserController {
             @Schema(description = "User 프로필 이미지")
             @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
-        System.out.println(userCreateRequest);
-        System.out.println(profile);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(List.of(profile), userCreateRequest));
     }
@@ -57,11 +55,7 @@ public class UserController {
             @PathVariable UUID userId,
             @Schema(description = "수정할 User 정보")
             @RequestPart("userUpdateRequest") userUpdateRequest userUpdateRequest,
-            @Parameter(description = "수정할 User 프로필 이미지", required = false) MultipartFile profile) {
-
-        System.out.println(userId);
-        System.out.println(userUpdateRequest);
-        System.out.println(profile);
+            @Parameter(description = "수정할 User 프로필 이미지",required = true ,allowEmptyValue = true) MultipartFile profile) {
 
         UpdateUserResponse update = userService.update(List.of(profile), UpdateUserDTO.getUpdateUser(userId, userUpdateRequest));
         return ResponseEntity.status(HttpStatus.OK).body(update);
@@ -72,8 +66,6 @@ public class UserController {
     @ApiResponse(responseCode = "400", description = "User를 찾을 수 없음")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> userDelete(@Schema(description = "삭제할 User ID") @PathVariable UUID userId) {
-
-        System.out.println(userId);
 
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -91,10 +83,6 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음")
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatus> userStatusUpdate(@Schema(description = "상태를 변경할 User ID") @PathVariable UUID userId, @Schema(description = "변경할 User 온라인 상태 정보") @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
-
-        System.out.println(userId);
-        System.out.println(userStatusUpdateRequest);
-
         UserStatus userStatus = userStatusService.updateByUserId(userId,userStatusUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(userStatus);
     }

@@ -6,9 +6,11 @@ import com.sprint.mission.discodeit.DTO.Message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,12 +33,12 @@ public class MessageController {
     @Operation(summary = "Message 생성")
     @ApiResponse(responseCode = "201", description = "Public Channel이 성공적으로 생성됨")
     @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Message> createMessage(
             @Schema(description = "Message 생성 정보")
             @RequestPart(name = "messageCreateRequest") CreateMessageDTO messageCreateRequest,
             @Schema(description = "Message 첨부 파일들")
-            @RequestPart(name = "attachments", required = false) List<MultipartFile> attachments) {
+            @RequestPart(name = "attachments",required = false) List<MultipartFile> attachments) {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.create(attachments, messageCreateRequest));
     }
 
