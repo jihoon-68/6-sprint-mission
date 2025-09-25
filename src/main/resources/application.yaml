@@ -8,7 +8,7 @@ spring:
       max-request-size: 10MB
       file-size-threshold: 1MB
   mvc:
-    static-path-pattern: /static/**
+    static-path-pattern: /**
 
 discodeit:
   repository:
