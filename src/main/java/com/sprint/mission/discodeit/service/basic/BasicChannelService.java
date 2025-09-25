@@ -10,6 +10,10 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,8 +39,6 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.save(channel);
   }
 
-  // todo channel 넘기는것과 createdChannel 넘기는것 차이?
-  // channel로 넘기면 인식 안됨
   public Channel createPrivate(CreatePrivateChannelRequest createPrivateChannelRequest) {
     Channel channel = Channel.createPrivate();
     Channel createdChannel = channelRepository.save(channel);
@@ -68,18 +70,18 @@ public class BasicChannelService implements ChannelService {
                 channel.getId()))
         .toList();
 
+    // todo 채널별 읽기상태 시간
     return channelInUser.stream().map(channel -> {
 //      Instant lastReadAt = readStatusRepository.findAllByUserId(userId).stream()
 //          .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
       Instant lastReadAt = readStatusRepository.findAllByChannelId(channel.getId()).stream()
           .map(ReadStatus::getLastReadAt)
           .findFirst()
-          .orElse(null);
+          .orElse(Instant.MIN);
 
       // 해당 채널의 모든 participantIds
       List<UUID> participantIds = readStatusRepository.findAllByChannelId(channel.getId()).stream()
-          .map(ReadStatus::getUserId)
-          .toList();
+          .map(ReadStatus::getUserId).distinct().collect(Collectors.toList());
 
       return new ChannelResponse(channel.getId(), channel.getType(), channel.getName(),
           channel.getDescription(), participantIds, lastReadAt);

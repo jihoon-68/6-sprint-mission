@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
-import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatus;
+import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
@@ -69,13 +69,13 @@ public class UserController {
     return ResponseEntity.ok(userId + " 삭제되었습니다");
   }
 
-  @PatchMapping("/{userId}/userStatus")
+  @PatchMapping(value = "/{userId}/userStatus", consumes = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<UserStatus> stateUser(
       @PathVariable UUID userId,
-      @RequestBody UpdateUserStatus updateUserStatus
+      @RequestBody UpdateUserStatusRequest request
   ) {
     System.out.println(userId);
-    UserStatus updated = userStatusService.update(userId, updateUserStatus);
+    UserStatus updated = userStatusService.update(userId, request);
     return ResponseEntity.ok(updated);
   }
 }

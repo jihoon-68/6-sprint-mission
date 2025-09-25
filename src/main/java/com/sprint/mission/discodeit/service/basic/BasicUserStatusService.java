@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 
 import com.sprint.mission.discodeit.dto.userstatus.CreateUserStatus;
-import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatus;
+import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -47,11 +46,11 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatus update(UUID userId, UpdateUserStatus updateUserStatus) {
+  public UserStatus update(UUID userId, UpdateUserStatusRequest updateUserStatusRequest) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NotFoundException(
             "UserStatus with userId " + userId + " not found"));
-    userStatus.update(updateUserStatus.newLastActiveAt());
+    userStatus.update(updateUserStatusRequest.newLastActiveAt());
     return userStatusRepository.save(userStatus);
   }
 

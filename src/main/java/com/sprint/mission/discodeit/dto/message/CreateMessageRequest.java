@@ -12,7 +12,4 @@ public record CreateMessageRequest(
     List<UUID> attachmentIds
 ) {
 
-  public CreateMessageRequest(String content, UUID channelId, UUID authorId) {
-    this(content, channelId, authorId, null);
-  }
 }

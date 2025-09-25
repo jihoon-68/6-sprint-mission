@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,8 @@ public class MessageController {
     return ResponseEntity.ok(messageList);
   }
 
-  @PostMapping
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+      MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<Message> createMessage(
       @RequestPart("messageCreateRequest") @Valid CreateMessageRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
