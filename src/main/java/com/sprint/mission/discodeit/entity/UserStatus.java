@@ -56,12 +56,13 @@ public class UserStatus implements Serializable {
         this.updatedAt = Instant.now();
     }
 
-    public UserStatusType isConnecting() {
-        Duration duration = Duration.between(this.lastAccessAt, Instant.now());
-        if (duration.toSeconds() >= 300) {
-            lastAccessAt = Instant.now();
-            return UserStatusType.ONLINE;
+    public void isConnecting(Instant newLastAccessAt) {
+        long duration = newLastAccessAt.toEpochMilli() - this.lastAccessAt.toEpochMilli();
+        if (duration <= 300000) {
+            this.lastAccessAt = Instant.now();
+            this.accessType = UserStatusType.ONLINE;
+            return;
         }
-        return UserStatusType.OFFLINE;
+        this.accessType = UserStatusType.OFFLINE;
     }
 }
