@@ -1,1 +1,11 @@
 rootProject.name = 'discodeit'
+// settings.gradle
+toolchainManagement {
+    jvm {
+        javaRepositories {
+            repository("FoojayToolchains") {
+                url = uri("https://api.foojay.io/disco/v3.0/")
+            }
+        }
+    }
+}
