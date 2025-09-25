@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.config;
 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -33,6 +34,9 @@ public class WebConfig implements WebMvcConfigurer {
 	 * */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/");
 
         // OS별 업로드 경로 설정 (현재 OS에 따라 경로를 다르게 설정)
         String osName = System.getProperty("os.name").toLowerCase();
