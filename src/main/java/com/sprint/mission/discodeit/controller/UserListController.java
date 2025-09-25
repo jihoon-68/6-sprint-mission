@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.userdto.UserResponse;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+// 스프린트4 유저리스트 페이지 api 주소
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class HomeAPIController {
+public class UserListController {
 
   private final UserService userService;
   private final BinaryContentService binaryContentService;

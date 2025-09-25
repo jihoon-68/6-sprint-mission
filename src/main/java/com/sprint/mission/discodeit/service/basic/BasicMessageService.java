@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.messagedto.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.messagedto.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -11,7 +12,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,10 +36,10 @@ public class BasicMessageService implements MessageService {
   public Message create(CreateMessageRequest createMessageRequest,
       List<MultipartFile> attachments) {
     if (!channelRepository.existsById(createMessageRequest.channelId())) {
-      throw new NoSuchElementException("채널이 없습니다 " + createMessageRequest.channelId());
+      throw new NotFoundException("채널이 없습니다 " + createMessageRequest.channelId());
     }
     if (!userRepository.existsById(createMessageRequest.authorId())) {
-      throw new NoSuchElementException("해당 유저가 없습니다 " + createMessageRequest.authorId());
+      throw new NotFoundException("해당 유저가 없습니다 " + createMessageRequest.authorId());
     }
 
     List<MultipartFile> attachmentsNotNull =
@@ -67,7 +67,7 @@ public class BasicMessageService implements MessageService {
   public Message find(UUID messageId) {
     return messageRepository.findById(messageId)
         .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            () -> new NotFoundException("Message with id " + messageId + " not found"));
   }
 
   @Override
@@ -79,7 +79,7 @@ public class BasicMessageService implements MessageService {
   public Message update(UUID messageId, UpdateMessageRequest updateMessageRequest) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            () -> new NotFoundException("Message with id " + messageId + " not found"));
     message.update(updateMessageRequest.newContent());
     return messageRepository.save(message);
   }
@@ -87,7 +87,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public void delete(UUID messageId) {
     if (!messageRepository.existsById(messageId)) {
-      throw new NoSuchElementException("Message with id " + messageId + " not found");
+      throw new NotFoundException("Message with id " + messageId + " not found");
     }
     // 메시지의 첨부파일들 객체 삭제
     Message message = messageRepository.findById(messageId).orElse(null);

@@ -1,6 +1,9 @@
 spring:
   application:
     name: discodeit
+  messages:
+    basename: messages
+    encoding: UTF-8
 
 discodeit:
   repository:

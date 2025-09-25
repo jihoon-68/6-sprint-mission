@@ -1,9 +1,7 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.exception;
 
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,10 +11,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(NullPointerException.class)
-  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public String handleNullPointerException(NullPointerException ex) {
-    log.warn("데이터가 없습니다", ex);
-    return "NOT_FOUND, 데이터 없음";
+    log.warn("NullPointerException", ex);
+    return "INTERNAL_SERVER_ERROR, NullPointerException";
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
@@ -24,6 +22,13 @@ public class GlobalExceptionHandler {
   public String handleIllegalArg(IllegalArgumentException ex) {
     log.warn("잘못된 요청", ex);
     return "BAD_REQUEST, 잘못된 요청";
+  }
+
+  @ExceptionHandler(NotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public String handleNotFoundException(NotFoundException ex) {
+    log.warn("데이터가 없습니다", ex);
+    return "NOT_FOUND, 데이터 없음";
   }
 
   // 이외 예외 처리

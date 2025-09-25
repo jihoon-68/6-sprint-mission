@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.channeldto;
+package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 import java.time.Instant;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.readstatusdto.CreateReadStatusRequest;
-import com.sprint.mission.discodeit.dto.readstatusdto.UpdateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+// 스프린트5 프론트엔드에서 url 표기 방식을 CamelCase로 사용 중
+// `${Xe.apiBaseUrl}/readStatuses`
 @RestController
 @RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
-public class readStatusController {
+public class ReadStatusController {
 
   public final ReadStatusService readStatusService;
 

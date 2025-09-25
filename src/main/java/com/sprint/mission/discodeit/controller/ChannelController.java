@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channeldto.ChannelResponse;
-import com.sprint.mission.discodeit.dto.channeldto.CreatePrivateChannelRequest;
-import com.sprint.mission.discodeit.dto.channeldto.CreatePublicChannelRequest;
-import com.sprint.mission.discodeit.dto.channeldto.UpdateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

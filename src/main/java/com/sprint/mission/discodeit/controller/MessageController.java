@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.messagedto.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.messagedto.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;

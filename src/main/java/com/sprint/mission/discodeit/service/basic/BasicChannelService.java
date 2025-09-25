@@ -1,17 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channeldto.ChannelResponse;
-import com.sprint.mission.discodeit.dto.channeldto.CreatePrivateChannelRequest;
-import com.sprint.mission.discodeit.dto.channeldto.CreatePublicChannelRequest;
-import com.sprint.mission.discodeit.dto.channeldto.UpdateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.util.stream.Stream;
-import lombok.Locked.Read;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import org.springframework.web.client.HttpClientErrorException.NotFound;
 
 @Service
 @Slf4j
@@ -53,7 +50,7 @@ public class BasicChannelService implements ChannelService {
   public Channel find(UUID channelId) {
     return channelRepository.findById(channelId)
         .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+            () -> new NotFoundException("Channel with id " + channelId + " not found"));
   }
 
   // todo 좀 더 간단하게 쓰는 방법?
@@ -72,8 +69,9 @@ public class BasicChannelService implements ChannelService {
         .toList();
 
     return channelInUser.stream().map(channel -> {
-      Instant lastReadAt = readStatusRepository.findAllByUserId(userId).stream()
-          .filter(rs -> rs.getChannelId().equals(channel.getId()))
+//      Instant lastReadAt = readStatusRepository.findAllByUserId(userId).stream()
+//          .filter(readStatus -> readStatus.getChannelId().equals(channel.getId()))
+      Instant lastReadAt = readStatusRepository.findAllByChannelId(channel.getId()).stream()
           .map(ReadStatus::getLastReadAt)
           .findFirst()
           .orElse(null);
@@ -93,7 +91,7 @@ public class BasicChannelService implements ChannelService {
   public Channel update(UUID channelId, UpdateChannelRequest updateChannelRequest) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+            () -> new NotFoundException("Channel with id " + channelId + " not found"));
 
     channel.update(updateChannelRequest.newName(), updateChannelRequest.newDescription());
     return channelRepository.save(channel);
@@ -102,7 +100,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void delete(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException("Channel with id " + channelId + " not found");
+      throw new NotFoundException("Channel with id " + channelId + " not found");
     }
     // 같은 채널에서 나온 읽기상태들 삭제
     List<ReadStatus> readStatusesInChannel = readStatusRepository.findAllByChannelId(channelId);

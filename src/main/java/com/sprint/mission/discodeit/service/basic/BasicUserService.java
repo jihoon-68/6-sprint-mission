@@ -1,24 +1,24 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userdto.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.userdto.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -33,10 +33,10 @@ public class BasicUserService implements UserService {
   @Override
   public User create(CreateUserRequest createUserRequest, Optional<MultipartFile> profile) {
     User user;
-    User findUserByName = userRepository.findByUsername(createUserRequest.username()).orElse(null);
-    User findUserByEmail = userRepository.findAll().stream()
+    User userByUserName = userRepository.findByUsername(createUserRequest.username()).orElse(null);
+    User userByEmail = userRepository.findAll().stream()
         .filter(users -> users.getEmail().equals(createUserRequest.email())).findAny().orElse(null);
-    if (findUserByName != null || findUserByEmail != null) {
+    if (userByUserName != null || userByEmail != null) {
       throw new IllegalArgumentException("유저네임 혹은 이메일이 같은 유저가 존재합니다.");
     }
 
@@ -64,7 +64,7 @@ public class BasicUserService implements UserService {
   @Override
   public User find(UUID userId) {
     return userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
   }
 
   // 유저 목록 새로고침할때마다 상태 업데이트
@@ -87,7 +87,7 @@ public class BasicUserService implements UserService {
   public User update(UUID userId, UpdateUserRequest updateUserRequest,
       Optional<MultipartFile> profile) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
     user.update(updateUserRequest.newUsername(), updateUserRequest.newEmail(),
         updateUserRequest.newPassword());
 
@@ -114,7 +114,7 @@ public class BasicUserService implements UserService {
     user.update(profileId);
 
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
-        .orElseThrow(() -> new NoSuchElementException("유저 상태 업데이트 도중에 유저 아이디를 찾지 못했습니다"));
+        .orElseThrow(() -> new NotFoundException("유저 상태 업데이트 도중에 유저 아이디를 찾지 못했습니다"));
     userStatus.update(Instant.now());
     userStatusRepository.save(userStatus);
     user.update(userStatus.isOnline());
@@ -125,7 +125,7 @@ public class BasicUserService implements UserService {
   @Override
   public User updateState(UUID userId, boolean online) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
     user.update(online);
     return userRepository.save(user);
   }
@@ -133,11 +133,11 @@ public class BasicUserService implements UserService {
   @Override
   public void delete(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException("User with id " + userId + " not found");
+      throw new NotFoundException("User with id " + userId + " not found");
     }
     // 유저의 프로필 사진들 객체 삭제
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("UserService delete: userId 없음"));
+        .orElseThrow(() -> new NotFoundException("UserService delete: userId 없음"));
     List<BinaryContent> binaryContentsInUser = binaryContentRepository.findAll().stream()
         .filter(binaryContent -> binaryContent.getId().equals(user.getProfileId())).toList();
     for (BinaryContent binaryContent : binaryContentsInUser) {

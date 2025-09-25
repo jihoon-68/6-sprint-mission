@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.messagedto;
+package com.sprint.mission.discodeit.dto.message;
 
 import jakarta.validation.constraints.NotBlank;
 

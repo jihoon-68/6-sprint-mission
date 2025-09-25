@@ -1,9 +1,6 @@
-package com.sprint.mission.discodeit.dto.channeldto;
+package com.sprint.mission.discodeit.dto.channel;
 
-import com.sprint.mission.discodeit.entity.ChannelType;
 import jakarta.validation.constraints.NotBlank;
-
-import java.util.UUID;
 
 public record UpdateChannelRequest(
     @NotBlank String newName,

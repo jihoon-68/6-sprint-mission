@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.authdto.AuthRequest;
+import com.sprint.mission.discodeit.dto.auth.AuthRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -23,6 +23,6 @@ public class BasicAuthService implements AuthService {
       return user;
     }
 
-    throw new IllegalArgumentException("아이디 혹은 비밀번호가 일치하지 않습니다");
+    throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
   }
 }
