@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,11 +29,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPublic(CreatePublicChannelDTO createPublicChannelDTO) {
-        Channel channel = channelRepository.save(new Channel(createPublicChannelDTO.name(), createPublicChannelDTO.description()));
-        messageRepository.save(new Message(null, channel.getId(), "대화를 시작해요"));
 
-
-        return channel;
+        return channelRepository.save(new Channel(createPublicChannelDTO.name(), createPublicChannelDTO.description()));
     }
 
     @Override
@@ -42,8 +40,6 @@ public class BasicChannelService implements ChannelService {
         createPrivateChannelDTO.participantIds()
                 .forEach(userId ->
                         readStatusRepository.save(new ReadStatus(channel.getId(), userId)));
-
-        messageRepository.save(new Message(null, channel.getId(), "대화를 시작해요"));
 
         return channelRepository.save(channel);
     }
@@ -91,19 +87,20 @@ public class BasicChannelService implements ChannelService {
         //채널별 최근채팅시간 연결
         List<FindChannelDTO> findChannelDTOS = new ArrayList<>();
         for (Channel channel : channels) {
-            Message message = messageRepository.findAll().stream()
+            Instant messageTime = messageRepository.findAll().stream()
                     .filter(m -> m.getChannelId().equals(channel.getId()))
-                    .findFirst().orElseThrow(() -> new NoSuchElementException("message not found"));
+                    .map(Message::getCreatedAt)
+                    .findFirst().orElse(channel.getCreatedAt());
 
             if (channel.getType().equals(ChannelType.PRIVATE)) {
                 List<UUID> userIds = readStatusRepository.findAll().stream()
                         .map(ReadStatus::getUserId)
                         .toList();
 
-                findChannelDTOS.add(new  FindChannelDTO(channel, message.getCreatedAt(),userIds));
+                findChannelDTOS.add(new  FindChannelDTO(channel, messageTime,userIds));
                 continue;
             }
-            findChannelDTOS.add(FindChannelDTO.createPublicChannelDto(channel, message.getCreatedAt()));
+            findChannelDTOS.add(FindChannelDTO.createPublicChannelDto(channel, messageTime));
         }
 
 
