@@ -55,7 +55,8 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(()-> new NoSuchElementException("user not found"));
-        userStatus.update(UpdateUserStatusDTO.getUserStatus(userId,userStatusUpdateRequest.newLastActiveAt()));
+
+        userStatus.isConnecting(userStatusUpdateRequest.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
 
