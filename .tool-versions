@@ -1,1 +1,7 @@
 java 17
+
+[phases.build]
+cmds = ["./gradlew clean build"]
+
+[start]
+cmd = "java -jar -Dserver.port=$PORT build/libs/*-SNAPSHOT.jar"
