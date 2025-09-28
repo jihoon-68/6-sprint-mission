@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.DTO.User.UpdateUserDTO;
+import com.sprint.mission.discodeit.dto.User.UpdateUserDTO;
 import lombok.Getter;
 
 import java.io.Serializable;

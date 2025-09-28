@@ -1,16 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.Message.CreateMessageDTO;
-import com.sprint.mission.discodeit.DTO.Message.FindMessageDTO;
-import com.sprint.mission.discodeit.DTO.Message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.Message.CreateMessageDTO;
+import com.sprint.mission.discodeit.dto.Message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -19,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

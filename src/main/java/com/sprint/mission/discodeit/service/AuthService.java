@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Auth.LoginDTO;
+import com.sprint.mission.discodeit.dto.Auth.LoginDTO;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.security.sasl.AuthenticationException;
-import java.time.Instant;
 import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor

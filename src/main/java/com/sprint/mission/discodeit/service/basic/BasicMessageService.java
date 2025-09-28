@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.BinaryContent.FileDTO;
-import com.sprint.mission.discodeit.DTO.Message.CreateMessageDTO;
-import com.sprint.mission.discodeit.DTO.Message.FindMessageDTO;
+import com.sprint.mission.discodeit.dto.BinaryContent.FileDTO;
+import com.sprint.mission.discodeit.dto.Message.CreateMessageDTO;
 import com.sprint.mission.discodeit.utilit.FileUpload;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;

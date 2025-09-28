@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.Message.CreateMessageDTO;
+import com.sprint.mission.discodeit.dto.Message.CreateMessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.web.multipart.MultipartFile;
 

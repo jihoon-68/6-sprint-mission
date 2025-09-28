@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.ReadStatus.CreateReadStatusDTO;
-import com.sprint.mission.discodeit.DTO.ReadStatus.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDTO;
+import com.sprint.mission.discodeit.dto.ReadStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.Operation;

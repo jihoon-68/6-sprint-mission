@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.DTO.UserStatus.UpdateUserStatusDTO;
-import com.sprint.mission.discodeit.Enum.UserStatusType;
+import com.sprint.mission.discodeit.dto.UserStatus.UpdateUserStatusDTO;
+import com.sprint.mission.discodeit.enumtype.UserStatusType;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 

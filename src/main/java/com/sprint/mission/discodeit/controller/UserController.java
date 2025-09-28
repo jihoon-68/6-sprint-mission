@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.DTO.User.*;
-import com.sprint.mission.discodeit.DTO.UserStatus.UpdateUserStatusDTO;
-import com.sprint.mission.discodeit.DTO.UserStatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.User.*;
+import com.sprint.mission.discodeit.dto.UserStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;

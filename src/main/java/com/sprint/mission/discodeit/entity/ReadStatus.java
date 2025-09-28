@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.Enum.ReadType;
+import com.sprint.mission.discodeit.enumtype.ReadType;
 import lombok.Getter;
 
 import java.io.Serializable;

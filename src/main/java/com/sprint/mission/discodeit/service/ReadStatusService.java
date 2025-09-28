@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.DTO.ReadStatus.CreateReadStatusDTO;
+import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
 import java.time.Instant;

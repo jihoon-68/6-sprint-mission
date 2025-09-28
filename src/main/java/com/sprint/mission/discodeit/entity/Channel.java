@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.Enum.ChannelType;
+import com.sprint.mission.discodeit.enumtype.ChannelType;
 import lombok.Getter;
 
 import java.io.Serializable;
