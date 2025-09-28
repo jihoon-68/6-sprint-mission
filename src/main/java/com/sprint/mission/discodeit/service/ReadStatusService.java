@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,8 +45,8 @@ public class ReadStatusService {
         return new ReadStatusResponseDto(
                 readStatus.getId(),
                 readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastlyReadAt()
+                readStatus.getChannelId()
+                // readStatus.getLastlyReadAt()
         );
     }
 
@@ -55,8 +56,8 @@ public class ReadStatusService {
         return new ReadStatusResponseDto(
                 readStatus.getId(),
                 readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastlyReadAt()
+                readStatus.getChannelId()
+                // readStatus.getLastlyReadAt()
         );
     }
 
@@ -66,21 +67,21 @@ public class ReadStatusService {
                 .map(rs -> new ReadStatusResponseDto(
                         rs.getId(),
                         rs.getUserId(),
-                        rs.getChannelId(),
-                        rs.getLastlyReadAt()))
+                        rs.getChannelId()))
+                        // rs.getLastlyReadAt()))
                 .toList();
     }
 
-    public ReadStatusResponseDto update(ReadStatusUpdateRequestDto dto){
-        ReadStatus readStatus = readStatusRepository.findById(dto.id())
+    public ReadStatusResponseDto update(UUID id){
+        ReadStatus readStatus = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
-        readStatus.setLastlyReadAt(dto.lastlyReadAt());
+        readStatus.setLastlyReadAt(Instant.now());
         readStatusRepository.save(readStatus);
         return new ReadStatusResponseDto(
                 readStatus.getId(),
                 readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastlyReadAt()
+                readStatus.getChannelId()
+                // readStatus.getLastlyReadAt()
         );
     }
 

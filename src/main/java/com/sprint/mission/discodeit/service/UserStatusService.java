@@ -33,8 +33,8 @@ public class UserStatusService {
             userStatusRepository.save(userStatus);
             return new UserStatusResponseDto(
                     userStatus.getId(),
-                    userStatus.getUserId(),
-                    userStatus.getLastlyConnectedAt()
+                    userStatus.getUserId()
+                    // userStatus.getLastlyConnectedAt()
             );
         }
         else {
@@ -47,42 +47,42 @@ public class UserStatusService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
         return new UserStatusResponseDto(
                 userStatus.getId(),
-                userStatus.getUserId(),
-                userStatus.getLastlyConnectedAt()
+                userStatus.getUserId()
+                // userStatus.getLastlyConnectedAt()
         );
     }
 
     public List<UserStatusResponseDto> findAll(){
         List<UserStatus> userStatuses = userStatusRepository.findAll();
         return userStatuses.stream()
-                .map(us -> new UserStatusResponseDto(us.getId(), us.getUserId(), us.getLastlyConnectedAt()))
+                .map(us -> new UserStatusResponseDto(us.getId(), us.getUserId())) // us.getLastlyConnectedAt()
                 .toList();
     }
 
     public UserStatusResponseDto update(UUID id, UserStatusUpdateRequestDto dto){
         UserStatus userStatus = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
-        userStatus.setLastlyConnectedAt(dto.lastlyConnectedAt());
+        userStatus.setLastlyConnectedAt(Instant.now());
         userStatusRepository.save(userStatus);
         return new UserStatusResponseDto(
                 userStatus.getId(),
-                userStatus.getUserId(),
-                userStatus.getLastlyConnectedAt()
+                userStatus.getUserId()
+                // userStatus.getLastlyConnectedAt()
         );
     }
 
-    public UserStatusResponseDto updateByUserId(UUID userId, Instant lastlyConnectedAt) {
+    public UserStatusResponseDto updateByUserId(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
 
-        userStatus.setLastlyConnectedAt(lastlyConnectedAt);
+        userStatus.setLastlyConnectedAt(Instant.now());
         userStatusRepository.save(userStatus);
         return new UserStatusResponseDto(
                 userStatus.getId(),
-                userStatus.getUserId(),
-                userStatus.getLastlyConnectedAt()
+                userStatus.getUserId()
+                // userStatus.getLastlyConnectedAt()
         );
     }
 

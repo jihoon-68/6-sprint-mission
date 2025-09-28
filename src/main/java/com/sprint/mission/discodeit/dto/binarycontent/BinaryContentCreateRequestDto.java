@@ -2,11 +2,9 @@ package com.sprint.mission.discodeit.dto.binarycontent;
 
 import com.sprint.mission.discodeit.entity.BinaryContentType;
 
-import java.util.UUID;
-
 public record BinaryContentCreateRequestDto(
-        UUID userId,
-        UUID messageId, // 프사의 경우 없을 수 있음
-        BinaryContentType type,
-        byte[] byteBuffer
+        String fileName,
+        String extension, // 파일 확장자
+        BinaryContentType type, // PROFILE_IMAGE 또는 ATTACH_IMAGE
+        byte[] bytes
 ) {}

@@ -26,12 +26,6 @@ public class AuthService {
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다."));
 
-        /*
-        if (user == null) {
-            throw new NotFoundException("존재하지 않는 사용자입니다.");
-        }
-         */
-
         if (!user.getPassword().equals(request.password())){
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
@@ -45,8 +39,8 @@ public class AuthService {
                 user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getProfileImageId(),
-                userStatus.isOnline()
+                // userStatus.isOnline(),
+                user.getProfileImageId()
         );
     }
 }

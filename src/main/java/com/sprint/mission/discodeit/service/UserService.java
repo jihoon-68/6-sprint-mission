@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -29,17 +31,35 @@ public class UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     // 유저 생성
-    public UserResponseDto create(UserCreateRequestDto dto) {
+    public UserResponseDto create(UserCreateRequestDto dto,
+                                  Optional<BinaryContentCreateRequestDto> profileImageCreateDto) {
         if (userRepository.findByUsername(dto.username()).isPresent()){
             throw new IllegalStateException("이미 사용중인 닉네임입니다.");
         }
         if (userRepository.findByEmail(dto.email()).isPresent()) {
             throw new IllegalStateException("이미 사용중인 이메일입니다.");
         }
-        User user = new User(dto.email(), dto.username(), dto.password(), dto.profileImageId());
+        User user = new User(dto.email(), dto.username(), dto.password());
         UserStatus userStatus = new UserStatus(user.getId());
 
+        UUID nullableProfileId = profileImageCreateDto
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(
+                            fileName,
+                            profileRequest.extension(),
+                            BinaryContentType.PROFILE_IMAGE,
+                            bytes,
+                            (long) bytes.length);
+                    binaryContentRepository.save(binaryContent);
+                    return binaryContent.getId();
+                })
+                .orElse(null);
+
+        user.setProfileImageId(nullableProfileId);
         userRepository.save(user);
+        userStatusRepository.save(userStatus);
         log.info("유저 추가 완료: " + user.getUsername());
         return new UserResponseDto(
                 user.getId(),
@@ -47,8 +67,8 @@ public class UserService {
                 user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getProfileImageId(),
-                userStatus.isOnline());
+                // userStatus.isOnline(),
+                user.getProfileImageId());
     }
 
     public UserResponseDto findByUsername(String name) {
@@ -62,8 +82,8 @@ public class UserService {
                 user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getProfileImageId(),
-                userStatus.isOnline()
+                // userStatus.isOnline(),
+                user.getProfileImageId()
                 );
     }
 
@@ -79,8 +99,9 @@ public class UserService {
                 user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getProfileImageId(),
-                userStatus.isOnline());
+                // userStatus.isOnline(),
+                user.getProfileImageId()
+        );
     }
 
     public UserResponseDto findById(UUID id){
@@ -95,8 +116,9 @@ public class UserService {
                 user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getProfileImageId(),
-                userStatus.isOnline());
+                // userStatus.isOnline(),
+                user.getProfileImageId()
+        );
     }
 
     public List<UserResponseDto> findAll(){
@@ -119,41 +141,55 @@ public class UserService {
                             user.getUpdatedAt(),
                             user.getEmail(),
                             user.getUsername(),
-                            user.getProfileImageId(),
-                            isUserOnline
+                            // isUserOnline,
+                            user.getProfileImageId()
                     );
                 })
                 .collect(Collectors.toList());
     }
 
     // 수정
-    public UserResponseDto update(UUID id, UserUpdateRequestDto dto) {
+    public UserResponseDto update(UUID id, UserUpdateRequestDto dto,
+        Optional<BinaryContentCreateRequestDto> optionalProfileCreateRequest) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
 
-        if (dto.username() != null){
-            userRepository.findByUsername(dto.username())
+        if (dto.newUsername() != null){
+            userRepository.findByUsername(dto.newUsername())
                     .filter(existingUser -> !existingUser.getId().equals(user.getId()))
                     .ifPresent(existingUser -> {
                         throw new IllegalStateException("이미 사용중인 닉네임입니다.");
                     });
-            user.setUsername(dto.username());
+            user.setUsername(dto.newUsername());
         }
 
-        if (dto.email() != null) {
-            userRepository.findByEmail(dto.email())
+        if (dto.newEmail() != null) {
+            userRepository.findByEmail(dto.newEmail())
                     .filter(existingUser -> !existingUser.getEmail().equals(user.getEmail()))
                     .ifPresent(existingUser -> {
                         throw new IllegalStateException("이미 사용중인 이메일입니다.");
                     });
-            user.setUsername(dto.username());
-            user.setEmail(dto.email());
+            user.setEmail(dto.newEmail());
         }
 
-        if (dto.password() != null) {
-            user.setPassword(dto.password());
+        if (dto.newPassword() != null) {
+            user.setPassword(dto.newPassword());
         }
+
+        UUID nullableProfileId = optionalProfileCreateRequest
+                .map(profileRequest -> {
+                    Optional.ofNullable(user.getProfileImageId())
+                            .ifPresent(binaryContentRepository::deleteById);
+
+                    String fileName = profileRequest.fileName();
+                    BinaryContentType type = profileRequest.type();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, profileRequest.extension(), type, bytes, (long) bytes.length);
+                    binaryContentRepository.save(binaryContent);
+                    return binaryContent.getId();
+                })
+                .orElse(null);
 
         userRepository.save(user);
 
@@ -176,8 +212,9 @@ public class UserService {
                 user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getProfileImageId(),
-                isUserOnline);
+                // isUserOnline,
+                user.getProfileImageId()
+        );
     }
 
     // 유저 삭제

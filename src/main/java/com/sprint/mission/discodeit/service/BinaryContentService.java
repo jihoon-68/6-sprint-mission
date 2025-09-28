@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -22,14 +20,15 @@ public class BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     public BinaryContentResponseDto create(BinaryContentCreateRequestDto dto){
-        BinaryContent binaryContent = new BinaryContent(dto.userId(), dto.messageId(), dto.type(), dto.byteBuffer());
+        byte[] bytes = dto.bytes();
+        BinaryContent binaryContent = new BinaryContent(dto.fileName(), dto.extension(), dto.type(), bytes, (long) bytes.length);
         binaryContentRepository.save(binaryContent);
 
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
-                binaryContent.getUserId(),
-                binaryContent.getMessageId(),
+                binaryContent.getFileName(),
                 binaryContent.getType(),
+                binaryContent.getData(),
                 binaryContent.getCreatedAt()
         );
     }
@@ -40,9 +39,9 @@ public class BinaryContentService {
 
         return new BinaryContentResponseDto(
                 binaryContent.getId(),
-                binaryContent.getUserId(),
-                binaryContent.getMessageId(),
+                binaryContent.getFileName(),
                 binaryContent.getType(),
+                binaryContent.getData(),
                 binaryContent.getCreatedAt()
         );
     }
@@ -55,9 +54,9 @@ public class BinaryContentService {
         return contents.stream()
                 .map(content -> new BinaryContentResponseDto(
                         content.getId(),
-                        content.getUserId(),
-                        content.getMessageId(),
+                        content.getFileName(),
                         content.getType(),
+                        content.getData(),
                         content.getCreatedAt()
                 ))
                 .toList();

@@ -9,7 +9,7 @@ public record UserResponseDto(
         Instant updatedAt,
         String email,
         String username,
-        UUID profileId,
-        Boolean online
+        // boolean online,
+        UUID profileId
 ) {
 }

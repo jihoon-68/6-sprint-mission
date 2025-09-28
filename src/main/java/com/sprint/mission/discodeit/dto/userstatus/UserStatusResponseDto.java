@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record UserStatusResponseDto (
     UUID id,
-    UUID userId,
-    Instant lastlyConnectedAt
+    UUID userId
+    // Instant lastlyConnectedAt
 ){
 }

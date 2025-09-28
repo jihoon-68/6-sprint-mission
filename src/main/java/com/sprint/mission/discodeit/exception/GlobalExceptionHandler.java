@@ -6,7 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice // 전역 예외처리 구성
+// 전역 예외처리 구성
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // 존재하지 않는 리소스 예외처리

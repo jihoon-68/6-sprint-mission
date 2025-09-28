@@ -16,21 +16,21 @@ public class Channel implements Serializable {
     private static final long serialVersionUID = 2L;
 
     private final UUID id;
-    private final UUID userId; // 채널 생성인
     private final Instant createdAt;
     private final List<UUID> participants = new ArrayList<>(); // 채널에 있는 유저들
     private final List<UUID> messages = new ArrayList<>(); // 채널에 올라온 메시지들
 
-    private ChannelType channelType;
+    private ChannelType type;
     private Instant updatedAt;
     private String name;
     private String description;
 
-    public Channel(UUID userId) {
+    public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.userId = userId;
-        this.participants.add(userId);
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
     // Setter

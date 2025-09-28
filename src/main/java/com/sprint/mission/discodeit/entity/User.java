@@ -24,14 +24,13 @@ public class User implements Serializable {
     private transient String password;
     private UUID profileImageId;
 
-    public User(String email, String username, String password, UUID profileImageId) {
+    public User(String email, String username, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         this.email = email;
         this.username = username;
         this.password = password;
-        this.profileImageId = profileImageId;
     }
 
     // Setter
