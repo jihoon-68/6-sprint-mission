@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -44,17 +45,17 @@ public class BasicMessageService implements MessageService {
                 throw new NullPointerException("Multipart files is empty");
             }
 
-            List<UUID> attachmentIds = files.stream()
-                            .map(path -> binaryContentRepository.save(
-                                    new BinaryContent(
-                                            path.FileName(),
-                                            path.file().getFreeSpace(),
-                                            path.file().getClass().getTypeName(),
-                                            path.file().toString().getBytes(StandardCharsets.UTF_8)
-                                    ))
-                                    .getId()
-                            ).toList();
+            List<UUID> attachmentIds =  new ArrayList<>();
+            for(FileDTO fileDTO : files){
+                UUID attachmentId = new BinaryContent(
+                        fileDTO.FileName(),
+                        fileDTO.file().getTotalSpace(),
+                        fileDTO.file().getClass().getTypeName(),
+                        fileDTO.file().toString().getBytes(StandardCharsets.UTF_8)
+                ).getId();
 
+                attachmentIds.add(attachmentId);
+            }
 
             return messageRepository.save(new Message(
                     createMessageDTO.authorId(),
