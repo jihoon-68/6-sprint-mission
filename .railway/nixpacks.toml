@@ -1,0 +1,6 @@
+[phases.setup]
+nixPkgs = ["jdk17"]
+cmds = ["chmod +x ./gradlew"]
+
+[phases.build]
+cmd = "export GRADLE_OPTS='-Xmx2048m -Xms512m' && ./gradlew clean build -x check -x test -Pproduction"
