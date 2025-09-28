@@ -126,14 +126,12 @@ public class UserService {
 
         return users.stream()
                 .map(user -> {
-                            boolean isUserOnline = false; // UserStatus가 없어도 기본값은 false.
-                            isUserOnline = userStatusRepository.findByUserId(user.getId())
-                                    .map(UserStatus::isOnline)
-                                    .orElse(false);
-
-                        if (!isUserOnline) {
-                            log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다.");
-                        }
+                    boolean isUserOnline = userStatusRepository.findByUserId(user.getId())
+                            .map(UserStatus::isOnline)
+                            .orElseGet(() -> {
+                                log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다: " +  user.getUsername());
+                                return false;
+                            });
 
                     return new UserResponseDto(
                             user.getId(),
