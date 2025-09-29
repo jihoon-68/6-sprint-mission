@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.utilit;
 
-import com.sprint.mission.discodeit.DTO.BinaryContent.FileDTO;
+import com.sprint.mission.discodeit.dto.BinaryContent.FileDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -7,11 +7,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
       file-size-threshold: 1MB
-  mvc:
-    static-path-pattern: /static/**
-    hiddenmethod:
-      filter:
-        enabled: true
 
 discodeit:
   repository:

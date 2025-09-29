@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.Enum.ChannelType;
+import com.sprint.mission.discodeit.enumtype.ChannelType;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -11,25 +11,25 @@ import java.util.UUID;
 public class Channel implements Serializable{
     private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final Instant created;
-    private final ChannelType type;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
+    private final ChannelType type;
     private String name;
-    private Instant updated;
     private String description;
 
     public Channel(String channelName, String description) {
         this.id = UUID.randomUUID();
         this.name = channelName;
         this.type = ChannelType.PUBLIC;
-        this.created = Instant.now();
+        this.createdAt = Instant.now();
         this.description = description;
     }
 
-    public Channel(ChannelType channelType) {
+    public Channel() {
         this.id = UUID.randomUUID();
-        this.created = Instant.now();
-        this.type = channelType;
+        this.createdAt = Instant.now();
+        this.type = ChannelType.PRIVATE;
         this.name = "";
         this.description = "";
     }
@@ -48,7 +48,7 @@ public class Channel implements Serializable{
         }
 
         if (anyValueUpdated) {
-            this.updated = Instant.now();
+            this.updatedAt = Instant.now();
         }
     }
 
@@ -58,7 +58,7 @@ public class Channel implements Serializable{
                 "체널 ID: " + this.id + "\n" +
                 "체널 이름: " + this.name + "\n" +
                 "체널 생성일자: " + this.name + "\n" +
-                "체널 수정일자: " + this.created + "\n";
+                "체널 수정일자: " + this.createdAt + "\n";
 
     }
 

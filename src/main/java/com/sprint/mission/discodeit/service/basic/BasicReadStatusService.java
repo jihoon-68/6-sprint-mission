@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.DTO.ReadStatus.CreateReadStatusDTO;
-import com.sprint.mission.discodeit.DTO.ReadStatus.UpdateReadStatusDTO;
+import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -10,6 +9,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -59,12 +59,12 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public void update(UpdateReadStatusDTO updateReadStatusDTO) {
-        ReadStatus readStatus = readStatusRepository.findById(updateReadStatusDTO.id())
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus not found") );
+    public ReadStatus update(UUID readStatusId, Instant newLastReadAt) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+                .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
 
-        readStatus.update(updateReadStatusDTO);
-        readStatusRepository.save(readStatus);
+        readStatus.messageRead(newLastReadAt);
+        return readStatusRepository.save(readStatus);
     }
 
     @Override
