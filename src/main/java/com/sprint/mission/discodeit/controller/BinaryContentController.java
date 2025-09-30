@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -10,23 +12,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@Controller
 @RequiredArgsConstructor
-@RequestMapping("/binary")
+@Controller
+@ResponseBody
+@RequestMapping("/api/binaryContents")
+@Tag(name = "BinaryContent", description = "첨부 파일 API")
 public class BinaryContentController {
-    private final BinaryContentService binaryContentService;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable("id") UUID id) {
-        BinaryContent content = binaryContentService.find(id);
+  private final BinaryContentService binaryContentService;
 
-        return ResponseEntity.ok(content);
-    }
+  @RequestMapping(path = "/{binaryContentId}", method = RequestMethod.GET)
+  public ResponseEntity<BinaryContent> find(@PathVariable("binaryContentId") UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContent);
+  }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContent>> createBinaryContent(@RequestParam(name = "ids") List<UUID> ids) {
-        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(ids);
-
-        return ResponseEntity.ok(binaryContents);
-    }
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContents);
+  }
 }
