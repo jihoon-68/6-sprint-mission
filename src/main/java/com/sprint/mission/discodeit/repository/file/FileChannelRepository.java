@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.FileLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -12,11 +14,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileChannelRepository implements ChannelRepository {
 
     // 채널 저장 경로
@@ -41,10 +44,13 @@ public class FileChannelRepository implements ChannelRepository {
 
     // 채널 ID로 채널 객체 불러오기
     @Override
-    public Channel findById(UUID id) {
+    public Optional<Channel> findById(UUID id) {
         Path filePath = CHANNEL_DIR.resolve(id + ".ser");
-        if (!Files.exists(filePath)) return null;
-        return (Channel) FileLoader.loadOne(filePath);
+        if (!Files.exists(filePath)) {
+            return Optional.empty();
+        }
+        Channel channel = (Channel) FileLoader.loadOne(filePath);
+        return Optional.ofNullable(channel);
     }
 
     // 전체 채널 객체 불러오기
@@ -73,7 +79,7 @@ public class FileChannelRepository implements ChannelRepository {
         try {
             boolean deleted = Files.deleteIfExists(path);
             if (!deleted) {
-                throw new NoSuchElementException("존재하지 않는 채널입니다. id=" + channel.getId());
+                throw new NotFoundException("존재하지 않는 채널입니다. id=" + channel.getId());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,7 +103,7 @@ public class FileChannelRepository implements ChannelRepository {
                             });
                 }
             }
-            System.out.println("Chanel 저장소 초기화 완료");
+            log.info("Chanel 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("Channel 저장소 초기화 실패", e);
         }

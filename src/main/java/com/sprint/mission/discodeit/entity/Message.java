@@ -22,7 +22,7 @@ public class Message implements Serializable {
 
     private Instant updatedAt;
     private String content; // 내용
-    private List<BinaryContent> binaryContents = new ArrayList<>(); // null 허용
+    private List<UUID> binaryContents = new ArrayList<>();
 
     public Message(UUID userId, UUID channelId, String content){
         this.id = UUID.randomUUID();
@@ -39,7 +39,7 @@ public class Message implements Serializable {
         this.updatedAt = Instant.now();
     }
 
-    public void setBinaryContents(List<BinaryContent> binaryContents) { // 메시지 첨부파일 수정
+    public void setBinaryContents(List<UUID> binaryContents) { // 메시지 첨부파일 수정
         this.binaryContents = (binaryContents != null ? binaryContents : new ArrayList<>());
         this.updatedAt = Instant.now();
     }

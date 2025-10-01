@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFBinaryContentRepository implements BinaryContentRepository {
@@ -19,11 +20,10 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         return data.stream()
                 .filter(binaryContent -> binaryContent.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     public void deleteById(UUID id) {
         boolean removed = data.removeIf(b -> b.getId().equals(id));
         if (!removed) {
-            throw new NoSuchElementException("존재하지 않는 BinaryContent입니다. id=" + id);
+            throw new NotFoundException("존재하지 않는 BinaryContent입니다. id=" + id);
         }
     }
 

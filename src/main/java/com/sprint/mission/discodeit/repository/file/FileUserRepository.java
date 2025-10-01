@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -11,10 +12,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileUserRepository implements UserRepository {
 
     // 유저 저장 경로
@@ -36,27 +39,28 @@ public class FileUserRepository implements UserRepository {
     }
 
     // 유저 단건 조회
+    // 파일 직접 찾아서 로딩
     @Override
-    public User findById(UUID id) {
+    public Optional<User> findById(UUID id) {
         Path filePath = USER_DIR.resolve(id + ".ser");
-        if (!Files.exists(filePath)) return null;
-        return (User) FileLoader.loadOne(filePath);
+        if (!Files.exists(filePath)) return Optional.empty();
+        User user = (User) FileLoader.loadOne(filePath);
+        return Optional.ofNullable(user);
     }
 
+    // finaAll() 이용
     @Override
-    public User findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         return findAll().stream()
                 .filter(user -> user.getUsername().equals(username))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return findAll().stream()
                 .filter(user -> user.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     // 모든 유저 객체 불러오기
@@ -104,7 +108,7 @@ public class FileUserRepository implements UserRepository {
                             });
                 }
             }
-            System.out.println("User 저장소 초기화 완료");
+            log.info("User 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("User 저장소 초기화 실패", e);
         }

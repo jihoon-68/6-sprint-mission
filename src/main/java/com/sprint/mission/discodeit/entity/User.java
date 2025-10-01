@@ -22,10 +22,12 @@ public class User implements Serializable {
     private String email;
     private String username;
     private transient String password;
+    private UUID profileImageId;
 
-    public User(String email, String username, String password, UUID profileImageId) {
+    public User(String email, String username, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.email = email;
         this.username = username;
         this.password = password;
@@ -45,6 +47,11 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+        this.updatedAt = Instant.now();
+    }
+
+    public void setProfileImageId(UUID profileImageId) {
+        this.profileImageId = profileImageId;
         this.updatedAt = Instant.now();
     }
 

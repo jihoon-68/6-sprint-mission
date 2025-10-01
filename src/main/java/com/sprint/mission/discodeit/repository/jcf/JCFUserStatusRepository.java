@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserStatusRepository implements UserStatusRepository {
@@ -19,19 +20,17 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findById(UUID id) {
+    public Optional<UserStatus> findById(UUID id) {
         return data.stream()
                 .filter(userStatus -> userStatus.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public UserStatus findByUserId(UUID userId) {
+    public Optional<UserStatus> findByUserId(UUID userId) {
         return data.stream()
                 .filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -40,11 +39,10 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void delete(UserStatus userStatus) {
-        boolean removed = data.removeIf(us -> us.getId().equals(userStatus.getId()));
-        if (!removed) {
-            throw new NoSuchElementException("존재하지 않는 UserStatus입니다. id=" + userStatus.getId());
-        }
+    public void deleteById(UUID id) {
+        UserStatus userStatus = findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+        data.remove(userStatus);
     }
 
     @Override

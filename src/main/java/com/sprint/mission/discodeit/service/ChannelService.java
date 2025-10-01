@@ -1,23 +1,24 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ChannelService {
 
@@ -27,28 +28,26 @@ public class ChannelService {
 
     // 채널 생성 및 저장
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto dto) {
-        Channel channel = new Channel(dto.userId());
+        Channel channel = new Channel(ChannelType.PRIVATE, "", "");
 
         // ReadStatus 생성
-        if (dto.participants() != null) {
-            dto.participants()
+        if (!dto.participantIds().isEmpty()) {
+            dto.participantIds()
                     .forEach(userId ->
                             readStatusRepository.save(new ReadStatus(userId, channel.getId())));
         }
 
         channelRepository.save(channel);
-        System.out.println("채널 추가 완료: " + channel.getName());
-        return new ChannelResponseDto(
+        log.info("채널 추가 완료: " + channel.getName());
+        return ChannelResponseDto.privateChannel( // private 채널은 name, description이 없음.
                 channel.getId(),
-                null, // private 채널은 name이 없음.
-                null, // private 채널은 description이 없음.
                 null,
                 channel.getParticipants()
-                );
+        );
     }
 
     public ChannelResponseDto createPublicChannel(PublicChannelCreateRequestDto dto) {
-        Channel channel = new Channel(dto.userId());
+        Channel channel = new Channel(ChannelType.PUBLIC, dto.name(), dto.description());
 
         channel.setName(dto.name());
 
@@ -57,37 +56,30 @@ public class ChannelService {
         }
 
         channelRepository.save(channel);
-        System.out.println("채널 추가 완료: " + channel.getName());
-        return new ChannelResponseDto(
+        log.info("채널 추가 완료: " + channel.getName());
+        return ChannelResponseDto.publicChannel( // public 채널은 participants가 없음.
                 channel.getId(),
                 channel.getName(),
                 channel.getDescription(),
-                null,
-                null // public 채널은 participants가 없음.
+                null
         );
     }
 
     public ChannelResponseDto findById(UUID id) {
-        Channel channel = channelRepository.findById(id);
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
-        if (channel == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
-        }
-
-        if (channel.getChannelType() == ChannelType.PRIVATE) {
-            return new ChannelResponseDto(
+        if (channel.getType() == ChannelType.PRIVATE) {
+            return ChannelResponseDto.privateChannel(
                     channel.getId(),
-                    null, // private 채널은 name이 없음.
-                    null, // private 채널은 description이 없음.
-                    latestMessageAddedAt(id),
+                    lastMessageAt(id),
                     channel.getParticipants());
         }
-        else return new ChannelResponseDto(
+        else return ChannelResponseDto.publicChannel(
                 channel.getId(),
                 channel.getName(),
                 channel.getDescription(),
-                latestMessageAddedAt(id),
-                null // public 채널은 participants가 없음.
+                lastMessageAt(id)
                 );
     }
 
@@ -97,25 +89,28 @@ public class ChannelService {
 
         return channels.stream()
                 .filter(channel ->
-                        channel.getChannelType() == ChannelType.PUBLIC ||
+                        channel.getType() == ChannelType.PUBLIC ||
                                 channel.getParticipants().contains(id)
                 )
                 .map(channel -> {
-                    if (channel.getChannelType() == ChannelType.PRIVATE) {
+                    if (channel.getType() == ChannelType.PRIVATE) {
                         return new ChannelResponseDto(
                                 channel.getId(),
+                                ChannelType.PRIVATE,
                                 null,
-                                null,
-                                latestMessageAddedAt(channel.getId()),
-                                channel.getParticipants()
+                                null
+//                                channel.getParticipants(),
+//                                lastMessageAt(channel.getId())
                         );
                     } else {
                         return new ChannelResponseDto(
                                 channel.getId(),
+                                ChannelType.PUBLIC,
                                 channel.getName(),
-                                channel.getDescription(),
-                                latestMessageAddedAt(channel.getId()),
-                                null
+                                channel.getDescription()
+                                // null,
+                                // lastMessageAt(channel.getId())
+
                         );
                     }
                 })
@@ -123,45 +118,44 @@ public class ChannelService {
     }
 
 
-    public ChannelResponseDto update(ChannelUpdateRequestDto dto) {
+    public ChannelResponseDto update(UUID id, PublicChannelUpdateRequestDto dto) {
         // validateCreator(user, channel);
-        Channel channel = channelRepository.findById(dto.id());
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
-        if (channel == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
-        }
-
-        if (channel.getChannelType() == ChannelType.PRIVATE) {
+        if (channel.getType() == ChannelType.PRIVATE) {
             throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
         }
 
-        if (dto.name() != null) {
-            channel.setName(dto.name());
+        if (dto.newName() != null) {
+            channel.setName(dto.newName());
         };
 
-        if (dto.description() != null) {
-            channel.setDescription(dto.description());
+        if (dto.newDescription() != null) {
+            channel.setDescription(dto.newDescription());
         }
 
         channelRepository.save(channel);
-        System.out.println("수정 및 저장 완료");
+        log.info("수정 및 저장 완료");
 
-        if (channel.getChannelType() == ChannelType.PRIVATE) {
+        if (channel.getType() == ChannelType.PRIVATE) {
             return new ChannelResponseDto(
                     channel.getId(),
+                    ChannelType.PRIVATE,
                     null,
-                    null,
-                    latestMessageAddedAt(dto.id()),
-                    channel.getParticipants()
+                    null
+//                    channel.getParticipants(),
+//                    lastMessageAt(id)
             );
         }
         else {
             return new ChannelResponseDto(
                     channel.getId(),
+                    ChannelType.PUBLIC,
                     channel.getName(),
-                    channel.getDescription(),
-                    latestMessageAddedAt(dto.id()),
-                    null
+                    channel.getDescription()
+                    // null,
+                    // lastMessageAt(id)
             );
         }
     }
@@ -170,10 +164,8 @@ public class ChannelService {
     public void deleteById(UUID id) {
         // validateCreator(user, channel); // 만든사람만 삭제 가능
 
-        Channel channel = channelRepository.findById(id);
-        if (channel == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
-        }
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         List<Message> messages = messageRepository.findByChannelId(id);
         if (messages != null) {
@@ -188,30 +180,28 @@ public class ChannelService {
         }
 
         channelRepository.delete(channel);
-        System.out.println("채널 삭제 완료: " + id);
+        log.info("채널 삭제 완료: " + id);
     }
 
     public void clear() {
         channelRepository.clear();
     }
 
-    // 메시지가 없을 수 있으므로 반환타입을 Optional로 감쌈
-    public Optional<Instant> latestMessageAddedAt(UUID id) {
-        Channel channel = channelRepository.findById(id);
-        if (channel == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
-        }
+    public Instant lastMessageAt(UUID id) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         List<UUID> messageIds = channel.getMessages();
         if (messageIds == null || messageIds.isEmpty()) {
-            return Optional.empty();
+            return null;
         }
 
         List<Message> messages = messageRepository.findAllByIdIn(channel.getMessages());
 
         return messages.stream()
                 .map(Message::getCreatedAt)
-                .max(Instant::compareTo);
+                .max(Instant::compareTo)
+                .orElse(null);
     }
 
     // TODO 추후 개선 필요

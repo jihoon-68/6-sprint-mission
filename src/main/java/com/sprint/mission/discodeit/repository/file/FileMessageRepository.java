@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileMessageRepository implements MessageRepository {
 
     // 메시지 저장 경로
@@ -45,14 +48,13 @@ public class FileMessageRepository implements MessageRepository {
 
     // 메시지 단건 조회
     @Override
-    public Message findById(UUID messageId) {
+    public Optional<Message> findById(UUID messageId) {
         try {
             return Files.walk(MESSAGE_DIR)
                     .filter(path -> path.getFileName().toString().equals(messageId + ".ser"))
                     .findFirst()
                     .map(FileLoader::loadOne)
-                    .map(obj -> (Message) obj)
-                    .orElse(null);
+                    .map(obj -> (Message) obj);
         } catch (IOException e) {
             throw new RuntimeException("메시지 탐색 실패", e);
         }
@@ -106,7 +108,7 @@ public class FileMessageRepository implements MessageRepository {
         try {
             boolean deleted = Files.deleteIfExists(path);
             if (!deleted) {
-                throw new NoSuchElementException("존재하지 않는 UserStatus입니다. id=" + message.getId());
+                throw new NotFoundException("존재하지 않는 UserStatus입니다. id=" + message.getId());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -128,7 +130,7 @@ public class FileMessageRepository implements MessageRepository {
                             }
                         });
             }
-            System.out.println("Message 저장소 초기화 완료");
+            log.info("Message 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("Message 저장소 초기화 실패", e);
         }

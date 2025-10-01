@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.FileLoader;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import lombok.Locked;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -11,12 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileReadStatusRepository implements ReadStatusRepository {
 
     private static final Path READ_STATUS_DIR = Paths.get("data","read-statuses");
@@ -37,10 +41,11 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
+    public Optional<ReadStatus> findById(UUID id) {
         Path filePath = READ_STATUS_DIR.resolve(id + ".ser");
         if (!Files.exists(filePath)) return null;
-        return (ReadStatus) FileLoader.loadOne(filePath);
+        ReadStatus readStatus = (ReadStatus) FileLoader.loadOne(filePath);
+        return Optional.ofNullable(readStatus);
     }
 
     @Override
@@ -81,15 +86,13 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void deleteById(UUID id) {
-        ReadStatus readStatus = findById(id);
+        ReadStatus readStatus = findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
         Path path = getFilePath(readStatus);
         try {
-            boolean deleted = Files.deleteIfExists(path);
-            if (!deleted) {
-                throw new NoSuchElementException("존재하지 않는 ReadStatus입니다. id=" + id);
-            }
+            Files.delete(path);
         } catch (IOException e) {
-            e.printStackTrace();
+          e.printStackTrace();
         }
     }
 
@@ -109,7 +112,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                             });
                 }
             }
-            System.out.println("ReadStatus 저장소 초기화 완료");
+            log.info("ReadStatus 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("ReadStatus 저장소 초기화 실패", e);
         }

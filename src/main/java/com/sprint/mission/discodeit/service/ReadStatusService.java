@@ -4,17 +4,20 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ReadStatusService {
 
@@ -23,11 +26,11 @@ public class ReadStatusService {
     private final ChannelRepository channelRepository;
 
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto dto){
-        if (userRepository.findById(dto.userId()) == null) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다.");
+        if (userRepository.findById(dto.userId()).isEmpty()) {
+            throw new NotFoundException("존재하지 않는 유저입니다.");
         }
-        if (channelRepository.findById(dto.channelId()) == null) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
+        if (channelRepository.findById(dto.channelId()).isEmpty()) {
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
         // 중복 체크
         List<ReadStatus> userReadStatuses = readStatusRepository.findAllByUserId(dto.userId());
@@ -42,18 +45,19 @@ public class ReadStatusService {
         return new ReadStatusResponseDto(
                 readStatus.getId(),
                 readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastlyReadAt()
+                readStatus.getChannelId()
+                // readStatus.getLastlyReadAt()
         );
     }
 
     public ReadStatusResponseDto findById(UUID id){
-        ReadStatus readStatus = readStatusRepository.findById(id);
+        ReadStatus readStatus = readStatusRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다"));
         return new ReadStatusResponseDto(
                 readStatus.getId(),
                 readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastlyReadAt()
+                readStatus.getChannelId()
+                // readStatus.getLastlyReadAt()
         );
     }
 
@@ -63,25 +67,27 @@ public class ReadStatusService {
                 .map(rs -> new ReadStatusResponseDto(
                         rs.getId(),
                         rs.getUserId(),
-                        rs.getChannelId(),
-                        rs.getLastlyReadAt()))
+                        rs.getChannelId()))
+                        // rs.getLastlyReadAt()))
                 .toList();
     }
 
-    public ReadStatusResponseDto update(ReadStatusUpdateRequestDto dto){
-        ReadStatus readStatus = readStatusRepository.findById(dto.id());
+    public ReadStatusResponseDto update(UUID id){
+        ReadStatus readStatus = readStatusRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
+        readStatus.setLastlyReadAt(Instant.now());
         readStatusRepository.save(readStatus);
         return new ReadStatusResponseDto(
                 readStatus.getId(),
                 readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastlyReadAt()
+                readStatus.getChannelId()
+                // readStatus.getLastlyReadAt()
         );
     }
 
     public void deleteById(UUID id){
         readStatusRepository.deleteById(id);
-        System.out.println("ReadStatus 삭제 완료: " + id);
+        log.info("ReadStatus 삭제 완료: " + id);
     }
 
     public void clear(){

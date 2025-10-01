@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.FileLoader;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -12,12 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
     private static final Path BINARY_CONTENT_DIR = Paths.get("data","user-statuses");
@@ -38,10 +41,11 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         Path filePath = BINARY_CONTENT_DIR.resolve(id + ".ser");
         if (!Files.exists(filePath)) return null;
-        return (BinaryContent) FileLoader.loadOne(filePath);
+        BinaryContent binaryContent = (BinaryContent) FileLoader.loadOne(filePath);
+        return Optional.ofNullable(binaryContent);
     }
 
     @Override
@@ -68,10 +72,9 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void deleteById(UUID id) {
-        BinaryContent binaryContent = findById(id);
-        if (binaryContent == null) {
-            throw new NoSuchElementException("존재하지 않는 BinaryContent입니다. id=" + id);
-        }
+        BinaryContent binaryContent = findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 BinaryContent입니다. id=" + id));
+
         Path path = getFilePath(binaryContent);
         try {
             boolean deleted = Files.deleteIfExists(path);
@@ -99,7 +102,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
                             });
                 }
             }
-            System.out.println("BinaryContent 저장소 초기화 완료");
+            log.info("BinaryContent 저장소 초기화 완료");
         } catch (IOException e) {
             throw new RuntimeException("BinaryContent 저장소 초기화 실패", e);
         }

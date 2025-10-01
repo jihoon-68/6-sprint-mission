@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
@@ -20,27 +21,24 @@ public class JCFUserRepository implements UserRepository {
 
     // 유저 단건 조회
     @Override
-    public User findById(UUID id) {
+    public Optional<User> findById(UUID id) {
         return data.stream()
                 .filter(user -> user.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public User findByUsername(String userName) {
+    public Optional<User> findByUsername(String userName) {
         return data.stream()
                 .filter(user -> user.getUsername().equals(userName))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
         return data.stream()
                 .filter(user -> user.getEmail().equals(email))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     // 유저 전체 조회
@@ -53,7 +51,7 @@ public class JCFUserRepository implements UserRepository {
     public void delete(User user) {
         boolean removed = data.removeIf(u -> u.getId().equals(user.getId()));
         if (!removed) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다. id=" + user.getId());
+            throw new NotFoundException("존재하지 않는 유저입니다. id=" + user.getId());
         }
     }
 
