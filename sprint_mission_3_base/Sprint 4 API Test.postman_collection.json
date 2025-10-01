@@ -17,7 +17,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/v1/users/findAll",
+							"raw": "http://localhost:8080/api/users",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -25,9 +25,7 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"users",
-								"findAll"
+								"users"
 							]
 						}
 					},
@@ -42,97 +40,9 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "username",
-									"value": "LeeJaesung",
-									"type": "text"
-								},
-								{
-									"key": "email",
-									"value": "LJS@example.com",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "lee1234",
-									"type": "text"
-								},
-								{
-									"key": "profile",
-									"type": "file",
-									"src": "/C:/Users/Kwonchanho/Downloads/rex.png"
-								}
-							]
-						},
-						"url": {
-							"raw": "localhost:8080/api/v1/users/create",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/api/v1/users/delete?userId=dd7b4833-599a-4734-9d5b-682c14aea595",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"delete"
-							],
-							"query": [
-								{
-									"key": "userId",
-									"value": "dd7b4833-599a-4734-9d5b-682c14aea595"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "userId",
-									"value": "8375bd6f-c356-4733-acaa-b3c999da477a",
-									"type": "text"
-								},
-								{
-									"key": "newUserName",
-									"value": "SonHeungmin",
-									"type": "text"
-								},
-								{
-									"key": "newEmail",
-									"value": "son@example.com",
-									"type": "text"
-								},
-								{
-									"key": "newPassword",
-									"value": "son1234",
+									"key": "userCreateRequest",
+									"value": "{\n  \"username\": \"이재성\",\n  \"email\": \"lee10@test.com\",\n  \"password\": \"lee10\"\n}",
+									"contentType": "application/json",
 									"type": "text"
 								},
 								{
@@ -144,7 +54,30 @@
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/users/update",
+							"raw": "localhost:8080/api/users",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/:userId",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -152,9 +85,58 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
 								"users",
-								"update"
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "userUpdateRequest",
+									"value": "{\n  \"newUsername\": \"양민혁\",\n  \"newEmail\": \"yang7@test.com\",\n  \"newPassword\": \"yang7\"\n}",
+									"contentType": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "profile",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/:userId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"users",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "c403a216-2d71-4dda-9772-94011a1fda0b"
+								}
 							]
 						}
 					},
@@ -163,11 +145,11 @@
 				{
 					"name": "updateUserStatus",
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"newLastActiveAt\": \"2025-09-16T04:12:08Z\"\r\n}",
+							"raw": "{\r\n    \"newLastActiveAt\": \"2025-09-25T04:38:23Z\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -175,7 +157,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/users/updateUserStatus?userId=4b5d4bc9-30e6-4e39-93bf-84a4920b8124",
+							"raw": "http://localhost:8080/api/users/:userId/userStatus",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -183,14 +165,14 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
 								"users",
-								"updateUserStatus"
+								":userId",
+								"userStatus"
 							],
-							"query": [
+							"variable": [
 								{
 									"key": "userId",
-									"value": "4b5d4bc9-30e6-4e39-93bf-84a4920b8124"
+									"value": "c5778c19-f99c-4200-8843-f0e8a28ba780"
 								}
 							]
 						}
@@ -209,7 +191,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\" : \"SonHeungmin\",\r\n    \"password\" : \"son1234\"\r\n}",
+							"raw": "{\r\n    \"username\" : \"김민재\",\r\n    \"password\" : \"kim3\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -217,7 +199,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/auth/login",
+							"raw": "http://localhost:8080/api/auth/login",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -225,7 +207,6 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
 								"auth",
 								"login"
 							]
@@ -245,7 +226,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\" : \"Sprint Discode\",\r\n    \"description\" : \"This is Discode for Sprint\"\r\n}",
+							"raw": "{\r\n    \"name\" : \"soccer player\",\r\n    \"description\" : \"test room with soccer player\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -253,7 +234,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/channels/createPublicChannel",
+							"raw": "http://localhost:8080/api/channels/public",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -261,9 +242,8 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
 								"channels",
-								"createPublicChannel"
+								"public"
 							]
 						}
 					},
@@ -276,7 +256,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"participantIds\" : [\r\n        \"65b5e2e9-6c81-410a-9d71-501ea3c2861e\",\r\n        \"8375bd6f-c356-4733-acaa-b3c999da477a\",\r\n        \"ba6f1f9c-c451-4a4c-a689-af8818d73756\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"participantIds\" : [\r\n        \"3e4b70c0-37a0-40d4-ad08-66d019c2a8f3\",\r\n        \"c403a216-2d71-4dda-9772-94011a1fda0b\",\r\n        \"c5778c19-f99c-4200-8843-f0e8a28ba780\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -284,7 +264,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/channels/createPrivateChannel",
+							"raw": "http://localhost:8080/api/channels/private",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -292,9 +272,35 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
 								"channels",
-								"createPrivateChannel"
+								"private"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteChannel",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/channels/:channelId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"channels",
+								":channelId"
+							],
+							"variable": [
+								{
+									"key": "channelId",
+									"value": "6b513524-3dcc-4b6c-a013-879089e1aec9"
+								}
 							]
 						}
 					},
@@ -303,11 +309,11 @@
 				{
 					"name": "updateChannel",
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"newName\" : \"Test Public Channel\",\r\n    \"newDescription\" : \"This is Test Public Channel\"\r\n}",
+							"raw": "{\r\n    \"newName\" : \"Update channel test\",\r\n    \"newDescription\" : \"This is Test Updating Public Channel\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -315,7 +321,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/channels/updateChannel?channelId=10be332b-2710-405d-9019-54ac83a75581",
+							"raw": "http://localhost:8080/api/channels/:channelId",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -323,14 +329,13 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
 								"channels",
-								"updateChannel"
+								":channelId"
 							],
-							"query": [
+							"variable": [
 								{
 									"key": "channelId",
-									"value": "10be332b-2710-405d-9019-54ac83a75581"
+									"value": "ecb7b370-17c6-4726-81a7-7d99ee48244d"
 								}
 							]
 						}
@@ -343,7 +348,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/v1/channels/getAllChannels?userId=65b5e2e9-6c81-410a-9d71-501ea3c2861e",
+							"raw": "http://localhost:8080/api/channels?userId=c5778c19-f99c-4200-8843-f0e8a28ba780",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -351,42 +356,12 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"channels",
-								"getAllChannels"
+								"channels"
 							],
 							"query": [
 								{
 									"key": "userId",
-									"value": "65b5e2e9-6c81-410a-9d71-501ea3c2861e"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "deleteChannel",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/api/v1/channels/deleteChannel?channelId=68c5d399-db6e-4d4e-8649-8399140b2ce8",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"api",
-								"v1",
-								"channels",
-								"deleteChannel"
-							],
-							"query": [
-								{
-									"key": "channelId",
-									"value": "68c5d399-db6e-4d4e-8649-8399140b2ce8"
+									"value": "c5778c19-f99c-4200-8843-f0e8a28ba780"
 								}
 							]
 						}
@@ -407,17 +382,21 @@
 							"mode": "formdata",
 							"formdata": [
 								{
-									"key": "files",
+									"key": "messageCreateRequest",
+									"value": "{\n  \"content\": \"Create Message Test\",\n  \"channelId\": \"ecb7b370-17c6-4726-81a7-7d99ee48244d\",\n  \"authorId\": \"3e4b70c0-37a0-40d4-ad08-66d019c2a8f3\"\n}",
+									"contentType": "application/json",
+									"type": "text"
+								},
+								{
+									"key": "attachments",
 									"type": "file",
-									"src": [
-										"/C:/Users/Kwonchanho/Downloads/woody.jpeg",
-										"/C:/Users/Kwonchanho/Downloads/buzz.jpeg"
-									]
+									"src": [],
+									"disabled": true
 								}
 							]
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/messages/create?channelId=10be332b-2710-405d-9019-54ac83a75581&authorId=65b5e2e9-6c81-410a-9d71-501ea3c2861e&content=send two IMG",
+							"raw": "http://localhost:8080/api/messages",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -425,23 +404,9 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"messages",
-								"create"
+								"messages"
 							],
 							"query": [
-								{
-									"key": "channelId",
-									"value": "10be332b-2710-405d-9019-54ac83a75581"
-								},
-								{
-									"key": "authorId",
-									"value": "65b5e2e9-6c81-410a-9d71-501ea3c2861e"
-								},
-								{
-									"key": "content",
-									"value": "send two IMG"
-								},
 								{
 									"key": "",
 									"value": null,
@@ -454,11 +419,24 @@
 				},
 				{
 					"name": "findAllByChannelId",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "channelId",
+									"value": "ecb7b370-17c6-4726-81a7-7d99ee48244d",
+									"type": "text"
+								}
+							]
+						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/messages/findAllByChannelId?channelId=10be332b-2710-405d-9019-54ac83a75581",
+							"raw": "http://localhost:8080/api/messages",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -466,15 +444,7 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"messages",
-								"findAllByChannelId"
-							],
-							"query": [
-								{
-									"key": "channelId",
-									"value": "10be332b-2710-405d-9019-54ac83a75581"
-								}
+								"messages"
 							]
 						}
 					},
@@ -486,7 +456,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/v1/messages/delete?messageId=a917737a-7179-4718-b8bc-450408e0d2b6",
+							"raw": "http://localhost:8080/api/messages/:messageId",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -494,14 +464,13 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
 								"messages",
-								"delete"
+								":messageId"
 							],
-							"query": [
+							"variable": [
 								{
 									"key": "messageId",
-									"value": "a917737a-7179-4718-b8bc-450408e0d2b6"
+									"value": "111550d4-a6c7-4414-844a-39149d5ddccb"
 								}
 							]
 						}
@@ -511,7 +480,7 @@
 				{
 					"name": "update",
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -523,7 +492,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/messages/update?messageId=df38868b-baa8-43a2-a22b-2f2f33a22b65",
+							"raw": "http://localhost:8080/api/messages/:messageId",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -531,14 +500,13 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
 								"messages",
-								"update"
+								":messageId"
 							],
-							"query": [
+							"variable": [
 								{
 									"key": "messageId",
-									"value": "df38868b-baa8-43a2-a22b-2f2f33a22b65"
+									"value": "ecd9fa36-8068-4e75-b35f-192f2e28a6d6"
 								}
 							]
 						}
@@ -557,7 +525,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"userId\" : \"8375bd6f-c356-4733-acaa-b3c999da477a\",\r\n    \"channelId\" : \"10be332b-2710-405d-9019-54ac83a75581\",\r\n    \"lastReadAt\" : \"2025-09-16T05:40:06.396882300Z\"\r\n}",
+							"raw": "{\r\n    \"userId\" : \"c5778c19-f99c-4200-8843-f0e8a28ba780\",\r\n    \"channelId\" : \"ecb7b370-17c6-4726-81a7-7d99ee48244d\",\r\n    \"lastReadAt\" : \"2025-09-25T05:40:06.396882300Z\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -565,7 +533,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/read-status/create",
+							"raw": "http://localhost:8080/api/readStatus",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -573,9 +541,7 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"read-status",
-								"create"
+								"readStatus"
 							]
 						}
 					},
@@ -590,11 +556,17 @@
 						"method": "GET",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"userId\" : \"ba6f1f9c-c451-4a4c-a689-af8818d73756\",\r\n    \"channelId\" : \"10be332b-2710-405d-9019-54ac83a75581\",\r\n    \"lastReadAt\" : \"2025-09-16T05:34:06.396882300Z\"\r\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "userId",
+									"value": "c5778c19-f99c-4200-8843-f0e8a28ba780",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/read-status/findAllByUserId?userId=8375bd6f-c356-4733-acaa-b3c999da477a",
+							"raw": "http://localhost:8080/api/readStatus",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -602,15 +574,7 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"read-status",
-								"findAllByUserId"
-							],
-							"query": [
-								{
-									"key": "userId",
-									"value": "8375bd6f-c356-4733-acaa-b3c999da477a"
-								}
+								"readStatus"
 							]
 						}
 					},
@@ -619,11 +583,11 @@
 				{
 					"name": "update",
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"newLastReadAt\" : \"2025-09-16T05:41:06.396882300Z\"\r\n}",
+							"raw": "{\r\n    \"newLastReadAt\" : \"2025-09-25T02:22:06.396882300Z\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -631,7 +595,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/read-status/update?readStatusId=950451cd-ed3d-4e8c-ac17-866617234856",
+							"raw": "http://localhost:8080/api/readStatus/:readStatusId",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -639,14 +603,13 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"read-status",
-								"update"
+								"readStatus",
+								":readStatusId"
 							],
-							"query": [
+							"variable": [
 								{
 									"key": "readStatusId",
-									"value": "950451cd-ed3d-4e8c-ac17-866617234856"
+									"value": "24c41ff6-6cda-4e0d-b8bc-3ee7cd04b9fe"
 								}
 							]
 						}
@@ -671,7 +634,7 @@
 							"raw": "{\r\n    \"userId\" : \"8375bd6f-c356-4733-acaa-b3c999da477a\",\r\n    \"channelId\" : \"10be332b-2710-405d-9019-54ac83a75581\",\r\n    \"lastReadAt\" : \"2025-09-16T05:40:06.396882300Z\"\r\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/v1/binary-content/find?binaryContentId=1cba2c95-9c7f-4933-92fd-570e502f5ef8",
+							"raw": "http://localhost:8080/api/binaryContents/:binaryContentId",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -679,14 +642,13 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"binary-content",
-								"find"
+								"binaryContents",
+								":binaryContentId"
 							],
-							"query": [
+							"variable": [
 								{
 									"key": "binaryContentId",
-									"value": "1cba2c95-9c7f-4933-92fd-570e502f5ef8"
+									"value": ""
 								}
 							]
 						}
@@ -699,7 +661,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/v1/binary-content/findAllByIdIn?binaryContentIds=1cba2c95-9c7f-4933-92fd-570e502f5ef8&binaryContentIds=8ca2fd45-a6d8-4717-b702-694f6dcd35cc",
+							"raw": "http://localhost:8080/api/binaryContents",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -707,19 +669,7 @@
 							"port": "8080",
 							"path": [
 								"api",
-								"v1",
-								"binary-content",
-								"findAllByIdIn"
-							],
-							"query": [
-								{
-									"key": "binaryContentIds",
-									"value": "1cba2c95-9c7f-4933-92fd-570e502f5ef8"
-								},
-								{
-									"key": "binaryContentIds",
-									"value": "8ca2fd45-a6d8-4717-b702-694f6dcd35cc"
-								}
+								"binaryContents"
 							]
 						}
 					},
