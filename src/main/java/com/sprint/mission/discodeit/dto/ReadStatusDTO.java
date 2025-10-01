@@ -7,7 +7,7 @@ import java.util.UUID;
 public class ReadStatusDTO {
 
     @Builder
-    public record CreateReadStatusCommand(UUID channelId, UUID userId){
+    public record CreateReadStatusCommand(UUID channelId, UUID userId, Long lastReadTimestamp){
 
     }
 
@@ -24,7 +24,7 @@ public class ReadStatusDTO {
     }
 
     @Builder
-    public record UpdateReadStatusCommand(UUID id){
+    public record UpdateReadStatusCommand(UUID id, Long lastReadTimestamp){
 
     }
 

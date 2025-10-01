@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -33,6 +34,7 @@ public class BasicChannelService implements ChannelService {
                 .channelName(request.channelName())
                 .category(request.category())
                 .isVoiceChannel(request.isVoiceChannel())
+                .description(request.description())
                 .build();
 
         channelRepository.save(channel);
@@ -42,17 +44,14 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void createPrivateChannel(ChannelDTO.CreatePrivateChannelCommand request) {
 
-        if (request.category() == null) {
-            throw new IllegalArgumentException("Invalid channel data.");
-        }
-
         Channel channel = new Channel.Builder()
                 .category(request.category())
                 .isPrivate(true)
+                .description(request.description())
                 .build();
 
         List<ReadStatus> readStatusList = request.userIdList().stream()
-                .map(userId -> new ReadStatus(channel.getId(), userId))
+                .map(userId -> new ReadStatus(channel.getId(), userId, Instant.now().toEpochMilli()))
                 .toList();
 
         readStatusRepository.saveAll(readStatusList);
@@ -81,6 +80,7 @@ public class BasicChannelService implements ChannelService {
                         .map(ReadStatus::getUserId).toList() : new ArrayList<>())
                 .recentMessageTime(messageRepository.findByChannelId(channel.getId()).stream()
                         .max(Comparator.comparing(Message::getCreatedAt)).map(Message::getCreatedAt).orElse(null))
+                .description(channel.getDescription())
                 .createdAt(channel.getCreatedAt())
                 .updatedAt(channel.getUpdatedAt())
                 .build());
@@ -89,23 +89,55 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelDTO.FindChannelResult> findChannelsByUserId(UUID userId) {
-        return readStatusRepository.findByUserId(userId).stream()
+
+        List<ChannelDTO.FindChannelResult> privateChannelList = readStatusRepository.findByUserId(userId).stream()
                 .map(readStatus -> channelRepository.findById(readStatus.getChannelId())
-                        .orElseThrow(() -> new IllegalArgumentException("No such channel.")))
-                        .map(channel -> ChannelDTO.FindChannelResult.builder()
+                        .orElseThrow(() -> new NoSuchDataException("No such channel.")))
+                .map(channel -> ChannelDTO.FindChannelResult.builder()
                         .id(channel.getId())
                         .channelName(channel.getChannelName())
                         .category(channel.getCategory())
                         .isVoiceChannel(channel.isVoiceChannel())
                         .isPrivate(channel.isPrivate())
-                        .userIdList(channel.isPrivate() ? readStatusRepository.findByChannelId(channel.getId()).stream()
-                                .map(ReadStatus::getUserId).toList() : new ArrayList<>())
-                                .recentMessageTime(messageRepository.findByChannelId(channel.getId()).stream()
-                                        .max(Comparator.comparing(Message::getCreatedAt)).map(Message::getCreatedAt).orElse(null))
-                                .createdAt(channel.getCreatedAt())
-                                .updatedAt(channel.getUpdatedAt())
+                        .userIdList(channel.isPrivate() ? 
+                                readStatusRepository.findByChannelId(channel.getId()).stream()
+                                        .map(ReadStatus::getUserId)
+                                        .toList() : 
+                                new ArrayList<>())
+                        .recentMessageTime(messageRepository.findByChannelId(channel.getId()).stream()
+                                .max(Comparator.comparing(Message::getCreatedAt))
+                                .map(Message::getCreatedAt)
+                                .orElse(null))
+                        .description(channel.getDescription())
+                        .createdAt(channel.getCreatedAt())
+                        .updatedAt(channel.getUpdatedAt())
                         .build())
-                        .toList();
+                .toList();
+
+        List<ChannelDTO.FindChannelResult> publicChannelList = channelRepository.findAll().stream()
+                .filter(channel -> !channel.isPrivate())
+                .map(channel -> ChannelDTO.FindChannelResult.builder()
+                        .id(channel.getId())
+                        .channelName(channel.getChannelName())
+                        .category(channel.getCategory())
+                        .isVoiceChannel(channel.isVoiceChannel())
+                        .isPrivate(channel.isPrivate())
+                        .userIdList(new ArrayList<>())
+                        .recentMessageTime(messageRepository.findByChannelId(channel.getId()).stream()
+                                .max(Comparator.comparing(Message::getCreatedAt))
+                                .map(Message::getCreatedAt)
+                                .orElse(null))
+                        .description(channel.getDescription())
+                        .createdAt(channel.getCreatedAt())
+                        .updatedAt(channel.getUpdatedAt())
+                        .build())
+                .toList();
+
+        Set<ChannelDTO.FindChannelResult> combined = new HashSet<>();
+        combined.addAll(privateChannelList);
+        combined.addAll(publicChannelList);
+        
+        return new ArrayList<>(combined);
     }
 
     @Override
@@ -120,7 +152,9 @@ public class BasicChannelService implements ChannelService {
                         .userIdList(channel.isPrivate() ? readStatusRepository.findByChannelId(channel.getId()).stream()
                                 .map(ReadStatus::getUserId).toList() : new ArrayList<>())
                         .recentMessageTime(messageRepository.findByChannelId(channel.getId()).stream()
-                                .max(Comparator.comparing(Message::getCreatedAt)).map(Message::getCreatedAt).orElse(null))
+                                .max(Comparator.comparing(Message::getCreatedAt))
+                                .map(Message::getCreatedAt).orElse(null))
+                        .description(channel.getDescription())
                         .createdAt(channel.getCreatedAt())
                         .updatedAt(channel.getUpdatedAt())
                         .build())
@@ -145,7 +179,7 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalArgumentException("Private channel cannot be updated.");
         }
 
-        updatedChannel.update(request.channelName(), request.category(), request.isVoiceChannel());
+        updatedChannel.update(request.channelName(), request.category(), request.isVoiceChannel(), request.description());
         channelRepository.save(updatedChannel);
 
     }

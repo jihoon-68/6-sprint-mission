@@ -41,6 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = new ReadStatus.Builder()
                 .channelId(request.channelId())
                 .userId(request.userId())
+                .lastReadTimestamp(request.lastReadTimestamp())
                 .build();
 
         readStatusRepository.save(readStatus);
@@ -158,7 +159,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusRepository.findById(request.id())
                 .orElseThrow(() -> new NoSuchDataException("No such read status."));
 
-        readStatus.updateLastReadTimestamp();
+        readStatus.updateLastReadTimestamp(request.lastReadTimestamp());
 
         readStatusRepository.save(readStatus);
 

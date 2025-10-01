@@ -12,21 +12,23 @@ public class ReadStatus extends BaseEntity implements Serializable {
 
     private UUID channelId;
     private UUID userId;
-    private Long lastReadTimestamp = Instant.now().toEpochMilli();
+    private Long lastReadTimestamp;
 
-    public ReadStatus(UUID channelId, UUID userId) {
+    public ReadStatus(UUID channelId, UUID userId, Long lastReadTimestamp) {
         super();
         this.channelId = channelId;
         this.userId = userId;
+        this.lastReadTimestamp = lastReadTimestamp;
     }
 
-    public void updateLastReadTimestamp() {
-        this.lastReadTimestamp = Instant.now().toEpochMilli();
+    public void updateLastReadTimestamp(Long lastReadTimestamp) {
+        this.lastReadTimestamp = lastReadTimestamp;
     }
 
     public static class Builder {
         private UUID channelId;
         private UUID userId;
+        private Long lastReadTimestamp;
 
         public Builder channelId(UUID channelId) {
             this.channelId = channelId;
@@ -38,8 +40,13 @@ public class ReadStatus extends BaseEntity implements Serializable {
             return this;
         }
 
+        public Builder lastReadTimestamp(Long lastReadTimestamp) {
+            this.lastReadTimestamp = lastReadTimestamp;
+            return this;
+        }
+
         public ReadStatus build() {
-            return new ReadStatus(channelId, userId);
+            return new ReadStatus(channelId, userId, lastReadTimestamp);
         }
     }
 

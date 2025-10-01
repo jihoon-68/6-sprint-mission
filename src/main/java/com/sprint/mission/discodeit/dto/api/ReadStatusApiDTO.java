@@ -2,26 +2,29 @@ package com.sprint.mission.discodeit.dto.api;
 
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ReadStatusApiDTO {
 
     @Builder
-    public record CreateReadStatusRequest(UUID channelId, UUID userId){
+    public record ReadStatusCreateRequest(UUID userId, UUID channelId, LocalDateTime lastReadAt){
 
     }
 
     @Builder
-    public record UpdateReadStatusRequest(UUID id){
+    public record ReadStatusUpdateRequest(LocalDateTime newLastReadAt){
 
     }
 
     @Builder
     public record FindReadStatusResponse(
             UUID id,
-            UUID channelId,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
             UUID userId,
-            Long lastReadTimestamp
+            UUID channelId,
+            LocalDateTime lastReadAt
     ){
 
     }

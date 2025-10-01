@@ -1,40 +1,59 @@
 package com.sprint.mission.discodeit.dto.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprint.mission.discodeit.enums.ChannelType;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public class ChannelApiDTO {
 
     @Builder
-    public record CreatePublicChannelRequest(String channelName, String category, boolean isVoiceChannel) {
+    public record PublicChannelCreateRequest(
+        @JsonProperty("name")
+        String channelName,
+        String category,
+        boolean isVoiceChannel,
+        String description) {
 
     }
 
     @Builder
-    public record CreatePrivateChannelRequest(ChannelType category, boolean isVoiceChannel, List<UUID> userIdList) {
+    public record PrivateChannelCreateRequest(
+        //ChannelType category,
+        //boolean isVoiceChannel,
+        @JsonProperty("participantIds")
+        List<UUID> userIdList
+        //String description
+    ) {
 
     }
 
     @Builder
-    public record UpdateChannelRequest(UUID id, String channelName, String category, boolean isVoiceChannel) {
-
-    }
-
-    @Builder
-    public record DeleteChannelRequest(UUID id) {
+    public record ChannelUpdateRequest(
+        @JsonProperty("newName")
+        String channelName,
+        String category,
+        boolean isVoiceChannel,
+        @JsonProperty("newDescription")
+        String description) {
 
     }
 
     @Builder
     public record FindChannelResponse(
             UUID id,
-            String channelName,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
             ChannelType category,
             boolean isVoiceChannel,
-            boolean isPrivate,
+            String type,
+            @JsonProperty("name")
+            String channelName,
+            String description,
+            @JsonProperty("participantIds")
             List<UUID> userIdList,
             Long recentMessageTime
     ) {

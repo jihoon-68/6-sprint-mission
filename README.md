@@ -1,27 +1,13 @@
 ## 요구사항
 
-### 기본 요구사항
+### 기본
+- [x] 스프린트 미션#4에서 구현한 API를 RESTful API로 다시 설계해보세요. 
+- [x] Postman을 활용해 컨트롤러를 테스트 하세요. 
+- [x] springdoc-openapi를 활용하여 Swagger 기반의 API 문서를 생성하세요.
+- [x] Swagger-UI를 활용해 API를 테스트해보세요.
 
-#### 컨트롤러 레이어 구현
+### 심화
+- [x] 다음의 정적 리소스를 서빙하여 프론트엔드와 통합해보세요. API 스펙을 준수했다면 잘 동작할거예요.
+- [x] Railway.app을 활용하여 애플리케이션을 배포해보세요.
 
-- [x] DiscodeitApplication의 테스트 로직은 삭제하세요.
-- [x] 지금까지 구현한 서비스 로직을 활용해 웹 API를 구현하세요.  
-  이때 @RequestMapping만 사용해 구현해보세요.
-- [x] 웹 API의 예외를 전역으로 처리하세요.
-
-#### API 테스트
-- [x]  Postman을 활용해 컨트롤러를 테스트 하세요. 
-  - Postman API 테스트 결과를 다음과 같이 export하여 PR에 첨부해주세요. 
-
-### 심화 요구사항
-
-#### 정적 리소스 서빙
-
-- [x] 사용자 목록 조회, BinaryContent 파일 조회 API를 다음의 조건을 만족하도록 수정하세요.
-  - [x] 사용자 목록 조회
-  - [x] BinaryContent 파일 조회
-- [x] 다음의 파일을 활용하여 사용자 목록을 보여주는 화면을 서빙해보세요.
-
-#### 생성형 AI 활용
-
-- [x] 생성형 AI (Claude, ChatGPT 등)를 활용해서 위 이미지와 비슷한 화면을 생성 후 서빙해보세요.
+https://6-sprint-mission-production.up.railway.app/
