@@ -52,7 +52,7 @@ public class ChannelController {
   @PatchMapping
   public ResponseEntity<Channel> update(@RequestParam("channelId") UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
-    Channel udpatedChannel = channelService.update(channelId, request);
+    Channel updatedChannel = channelService.update(channelId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(udpatedChannel);
