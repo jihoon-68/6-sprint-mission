@@ -1,48 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
-import lombok.Setter;
 
+import java.io.Serializable;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-
 @Getter
-@Setter
-public class UserStatus {
+public class UserStatus implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private UUID userId;
-    private boolean status;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  private UUID userId;
+  private Instant lastActiveAt;
 
-    public UserStatus(UUID userId, Boolean status) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.status = false;
-        this.createdAt = createdAt;
-        this.updatedAt = Instant.now();
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.userId = userId;
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  public void update(Instant lastActiveAt) {
+    boolean anyValueUpdated = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      anyValueUpdated = true;
     }
 
-    public boolean getStatus() {
-        return status;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-    public void lastUpdateAt() {
-        this.updatedAt = Instant.now();
-    }
-
-    public boolean isOnlineByUserId(UUID userId, long minutesToConsiderOnline) {
-        if (this.updatedAt == null) {
-            return false;  // 사용자 offline
-        }
-        //현재 시간에서 5분전에 시간이 thereshold 에저장
-        Instant threshold = Instant.now().minusSeconds(minutesToConsiderOnline * 60);
-        return this.updatedAt.isAfter(threshold);  // 사용자 5분 이내면 online,아니면 offline
-    }
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 }

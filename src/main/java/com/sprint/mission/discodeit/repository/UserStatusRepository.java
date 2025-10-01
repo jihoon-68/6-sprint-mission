@@ -1,27 +1,24 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface UserStatusRepository {
-    UserStatus save(UserStatus entity);
 
-    Optional<UserStatus> findById(UUID id);
+  UserStatus save(UserStatus userStatus);
 
-    Optional<UserStatus> findByUserId(UUID userId);
+  Optional<UserStatus> findById(UUID id);
 
-    List<UserStatus> findAll();
+  Optional<UserStatus> findByUserId(UUID userId);
 
-    void deleteById(UUID id);
+  List<UserStatus> findAll();
 
-    void lastUpdateAt(UUID userId);
+  boolean existsById(UUID id);
 
-    boolean isOnlineByUserId(UUID userId, long minutesToConsiderOnline);
+  void deleteById(UUID id);
 
-    void deleteByUserId(UUID userId);
+  void deleteByUserId(UUID userId);
 }
