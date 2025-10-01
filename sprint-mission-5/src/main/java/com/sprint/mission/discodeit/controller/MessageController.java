@@ -48,7 +48,7 @@ public class MessageController {
               }
             })
             .toList())
-        .orElse(new ArrayList<>());
+        .orElse(Collections.emptyList());
     Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
     return ResponseEntity
         .status(HttpStatus.CREATED)
