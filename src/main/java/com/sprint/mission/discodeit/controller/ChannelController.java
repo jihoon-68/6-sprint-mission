@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channeldto.CreateChannel;
-import com.sprint.mission.discodeit.dto.channeldto.UpdateChannel;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
@@ -14,41 +16,50 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/channels")
+@RequestMapping("/api/channels")
 @RequiredArgsConstructor
 public class ChannelController {
 
-    private final ChannelService channelService;
+  private final ChannelService channelService;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<Channel>> readChannelByUserId(
-            @PathVariable UUID userId) {
-        List<Channel> channel = channelService.findAllByUserId(userId);
-        return ResponseEntity.ok(channel);
-    }
+  @GetMapping
+  public ResponseEntity<List<ChannelResponse>> readChannelByUserId(
+      @RequestParam UUID userId) {
+    List<ChannelResponse> responses = channelService.findAllByUserId(userId);
+    return ResponseEntity.ok(responses);
+  }
 
-    @PostMapping
-    public ResponseEntity<Channel> createChannel(
-            @RequestBody @Valid CreateChannel createChannel
-            ) {
-        Channel channel = channelService.create(createChannel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
-    }
+  @PostMapping("/public")
+  public ResponseEntity<Channel> createPublicChannel(
+      @RequestBody CreatePublicChannelRequest request
+  ) {
+    Channel channel = channelService.createPublic(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+  }
 
-    @PutMapping("/{channelId}")
-    public ResponseEntity<Channel> updatePublicChannel(
-            @PathVariable UUID channelId,
-            @RequestBody @Valid UpdateChannel updateChannel
-            ) {
-        Channel channel = channelService.update(channelId, updateChannel);
-        return ResponseEntity.ok(channel);
-    }
+  @PostMapping("/private")
+  public ResponseEntity<Channel> createPrivateChannel(
+      @RequestBody @Valid CreatePrivateChannelRequest request
+  ) {
+    Channel channel = channelService.createPrivate(request);
 
-    @DeleteMapping("/{channelId}")
-    public ResponseEntity<String> deleteChannel(
-            @PathVariable UUID channelId
-    ){
-        channelService.delete(channelId);
-        return ResponseEntity.ok(channelId +" 삭제되었습니다");
-    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+  }
+
+  @PatchMapping("/{channelId}")
+  public ResponseEntity<Channel> updatePublicChannel(
+      @PathVariable UUID channelId,
+      @RequestBody @Valid UpdateChannelRequest request
+  ) {
+    Channel channel = channelService.update(channelId, request);
+    return ResponseEntity.ok(channel);
+  }
+
+  @DeleteMapping("/{channelId}")
+  public ResponseEntity<String> deleteChannel(
+      @PathVariable UUID channelId
+  ) {
+    channelService.delete(channelId);
+    return ResponseEntity.ok(channelId + " 삭제되었습니다");
+  }
 }
