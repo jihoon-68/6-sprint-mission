@@ -1,31 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.enumtype.ReadType;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+
 
 @Getter
-public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+@Setter(AccessLevel.PACKAGE)
+@Table(name = "read_statuses")
+public class ReadStatus extends BaseUpdatableEntity{
 
-    private final UUID userId;
-    private final UUID channelId;
-    private ReadType type;
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
+    @Column(nullable = false)
     private Instant lastReadAt ;
 
-    public ReadStatus(UUID channelId, UUID userId) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.channelId = channelId;
-
-        this.type = ReadType.UNREAD;
-        this.createdAt = Instant.now();
+    public ReadStatus(Channel channel, User user) {
+        this.user = user;
+        this.channel = channel;
         this.lastReadAt = Instant.now();
     }
 
@@ -37,13 +42,8 @@ public class ReadStatus implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
+            this.updatedAtNow();
         }
     }
 
-    public void messageRead(Instant lastReadAt){
-        this.lastReadAt = lastReadAt;
-        this.updatedAt = Instant.now();
-        this.type = ReadType.READ;
-    }
 }
