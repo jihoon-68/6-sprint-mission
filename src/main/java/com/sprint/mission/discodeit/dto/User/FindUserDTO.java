@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.User;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
@@ -12,7 +13,7 @@ public record FindUserDTO(
         Instant updatedAt,
         String username,
         String email,
-        UUID profileId,
+        BinaryContent profileId,
         boolean online
 ) {
     public FindUserDTO(User user, UserStatus userStatus) {
@@ -22,8 +23,8 @@ public record FindUserDTO(
                 user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getProfileId(),
-                userStatus.getAccessType().getValue()
+                user.getProfile(),
+                userStatus.isConnecting(Instant.now())
         );
     }
 }

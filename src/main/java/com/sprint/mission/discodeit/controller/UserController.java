@@ -42,7 +42,7 @@ public class UserController {
             @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(List.of(profile), userCreateRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(profile, userCreateRequest));
     }
 
     @Operation(summary = "User 수정")
@@ -53,10 +53,10 @@ public class UserController {
             @Schema(description = "수정할 User ID")
             @PathVariable UUID userId,
             @Schema(description = "수정할 User 정보")
-            @RequestPart("userUpdateRequest") userUpdateRequest userUpdateRequest,
+            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @Parameter(description = "수정할 User 프로필 이미지",required = true ,allowEmptyValue = true) MultipartFile profile) {
 
-        UpdateUserResponse update = userService.update(List.of(profile), UpdateUserDTO.getUpdateUser(userId, userUpdateRequest));
+        UpdateUserResponse update = userService.update(profile, userId, userUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(update);
     }
 

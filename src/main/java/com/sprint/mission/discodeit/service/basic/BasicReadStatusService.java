@@ -63,7 +63,7 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
 
-        readStatus.messageRead(newLastReadAt);
+        readStatus.update(newLastReadAt);
         return readStatusRepository.save(readStatus);
     }
 

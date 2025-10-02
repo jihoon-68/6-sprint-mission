@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.security.sasl.AuthenticationException;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class AuthService {
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
         //로그인시 오프라인 -> 온라인으로
-        userStatus.connect();
+        userStatus.update(Instant.now());
         userStatusRepository.save(userStatus);
         return user;
     }

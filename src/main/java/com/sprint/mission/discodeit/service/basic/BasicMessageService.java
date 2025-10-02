@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContent.FileDTO;
 import com.sprint.mission.discodeit.dto.Message.CreateMessageDTO;
-import com.sprint.mission.discodeit.utilit.FileUpload;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -14,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,41 +25,24 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final FileUpload fileUpload;
 
     @Override
     public Message create(List<MultipartFile> multipartFiles, CreateMessageDTO createMessageDTO) {
-        if(!userRepository.existsById(createMessageDTO.authorId())
-                || !channelRepository.existsById(createMessageDTO.channelId())){
+        if (!userRepository.existsById(createMessageDTO.authorId())
+                || !channelRepository.existsById(createMessageDTO.channelId())) {
 
             throw new NoSuchElementException("Sender Or Receiver channels are mandatory");
         }
 
 
-        if(!multipartFiles.isEmpty()){
-            List<FileDTO> files = fileUpload.upload(multipartFiles);
-
-            if(files.isEmpty()){
-                throw new NullPointerException("Multipart files is empty");
-            }
-
-            List<UUID> attachmentIds =  new ArrayList<>();
-            for(FileDTO fileDTO : files){
-                UUID attachmentId = new BinaryContent(
-                        fileDTO.FileName(),
-                        fileDTO.file().getTotalSpace(),
-                        fileDTO.file().getClass().getTypeName(),
-                        fileDTO.file().toString().getBytes(StandardCharsets.UTF_8)
-                ).getId();
-
-                attachmentIds.add(attachmentId);
-            }
+        if (!multipartFiles.isEmpty()) {
+            List<BinaryContent> binaryContents = getBinaryContents(multipartFiles);
 
             return messageRepository.save(new Message(
                     createMessageDTO.authorId(),
                     createMessageDTO.channelId(),
                     createMessageDTO.content(),
-                    attachmentIds
+                    binaryContents
             ));
         }
 
@@ -74,7 +55,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message find(UUID id) {
-        return messageRepository.findById(id).orElseThrow(() -> new  NoSuchElementException("Message not found"));
+        return messageRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Message not found"));
     }
 
     @Override
@@ -89,7 +70,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message update(UUID messageId, String newContent) {
         Message messageUpdated = messageRepository.findById(messageId)
-                .orElseThrow(() -> new  NoSuchElementException("Message not found"));
+                .orElseThrow(() -> new NoSuchElementException("Message not found"));
 
         messageUpdated.update(newContent);
         return messageRepository.save(messageUpdated);
@@ -98,9 +79,27 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(UUID id) {
         Message message = messageRepository
-                .findById(id).orElseThrow(() -> new  NoSuchElementException("Message not found"));
+                .findById(id).orElseThrow(() -> new NoSuchElementException("Message not found"));
 
-        message.getAttachmentIds().forEach(binaryContentRepository::deleteById);
+        message.getAttachmentIds().forEach(attachment -> messageRepository.deleteById(attachment.getId()));
         messageRepository.deleteById(id);
+    }
+
+    private List<BinaryContent> getBinaryContents(List<MultipartFile> multipartFiles) {
+        List<BinaryContent> binaryContents = new ArrayList<>();
+        for (MultipartFile multipartFile : multipartFiles) {
+            try {
+                BinaryContent binaryContent = new BinaryContent(
+                        multipartFile.getOriginalFilename(),
+                        multipartFile.getSize(),
+                        multipartFile.getContentType(),
+                        multipartFile.getBytes()
+                );
+                binaryContents.add(binaryContent);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return binaryContents;
     }
 }

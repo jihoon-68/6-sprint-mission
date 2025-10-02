@@ -1,11 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContent.FileDTO;
-import com.sprint.mission.discodeit.dto.User.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.User.FindUserDTO;
-import com.sprint.mission.discodeit.dto.User.UpdateUserDTO;
-import com.sprint.mission.discodeit.dto.User.UpdateUserResponse;
-import com.sprint.mission.discodeit.utilit.FileUpload;
+import com.sprint.mission.discodeit.dto.User.*;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -17,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,10 +24,9 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final FileUpload fileUpload;
 
     @Override
-    public User create(List<MultipartFile> multipartFile, UserCreateRequest userCreateRequest) {
+    public User create(MultipartFile multipartFile, UserCreateRequest userCreateRequest) {
         System.out.println(userCreateRequest);
 
         //널 체크
@@ -48,30 +42,19 @@ public class BasicUserService implements UserService {
             throw new DuplicateFormatFlagsException("Username already exists");
         }
 
-        //유저 중복 확인후 유저 생성
+        //파일 있으면 파일 생성
+        BinaryContent profile = getBinaryContent(multipartFile);
+
+        //유저 생성
         User user = userRepository.save(new User(
                         userCreateRequest.username(),
                         userCreateRequest.email(),
-                        userCreateRequest.password()
+                        userCreateRequest.password(),
+                        profile
                 )
         );
-
-        //파일 있으면 파일 생성
-        if (!multipartFile.isEmpty()) {
-            FileDTO profile = fileUpload.upload(multipartFile).get(0);
-
-            BinaryContent binaryContent = binaryContentRepository.save(
-                    new BinaryContent(
-                            profile.FileName(),
-                            profile.file().getFreeSpace(),
-                            profile.file().getClass().getTypeName(),
-                            profile.file().toString().getBytes(StandardCharsets.UTF_8)
-                    )
-            );
-
-            user.update(UpdateUserDTO.getFileInput(binaryContent.getId()));
-        }
-        userStatusRepository.save(new UserStatus(user.getId()));
+        //유저에 유저 상태 추가
+        user.update(UpdateUserDTO.getStatus(userStatusRepository.save(new UserStatus(user.getId()))));
         return userRepository.save(user);
     }
 
@@ -106,37 +89,24 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UpdateUserResponse update(List<MultipartFile> multipartFile, UpdateUserDTO updateUserDTO) {
+    public UpdateUserResponse update(MultipartFile multipartFile, UUID userId, UserUpdateRequest userUpdateRequest) {
 
         //유저 중복 확인
-        if (isDuplicate(updateUserDTO.username(), updateUserDTO.email())) {
+        if (isDuplicate(userUpdateRequest.newUsername(), userUpdateRequest.newEmail())) {
             throw new DuplicateFormatFlagsException("Username already exists");
         }
 
-        User user = userRepository.findById(updateUserDTO.id()).orElseThrow(() -> new NoSuchElementException("user not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("user not found"));
 
-        if (!multipartFile.isEmpty()) {
-            FileDTO profile = fileUpload.upload(multipartFile).get(0);
-            UUID profileId = binaryContentRepository.save(
-                    new BinaryContent(
-                            profile.FileName(),
-                            profile.file().getFreeSpace(),
-                            profile.file().getClass().getTypeName(),
-                            profile.file().toString().getBytes(StandardCharsets.UTF_8)
-                    )).getId();
+        //파일 있으면 파일 생성
+        BinaryContent profile = getBinaryContent(multipartFile);
 
-            user.update(new UpdateUserDTO(
-                    updateUserDTO.id(),
-                    updateUserDTO.username(),
-                    updateUserDTO.email(),
-                    profileId,
-                    updateUserDTO.password())
-            );
-            User userE = userRepository.save(user);
-            return new UpdateUserResponse(userE);
-        }
+        user.update(UpdateUserDTO.getUpdateUser(
+                user.getId(),
+                userUpdateRequest,
+                profile
+        ));
 
-        user.update(updateUserDTO);
         return new UpdateUserResponse(user);
     }
 
@@ -145,7 +115,7 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = userStatusRepository.findByUserId(id).orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        binaryContentRepository.deleteById(user.getProfileId());
+        binaryContentRepository.deleteById(user.getProfile().getId());
         userStatusRepository.deleteById(userStatus.getId());
         userRepository.deleteById(id);
     }
@@ -154,5 +124,22 @@ public class BasicUserService implements UserService {
         List<User> users = userRepository.findAll();
         return users.stream().anyMatch(user -> user.getUsername().equals(name)) ||
                 users.stream().anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    public BinaryContent getBinaryContent(MultipartFile multipartFile) {
+        if (multipartFile.isEmpty()) {
+            return null;
+        } else {
+            try {
+                return new BinaryContent(
+                        multipartFile.getOriginalFilename(),
+                        multipartFile.getSize(),
+                        multipartFile.getContentType(),
+                        multipartFile.getBytes()
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
