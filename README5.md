@@ -7,4 +7,4 @@
  - [x] Postman을 활용해 컨트롤러를 테스트 하세요.
    - Postman API 테스트 결과를 export하여 PR에 첨부해주세요.
  - [x] springdoc-openapi를 활용하여 Swagger 기반의 API 문서를 생성하세요.
- - [ ] Swagger-UI를 활용해 API를 테스트해보세요.
+ - [x] Swagger-UI를 활용해 API를 테스트해보세요.
