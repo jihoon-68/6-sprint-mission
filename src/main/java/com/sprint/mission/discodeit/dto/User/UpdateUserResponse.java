@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.User;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.time.Instant;
@@ -12,7 +13,7 @@ public record UpdateUserResponse(
         String username,
         String email,
         String password,
-        UUID profileId
+        BinaryContent profileId
 ) {
     public UpdateUserResponse(User user) {
         this(
@@ -22,7 +23,7 @@ public record UpdateUserResponse(
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getProfileId()
+                user.getProfile()
         );
     }
 }

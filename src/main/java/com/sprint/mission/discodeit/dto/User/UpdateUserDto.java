@@ -1,30 +1,38 @@
 package com.sprint.mission.discodeit.dto.User;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.UserStatus;
+
 import java.util.UUID;
 
 public record UpdateUserDTO(
         UUID id,
         String username,
         String email,
-        UUID profileId,
-        String password
+        BinaryContent profile,
+        String password,
+        UserStatus status
 ) {
 
-    public static UpdateUserDTO getFileInput(UUID profileId) {
+    public static UpdateUserDTO getStatus(UserStatus status) {
         return new UpdateUserDTO(
                 null,
                 null,
                 null,
-                profileId,
-               null);
+                null,
+               null,
+                status
+
+        );
     }
-    public static UpdateUserDTO getUpdateUser(UUID userId, userUpdateRequest userUpdateRequest) {
+    public static UpdateUserDTO getUpdateUser(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContent binaryContent ) {
         return new UpdateUserDTO(
                 userId,
                 userUpdateRequest.newUsername(),
                 userUpdateRequest.newEmail(),
-                null,
-                userUpdateRequest.newPassword()
+                binaryContent,
+                userUpdateRequest.newPassword(),
+                null
         );
     }
 

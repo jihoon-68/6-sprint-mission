@@ -21,7 +21,7 @@ public record UpdateUserStatusDTO(
                 userStatus.getUpdatedAt(),
                 userStatus.getUserId(),
                 userStatus.getLastAccessAt(),
-                userStatus.getAccessType().getValue()
+                false
         );
     }
 
