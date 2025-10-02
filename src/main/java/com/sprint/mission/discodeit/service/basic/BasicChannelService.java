@@ -44,7 +44,8 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.createPrivate();
     Channel createdChannel = channelRepository.save(channel);
     for (UUID userId : createPrivateChannelRequest.participantIds()) {
-      readStatusRepository.save(new ReadStatus(userId, createdChannel.getId(), Instant.MIN));
+      readStatusRepository.save(
+          new ReadStatus(userId, createdChannel.getId(), channel.getCreatedAt()));
     }
     return createdChannel;
   }
@@ -55,7 +56,7 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(
             () -> new NotFoundException("Channel with id " + channelId + " not found"));
   }
-  
+
   @Override
   public List<ChannelResponse> findAllByUserId(UUID userId) {
 

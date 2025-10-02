@@ -1,23 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
-import io.swagger.v3.oas.models.security.SecurityScheme.In;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.File;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Entity
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class User implements Serializable {
 
   private static final long serialVersionUID = 1L;
-
+  @Id
   private UUID id;
   private UUID profileId;
   private Instant createdAt;

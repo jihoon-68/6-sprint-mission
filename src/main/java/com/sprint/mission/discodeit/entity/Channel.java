@@ -1,49 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Channel implements Serializable {
 
   private static final long serialVersionUID = 1L;
+  @Id
   private UUID id;
   private Instant createdAt;
   private Instant updatedAt;
   //
+  @Enumerated(EnumType.STRING)
   private ChannelType type;
   private String name;
   private String description;
 
-  //공개 채널 생성자
-  private Channel(String name, String description) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
-    this.type = ChannelType.PUBLIC;
-    this.name = name;
-    this.description = description;
-  }
-
-  //비공개 채널 생성자
-  private Channel() {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    this.type = ChannelType.PRIVATE;
-  }
-
   // 정적 팩토리 메서드
   public static Channel createPublic(String name, String description) {
-    return new Channel(name, description);
+    return Channel
+        .builder()
+        .id(UUID.randomUUID())
+        .createdAt(Instant.now())
+        .type(ChannelType.PUBLIC)
+        .name(name)
+        .description(description)
+        .build();
   }
 
   public static Channel createPrivate() {
-    return new Channel();
+    return Channel
+        .builder()
+        .id(UUID.randomUUID())
+        .createdAt(Instant.now())
+        .type(ChannelType.PRIVATE)
+        .build();
   }
 
 

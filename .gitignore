@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 file-data
 SwaggerTest
+src/main/resources/.env
 
 ### STS ###
 .apt_generated
