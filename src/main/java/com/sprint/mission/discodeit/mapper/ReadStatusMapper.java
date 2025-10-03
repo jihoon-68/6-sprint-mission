@@ -8,8 +8,9 @@ public class ReadStatusMapper {
     public static ReadStatusResponseDto toDto(ReadStatus readStatus){
         return ReadStatusResponseDto.builder()
                 .id(readStatus.getId())
-                .userId(readStatus.getUserId())
-                .channelId(readStatus.getChannelId())
+                .userId(readStatus.getUser().getId())
+                .channelId(readStatus.getChannel().getId())
+                .lastReadAt(readStatus.getLastReadAt())
                 .build();
     }
 

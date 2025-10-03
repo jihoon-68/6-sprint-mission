@@ -8,7 +8,8 @@ public class UserStatusMapper {
     public static UserStatusResponseDto toDto(UserStatus userStatus) {
         return UserStatusResponseDto.builder()
                 .id(userStatus.getId())
-                .userId(userStatus.getUserId())
+                .userId(userStatus.getUser().getId())
+                .lastActiveAt(userStatus.getLastActiveAt())
                 .build();
     }
 }

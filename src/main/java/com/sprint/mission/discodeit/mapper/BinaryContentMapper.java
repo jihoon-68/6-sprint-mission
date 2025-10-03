@@ -8,9 +8,10 @@ public class BinaryContentMapper {
         return BinaryContentResponseDto.builder()
                 .id(binaryContent.getId())
                 .fileName(binaryContent.getFileName())
+                .extension(binaryContent.getExtension())
+                .size(binaryContent.getSize())
                 .type(binaryContent.getType())
                 .data(binaryContent.getData())
-                .createdAt(binaryContent.getCreatedAt())
                 .build();
     }
 }

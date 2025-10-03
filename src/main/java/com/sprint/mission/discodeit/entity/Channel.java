@@ -31,8 +31,8 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private ChannelType type;
 
-    @LastModifiedDate
-    private Instant updatedAt;
+    @OneToMany(mappedBy = "message_id")
+    private List<Message> messages;
 
     private String name;
 
@@ -41,6 +41,9 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
+    @LastModifiedDate
+    private Instant updatedAt;
 
 //    public Channel(ChannelType type, String name, String description) {
 //        this.type = type;

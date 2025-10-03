@@ -5,14 +5,13 @@ import com.sprint.mission.discodeit.entity.User;
 
 public class UserMapper {
 
-    public static UserResponseDto toDto(User user) {
+    public static UserResponseDto toDto(User user, Boolean online) {
         return UserResponseDto.builder()
                 .id(user.getId())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
                 .email(user.getEmail())
                 .username(user.getUsername())
-                .profileId(user.getProfileImageId())
+                .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
+                .online(online)
                 .build();
     }
 }
