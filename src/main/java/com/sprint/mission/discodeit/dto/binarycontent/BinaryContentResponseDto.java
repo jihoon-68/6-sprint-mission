@@ -11,7 +11,8 @@ import java.util.UUID;
 public record BinaryContentResponseDto(
         UUID id,
         String fileName,
+        String extension,
+        Long size,
         BinaryContentType type,
-        byte[] data,
-        Instant createdAt
+        byte[] data
 ) {}

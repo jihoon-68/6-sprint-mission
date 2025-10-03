@@ -9,7 +9,7 @@ import java.util.UUID;
 public record ReadStatusResponseDto (
         UUID id,
         UUID userId,
-        UUID channelId
-        // Instant lastlyReadAt
+        UUID channelId,
+        Instant lastReadAt
 ){
 }

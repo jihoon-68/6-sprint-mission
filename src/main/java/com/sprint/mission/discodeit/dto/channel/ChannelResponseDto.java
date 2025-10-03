@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.channel;
 
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.Builder;
 
@@ -13,9 +14,9 @@ public record ChannelResponseDto(
         UUID id,
         ChannelType type,
         String name,
-        String description
-        // List<UUID> participantIds, // PRIVATE 채널만 사용
-        // Instant lastMessageAt // null 허용
+        String description,
+        List<UserResponseDto> participants, // PRIVATE 채널만 사용
+        Instant lastMessageAt // null 허용
 ){
     // PUBLIC 채널용
     public static ChannelResponseDto publicChannel(UUID id, String name, String description) {
@@ -23,33 +24,21 @@ public record ChannelResponseDto(
                 id,
                 ChannelType.PUBLIC,
                 name,
-                description
-                // List.of(), // null이면 빈 리스트
+                description,
+                List.of(),
+                null
         );
     }
 
     // PRIVATE 채널용
-    public static ChannelResponseDto privateChannel(UUID id, List<UUID> participantIds) {
+    public static ChannelResponseDto privateChannel(UUID id, List<UserResponseDto> participants) {
         return new ChannelResponseDto(
                 id,
                 ChannelType.PRIVATE,
                 "", // private 채널은 name이 없음.
-                "" // private 채널은 description이 없음.
-                // participantIds != null ? List.copyOf(participantIds) : List.of(),
-                // lastMessageAt
+                "", // private 채널은 description이 없음.
+                participants,
+                null
         );
     }
-
-//    // lastMessageSentAt 없는 경우
-//    public static ChannelResponseDto withoutLastMessage(UUID id, String name, String description, List<UUID> participantsIds) {
-//        return new ChannelResponseDto(
-//                id,
-//                name,
-//                description,
-//                null,
-//                participantIds != null ? java.util.List.copyOf(participantsIds) : java.util.List.of()
-//        );
-//    }
-
-
 }
