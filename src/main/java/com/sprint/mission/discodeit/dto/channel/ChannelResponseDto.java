@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
+import lombok.Builder;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Builder
 public record ChannelResponseDto(
         UUID id,
         ChannelType type,
@@ -16,21 +18,18 @@ public record ChannelResponseDto(
         // Instant lastMessageAt // null 허용
 ){
     // PUBLIC 채널용
-    public static ChannelResponseDto publicChannel(UUID id, String name, String description,
-                                                   Instant lastMessageAt) {
+    public static ChannelResponseDto publicChannel(UUID id, String name, String description) {
         return new ChannelResponseDto(
                 id,
                 ChannelType.PUBLIC,
                 name,
                 description
                 // List.of(), // null이면 빈 리스트
-                // lastMessageAt
         );
     }
 
     // PRIVATE 채널용
-    public static ChannelResponseDto privateChannel(UUID id, Instant lastMessageAt,
-                                                    List<UUID> participantIds) {
+    public static ChannelResponseDto privateChannel(UUID id, List<UUID> participantIds) {
         return new ChannelResponseDto(
                 id,
                 ChannelType.PRIVATE,

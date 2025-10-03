@@ -1,73 +1,62 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
 
-@Getter
-public class User implements Serializable {
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class User extends BaseUpdatableEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+//    @Serial
+//    private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final List<UUID> joinedChannels = new ArrayList<>(); // 속해있는 채널
-    private final List<UUID> createdMessages = new ArrayList<>(); // 작성한 메시지
+    @Id
+    @Builder.Default
+    private UUID id = UUID.randomUUID();
 
+    @OneToMany(mappedBy = "channel")
+    private List<Channel> channels; // 속해있는 채널
+
+    @OneToMany(mappedBy = "message")
+    private List<Message> messages; // 작성한 메시지
+
+    @LastModifiedDate
     private Instant updatedAt;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false, unique = true)
     private String username;
+
+    @Column(nullable = false)
     private transient String password;
-    private UUID profileImageId;
 
-    public User(String email, String username, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
-        this.email = email;
-        this.username = username;
-        this.password = password;
-    }
+    @OneToOne(mappedBy = "binary_content")
+    private BinaryContent profileImage;
 
-    // Setter
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
-    public void setEmail(String email) {
-        this.email = email;
-        this.updatedAt = Instant.now();
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-        this.updatedAt = Instant.now();
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-        this.updatedAt = Instant.now();
-    }
-
-    public void setProfileImageId(UUID profileImageId) {
-        this.profileImageId = profileImageId;
-        this.updatedAt = Instant.now();
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", joinedChannels=" + joinedChannels +
-                ", createdMessages=" + createdMessages +
-                ", updatedAt=" + updatedAt +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
+//    public User(String email, String username, String password) {
+//        this.id = UUID.randomUUID();
+//        this.email = email;
+//        this.username = username;
+//        this.password = password;
+//    }
 
     @Override
     public boolean equals(Object o) {

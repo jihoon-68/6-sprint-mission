@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serial;
 import java.time.Instant;
@@ -9,38 +13,38 @@ import java.util.List;
 import java.util.UUID;
 import java.io.Serializable;
 
-@Getter
-public class Channel implements Serializable {
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Channel extends BaseUpdatableEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 2L;
+//    @Serial
+//    private static final long serialVersionUID = 2L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final List<UUID> participants = new ArrayList<>(); // 채널에 있는 유저들
-    private final List<UUID> messages = new ArrayList<>(); // 채널에 올라온 메시지들
+    @Id
+    @Builder.Default
+    private UUID id = UUID.randomUUID();
 
+    @Column(nullable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
     private ChannelType type;
+
+    @LastModifiedDate
     private Instant updatedAt;
+
     private String name;
+
     private String description;
 
-    public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.type = type;
-        this.name = name;
-        this.description = description;
-    }
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
-    // Setter
-    public void setName(String name) {
-        this.name = name;
-        this.updatedAt = Instant.now();
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-        this.updatedAt = Instant.now();
-    }
+//    public Channel(ChannelType type, String name, String description) {
+//        this.type = type;
+//        this.name = name;
+//        this.description = description;
+//    }
 }

@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.dto.userstatus;
 
-import java.time.Instant;
+import lombok.Builder;
+
 import java.util.UUID;
 
+@Builder
 public record UserStatusResponseDto (
     UUID id,
     UUID userId

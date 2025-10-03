@@ -41,7 +41,6 @@ public class ChannelService {
         log.info("채널 추가 완료: " + channel.getName());
         return ChannelResponseDto.privateChannel( // private 채널은 name, description이 없음.
                 channel.getId(),
-                null,
                 channel.getParticipants()
         );
     }
@@ -60,8 +59,7 @@ public class ChannelService {
         return ChannelResponseDto.publicChannel( // public 채널은 participants가 없음.
                 channel.getId(),
                 channel.getName(),
-                channel.getDescription(),
-                null
+                channel.getDescription()
         );
     }
 
@@ -72,51 +70,43 @@ public class ChannelService {
         if (channel.getType() == ChannelType.PRIVATE) {
             return ChannelResponseDto.privateChannel(
                     channel.getId(),
-                    lastMessageAt(id),
                     channel.getParticipants());
         }
         else return ChannelResponseDto.publicChannel(
                 channel.getId(),
                 channel.getName(),
-                channel.getDescription(),
-                lastMessageAt(id)
+                channel.getDescription()
                 );
     }
 
     // 전체 PUBLIC, 참여중인 PRIVATE 채널
     public List<ChannelResponseDto> findAllByUserId(UUID id) {
-        List<Channel> channels = channelRepository.findAll();
+        List<UUID> privateChannelIds = readStatusRepository.findAllByUserId(id)
+                .stream()
+                .map(ReadStatus::getChannelId)
+                .toList();
 
-        return channels.stream()
+        return channelRepository.findAll().stream()
                 .filter(channel ->
-                        channel.getType() == ChannelType.PUBLIC ||
-                                channel.getParticipants().contains(id)
+                        channel.getType().equals(ChannelType.PUBLIC) || // 공개 채널
+                                privateChannelIds.contains(channel.getId()) // 비공개 채널
                 )
                 .map(channel -> {
                     if (channel.getType() == ChannelType.PRIVATE) {
-                        return new ChannelResponseDto(
+                        return ChannelResponseDto.privateChannel(
                                 channel.getId(),
-                                ChannelType.PRIVATE,
-                                null,
-                                null
-//                                channel.getParticipants(),
-//                                lastMessageAt(channel.getId())
+                                channel.getParticipants()
                         );
                     } else {
-                        return new ChannelResponseDto(
+                        return ChannelResponseDto.publicChannel(
                                 channel.getId(),
-                                ChannelType.PUBLIC,
                                 channel.getName(),
                                 channel.getDescription()
-                                // null,
-                                // lastMessageAt(channel.getId())
-
                         );
                     }
                 })
                 .toList();
     }
-
 
     public ChannelResponseDto update(UUID id, PublicChannelUpdateRequestDto dto) {
         // validateCreator(user, channel);

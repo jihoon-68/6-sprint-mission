@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -9,52 +13,50 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-public class Message implements Serializable {
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Message extends BaseUpdatableEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 3L;
+//    @Serial
+//    private static final long serialVersionUID = 3L;
 
-    private final UUID id;
-    private final UUID userId;
-    private final UUID channelId;
-    private final Instant createdAt;
+    @Id
+    @Builder.Default
+    private UUID id = UUID.randomUUID();
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
+    @OneToMany(mappedBy = "binary_content")
+    private List<BinaryContent> binaryContents;
+
+    private String content; // 내용. NULL 허용, 수정 가능.
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
     private Instant updatedAt;
-    private String content; // 내용
-    private List<UUID> binaryContents = new ArrayList<>();
-
-    public Message(UUID userId, UUID channelId, String content){
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.content = content;
-    }
-
-    // Setter
-
-    public void setContent(String content) { // 메시지 내용 수정
-        this.content = content;
-        this.updatedAt = Instant.now();
-    }
-
-    public void setBinaryContents(List<UUID> binaryContents) { // 메시지 첨부파일 수정
-        this.binaryContents = (binaryContents != null ? binaryContents : new ArrayList<>());
-        this.updatedAt = Instant.now();
-    }
 
 
-    // toString()
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id='" + id + '\'' +
-                ", createdAt=" + createdAt +
-                ", userId=" + userId +
-                ", channelId=" + channelId +
-                ", updatedAt=" + updatedAt +
-                ", content='" + content + '\'' +
-                '}';
-    }
+
+//    public Message(UUID userId, UUID channelId, String content){
+//        this.id = UUID.randomUUID();
+//        this.userId = userId;
+//        this.channelId = channelId;
+//        this.content = content;
+//    }
+
+//    public void setBinaryContents(List<UUID> binaryContents) { // 메시지 첨부파일 수정
+//        this.binaryContents = (binaryContents != null ? binaryContents : new ArrayList<>());
+//    }
 }
