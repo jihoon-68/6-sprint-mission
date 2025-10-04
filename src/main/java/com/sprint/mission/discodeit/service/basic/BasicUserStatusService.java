@@ -30,7 +30,7 @@ public class BasicUserStatusService implements UserStatusService {
         if (userStatusRepository.findByUserId(createUserStatusDTO.userId()).isPresent()) {
             throw new DuplicateFormatFlagsException("Duplicate UserStatus");
         }
-        return new UserStatus(user.getId());
+        return new UserStatus(user);
     }
 
     @Override

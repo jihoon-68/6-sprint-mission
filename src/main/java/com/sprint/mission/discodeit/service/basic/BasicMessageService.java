@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.Message.CreateMessageDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -28,27 +30,28 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message create(List<MultipartFile> multipartFiles, CreateMessageDTO createMessageDTO) {
-        if (!userRepository.existsById(createMessageDTO.authorId())
-                || !channelRepository.existsById(createMessageDTO.channelId())) {
 
-            throw new NoSuchElementException("Sender Or Receiver channels are mandatory");
-        }
+        User user = userRepository.findById(createMessageDTO.authorId())
+                .orElseThrow(()-> new IllegalArgumentException("User with id: " + createMessageDTO.authorId() + " not found"));
 
+        Channel channel = channelRepository.findById(createMessageDTO.channelId())
+                .orElseThrow(()-> new IllegalArgumentException("Channel with id: " + createMessageDTO.channelId() + " not found"));
 
         if (!multipartFiles.isEmpty()) {
             List<BinaryContent> binaryContents = getBinaryContents(multipartFiles);
+            binaryContentRepository.saveAll(binaryContents);
 
             return messageRepository.save(new Message(
-                    createMessageDTO.authorId(),
-                    createMessageDTO.channelId(),
+                    user,
+                    channel,
                     createMessageDTO.content(),
                     binaryContents
             ));
         }
 
         return messageRepository.save(new Message(
-                createMessageDTO.authorId(),
-                createMessageDTO.channelId(),
+                user,
+                channel,
                 createMessageDTO.content()
         ));
     }
@@ -63,7 +66,7 @@ public class BasicMessageService implements MessageService {
         List<Message> messages = messageRepository.findAll();
 
         return messages.stream()
-                .filter(message -> message.getChannelId().equals(channelId))
+                .filter(message -> message.getChannel().getId().equals(channelId))
                 .toList();
     }
 

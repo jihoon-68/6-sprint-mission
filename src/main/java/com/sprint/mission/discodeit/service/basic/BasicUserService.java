@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.User.*;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -44,6 +45,7 @@ public class BasicUserService implements UserService {
 
         //파일 있으면 파일 생성
         BinaryContent profile = getBinaryContent(multipartFile);
+        binaryContentRepository.save(profile);
 
         //유저 생성
         User user = userRepository.save(new User(
@@ -54,7 +56,7 @@ public class BasicUserService implements UserService {
                 )
         );
         //유저에 유저 상태 추가
-        user.update(UpdateUserDTO.getStatus(userStatusRepository.save(new UserStatus(user.getId()))));
+        user.update(UpdateUserDTO.getStatus(userStatusRepository.save(new UserStatus(user))));
         return userRepository.save(user);
     }
 
@@ -81,7 +83,7 @@ public class BasicUserService implements UserService {
         List<User> users = userRepository.findAll();
         List<UserStatus> userStatuses = userStatusRepository.findAll();
         Map<UUID, UserStatus> userStatusMap = userStatuses.stream()
-                .collect(Collectors.toMap(UserStatus::getUserId, Function.identity()));
+                .collect(Collectors.toMap(BaseEntity::getId, Function.identity()));
 
         return users.stream()
                 .map(user -> new FindUserDTO(user, userStatusMap.get(user.getId())))
@@ -100,6 +102,7 @@ public class BasicUserService implements UserService {
 
         //파일 있으면 파일 생성
         BinaryContent profile = getBinaryContent(multipartFile);
+        binaryContentRepository.save(profile);
 
         user.update(UpdateUserDTO.getUpdateUser(
                 user.getId(),

@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDTO;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -26,21 +28,21 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus create(CreateReadStatusDTO createReadStatusDTO) {
 
-        if(!userRepository.existsById(createReadStatusDTO.userId())
-                ||!channelRepository.existsById(createReadStatusDTO.channelId())){
-            throw new NoSuchElementException("User Or Channel channels are mandatory");
-        }
+        User user = userRepository.findById(createReadStatusDTO.userId())
+                .orElseThrow(()-> new IllegalArgumentException("User with id: " + createReadStatusDTO.userId() + " not found"));
+        Channel channel = channelRepository.findById(createReadStatusDTO.channelId())
+                .orElseThrow(()-> new IllegalArgumentException("Channel with id: " + createReadStatusDTO.channelId() + " not found"));
 
         boolean isDuplication = readStatusRepository.findAll().stream()
                 .anyMatch(rs ->
-                        rs.getUserId().equals(createReadStatusDTO.userId())
-                                && rs.getChannelId().equals(createReadStatusDTO.channelId()));
+                        rs.getUser().getId().equals(user.getId())
+                                && rs.getChannel().getId().equals(channel.getId()));
         if(isDuplication) {
             throw new DuplicateFormatFlagsException("Duplicate Read Status");
         }
 
 
-        return readStatusRepository.save(new ReadStatus(createReadStatusDTO.channelId(),createReadStatusDTO.userId()));
+        return readStatusRepository.save(new ReadStatus(channel,user));
     }
 
     @Override
@@ -54,7 +56,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public List<ReadStatus> findAllByUserId(UUID userId) {
 
         return readStatusRepository.findAll().stream()
-                .filter(sr -> sr.getUserId().equals(userId))
+                .filter(sr -> sr.getUser().getId().equals(userId))
                 .toList();
     }
 
