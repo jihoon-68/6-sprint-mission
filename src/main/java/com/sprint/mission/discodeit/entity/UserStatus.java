@@ -23,7 +23,7 @@ public class UserStatus extends BaseUpdatableEntity {
     private UUID id = UUID.randomUUID();
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_status_id")
     private User user;
 
     private Instant lastActiveAt; // NULL 허용, 수정 가능.
@@ -38,10 +38,5 @@ public class UserStatus extends BaseUpdatableEntity {
     public boolean isOnline() {
         Instant fiveMinuteAgo = Instant.now().minus(5, ChronoUnit.MINUTES);
         return lastActiveAt.isAfter(fiveMinuteAgo); // 5분전 시각이 마지막 접속시간보다 뒤이면 false 반환
-    }
-
-    public UserStatus(User user) {
-        this.user = user;
-        this.lastActiveAt = Instant.now();
     }
 }

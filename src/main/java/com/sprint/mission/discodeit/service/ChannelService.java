@@ -4,18 +4,19 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.*;
+import lombok.Locked;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -25,28 +26,54 @@ public class ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
     // 채널 생성 및 저장
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto dto) {
-        Channel channel = new Channel(ChannelType.PRIVATE, "", "");
 
-        // ReadStatus 생성
-        if (!dto.participantIds().isEmpty()) {
-            dto.participantIds()
-                    .forEach(userId ->
-                            readStatusRepository.save(new ReadStatus(userId, channel.getId())));
-        }
-
+        Channel channel = Channel.builder()
+                .type(ChannelType.PRIVATE)
+                .build();
         channelRepository.save(channel);
+
+        List<User> users = userRepository.findAllById(dto.participantIds());
+        List<UserStatus> userStatuses = userStatusRepository.findAllById(dto.participantIds());
+
+        List<UserResponseDto> userResponseDtos = new ArrayList<>();
+        List<ReadStatus> readStatuses = new ArrayList<>();
+
+        Map<UUID, UserStatus> statusMap = userStatuses.stream()
+                .collect(Collectors.toMap(status -> status.getUser().getId(), status -> status));
+
+        users.forEach(user -> {
+            boolean isOnline = Optional.ofNullable(statusMap.get(user.getId()))
+                    .map(UserStatus::isOnline)
+                    .orElse(false);
+            UserMapper.toDto(user, isOnline);
+
+            readStatuses.add(ReadStatus.builder()
+                    .user(user)
+                    .channel(channel)
+                    .lastReadAt(Instant.now())
+                    .build());
+        });
+
+        readStatusRepository.saveAll(readStatuses);
+
         log.info("채널 추가 완료: " + channel.getName());
         return ChannelResponseDto.privateChannel( // private 채널은 name, description이 없음.
                 channel.getId(),
-                channel.getParticipants()
+                userResponseDtos
         );
     }
 
     public ChannelResponseDto createPublicChannel(PublicChannelCreateRequestDto dto) {
-        Channel channel = new Channel(ChannelType.PUBLIC, dto.name(), dto.description());
+        Channel channel = Channel.builder()
+                .type(ChannelType.PUBLIC)
+                .name(dto.name())
+                .description(dto.description())
+                .build();
 
         channel.setName(dto.name());
 
@@ -68,10 +95,13 @@ public class ChannelService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
         if (channel.getType() == ChannelType.PRIVATE) {
+
             return ChannelResponseDto.privateChannel(
                     channel.getId(),
-                    channel.getParticipants());
+                    getUserResponseDtos(channel.getId(), readStatusRepository, userStatusRepository)
+                    );
         }
+
         else return ChannelResponseDto.publicChannel(
                 channel.getId(),
                 channel.getName(),
@@ -81,9 +111,11 @@ public class ChannelService {
 
     // 전체 PUBLIC, 참여중인 PRIVATE 채널
     public List<ChannelResponseDto> findAllByUserId(UUID id) {
-        List<UUID> privateChannelIds = readStatusRepository.findAllByUserId(id)
-                .stream()
-                .map(ReadStatus::getChannelId)
+
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(id);
+
+        List<UUID> privateChannelIds = readStatuses.stream()
+                .map(readStatus -> readStatus.getChannel().getId())
                 .toList();
 
         return channelRepository.findAll().stream()
@@ -95,7 +127,7 @@ public class ChannelService {
                     if (channel.getType() == ChannelType.PRIVATE) {
                         return ChannelResponseDto.privateChannel(
                                 channel.getId(),
-                                channel.getParticipants()
+                                getUserResponseDtos(channel.getId(), readStatusRepository, userStatusRepository)
                         );
                     } else {
                         return ChannelResponseDto.publicChannel(
@@ -129,23 +161,16 @@ public class ChannelService {
         log.info("수정 및 저장 완료");
 
         if (channel.getType() == ChannelType.PRIVATE) {
-            return new ChannelResponseDto(
+            return ChannelResponseDto.privateChannel(
                     channel.getId(),
-                    ChannelType.PRIVATE,
-                    null,
-                    null
-//                    channel.getParticipants(),
-//                    lastMessageAt(id)
+                    getUserResponseDtos(channel.getId(), readStatusRepository, userStatusRepository)
             );
         }
         else {
-            return new ChannelResponseDto(
+            return ChannelResponseDto.publicChannel(
                     channel.getId(),
-                    ChannelType.PUBLIC,
                     channel.getName(),
                     channel.getDescription()
-                    // null,
-                    // lastMessageAt(id)
             );
         }
     }
@@ -159,7 +184,7 @@ public class ChannelService {
 
         List<Message> messages = messageRepository.findByChannelId(id);
         if (messages != null) {
-            messages.forEach(messageRepository::delete);
+            messageRepository.deleteAll(messages);
         }
 
         List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(id);
@@ -181,17 +206,53 @@ public class ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
 
-        List<UUID> messageIds = channel.getMessages();
-        if (messageIds == null || messageIds.isEmpty()) {
+        List<UUID> messageIds = channel.getMessages().stream()
+                .map(Message::getId).toList();
+
+        if (messageIds.isEmpty()) {
             return null;
         }
 
-        List<Message> messages = messageRepository.findAllByIdIn(channel.getMessages());
+        List<Message> messages = messageRepository.findAllByIdIn(
+                channel.getMessages().stream().map(Message::getId).toList()
+        );
 
         return messages.stream()
                 .map(Message::getCreatedAt)
                 .max(Instant::compareTo)
                 .orElse(null);
+    }
+
+    public static List<UserResponseDto> getUserResponseDtos(UUID channelId,
+                                                            ReadStatusRepository readStatusRepository,
+                                                            UserStatusRepository userStatusRepository) {
+        // ReadStatus 가져오기 (다대다 연결테이블)
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+
+        // User, UserId 가져오기
+        List<User> users = readStatuses.stream()
+                .map(ReadStatus::getUser)
+                .toList();
+        List<UUID> userIds = readStatuses.stream()
+                .map(readStatus -> readStatus.getUser().getId())
+                .collect(Collectors.toList());
+
+        // UserStatus 가져오기
+        List<UserStatus> userStatuses = userStatusRepository.findAllById(userIds);
+
+        Map<UUID, UserStatus> statusMap = userStatuses.stream()
+                .collect(Collectors.toMap(status -> status.getUser().getId(), status -> status));
+
+        List<UserResponseDto> userResponseDtos;
+        return userResponseDtos = users.stream()
+                .map(user -> {
+                            boolean isOnline = Optional.ofNullable(statusMap.get(user.getId()))
+                                    .map(UserStatus::isOnline)
+                                    .orElse(false);
+                            return  UserMapper.toDto(user, isOnline);
+                        }
+                )
+                .toList();
     }
 
     // TODO 추후 개선 필요

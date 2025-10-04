@@ -27,7 +27,7 @@ public class BinaryContent extends BaseEntity implements Serializable{
     private Message message;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "binary_content_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(nullable = false, updatable = false)
@@ -48,13 +48,5 @@ public class BinaryContent extends BaseEntity implements Serializable{
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
-
-//    public BinaryContent(String name, String extension, BinaryContentType type, byte[] data, Long size) {
-//        this.fileName = name;
-//        this.extension = extension;
-//        this.type = type;
-//        this.data = data;
-//        this.size = size;
-//    }
 }
 

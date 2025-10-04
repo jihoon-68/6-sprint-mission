@@ -6,8 +6,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
     public UserResponseDto login(LoginRequestDto request){
 
@@ -30,17 +33,21 @@ public class AuthService {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
 
-        UserStatus userStatus = new UserStatus(user.getId());
+        boolean isUserOnline = userStatusRepository.findByUserId(user.getId())
+                .map(UserStatus::isOnline)
+                .orElseGet(() -> {
+                    log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다: " +  user.getUsername());
+                    return false;
+                });
 
         log.info("로그인 되었습니다.");
-        return new UserResponseDto(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getEmail(),
-                user.getUsername(),
-                // userStatus.isOnline(),
-                user.getProfileImageId()
-        );
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
+                .online(isUserOnline)
+                .build();
+
     }
 }

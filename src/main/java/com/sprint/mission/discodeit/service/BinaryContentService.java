@@ -21,29 +21,37 @@ public class BinaryContentService {
 
     public BinaryContentResponseDto create(BinaryContentCreateRequestDto dto){
         byte[] bytes = dto.bytes();
-        BinaryContent binaryContent = new BinaryContent(dto.fileName(), dto.extension(), dto.type(), bytes, (long) bytes.length);
+        BinaryContent binaryContent = BinaryContent.builder()
+                .fileName(dto.fileName())
+                .extension(dto.extension())
+                .type(dto.type())
+                .size((long) bytes.length)
+                .data(dto.bytes())
+                .build();
         binaryContentRepository.save(binaryContent);
 
-        return new BinaryContentResponseDto(
-                binaryContent.getId(),
-                binaryContent.getFileName(),
-                binaryContent.getType(),
-                binaryContent.getData(),
-                binaryContent.getCreatedAt()
-        );
+        return BinaryContentResponseDto.builder()
+                .id(binaryContent.getId())
+                .fileName(binaryContent.getFileName())
+                .extension(binaryContent.getExtension())
+                .type(binaryContent.getType())
+                .size(binaryContent.getSize())
+                .data(binaryContent.getData())
+                .build();
     }
 
     public BinaryContentResponseDto findById(UUID id){
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 BinaryContent입니다."));
 
-        return new BinaryContentResponseDto(
-                binaryContent.getId(),
-                binaryContent.getFileName(),
-                binaryContent.getType(),
-                binaryContent.getData(),
-                binaryContent.getCreatedAt()
-        );
+        return BinaryContentResponseDto.builder()
+                .id(binaryContent.getId())
+                .fileName(binaryContent.getFileName())
+                .extension(binaryContent.getExtension())
+                .type(binaryContent.getType())
+                .size(binaryContent.getSize())
+                .data(binaryContent.getData())
+                .build();
     }
 
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> ids){
@@ -52,13 +60,15 @@ public class BinaryContentService {
             throw new NotFoundException("해당하는 BinaryContent가 존재하지 않습니다.");
         }
         return contents.stream()
-                .map(content -> new BinaryContentResponseDto(
-                        content.getId(),
-                        content.getFileName(),
-                        content.getType(),
-                        content.getData(),
-                        content.getCreatedAt()
-                ))
+                .map(binaryContent -> BinaryContentResponseDto.builder()
+                        .id(binaryContent.getId())
+                        .fileName(binaryContent.getFileName())
+                        .extension(binaryContent.getExtension())
+                        .type(binaryContent.getType())
+                        .size(binaryContent.getSize())
+                        .data(binaryContent.getData())
+                        .build()
+                )
                 .toList();
     }
 

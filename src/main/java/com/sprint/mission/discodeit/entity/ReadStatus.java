@@ -38,10 +38,4 @@ public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
     @LastModifiedDate
     private Instant updatedAt;
-
-//    public ReadStatus(UUID userId, UUID channelId) {
-//        this.id = UUID.randomUUID();
-//        this.userId = userId;
-//        this.channelId = channelId;
-//    }
 }

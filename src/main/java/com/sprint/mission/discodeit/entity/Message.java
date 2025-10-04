@@ -35,10 +35,11 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
-    @OneToMany(mappedBy = "binary_content")
+    @OneToMany(mappedBy = "message")
     private List<BinaryContent> binaryContents;
 
-    private String content; // 내용. NULL 허용, 수정 가능.
+    @Column(nullable = false)
+    private String content; // 내용. 수정 가능.
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

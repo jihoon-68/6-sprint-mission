@@ -26,14 +26,17 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @Builder.Default
     private UUID id = UUID.randomUUID();
 
-    @OneToMany(mappedBy = "channel")
+    @OneToMany(mappedBy = "user")
     private List<Channel> channels; // 속해있는 채널
 
-    @OneToMany(mappedBy = "message")
+    @OneToMany(mappedBy = "user")
     private List<Message> messages; // 작성한 메시지
 
-    @LastModifiedDate
-    private Instant updatedAt;
+    @OneToOne(mappedBy = "user")
+    private UserStatus userStatus;
+
+    @OneToOne(mappedBy = "user")
+    private BinaryContent profileImage;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -44,19 +47,12 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @Column(nullable = false)
     private transient String password;
 
-    @OneToOne(mappedBy = "binary_content")
-    private BinaryContent profileImage;
-
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-//    public User(String email, String username, String password) {
-//        this.id = UUID.randomUUID();
-//        this.email = email;
-//        this.username = username;
-//        this.password = password;
-//    }
+    @LastModifiedDate
+    private Instant updatedAt;
 
     @Override
     public boolean equals(Object o) {
