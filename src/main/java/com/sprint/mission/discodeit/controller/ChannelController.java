@@ -64,7 +64,7 @@ public class ChannelController {
     @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @ApiResponse(responseCode = "200", description = "Channel 목록 조회 성공")
     @GetMapping
-    public ResponseEntity<List<FindChannelDTO>> findAll(@Schema(description = "조회할 User ID") @RequestParam("userId") UUID id, Model model) {
+    public ResponseEntity<List<FindChannelDTO>> findAll(@Schema(description = "조회할 User ID") @RequestParam("userId") UUID id) {
         List<FindChannelDTO> findChannelDTOS = channelService.findAllByUserId(id);
         return ResponseEntity.status(HttpStatus.OK).body(findChannelDTOS);
     }
