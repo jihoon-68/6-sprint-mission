@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDTO;
 import com.sprint.mission.discodeit.dto.ReadStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.ReadStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -33,19 +32,19 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusDto create(ReadStatusCreateRequest request) {
 
         User user = userRepository.findById(request.userId())
-                .orElseThrow(()-> new IllegalArgumentException("User with id: " + request.userId() + " not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User with id: " + request.userId() + " not found"));
         Channel channel = channelRepository.findById(request.channelId())
-                .orElseThrow(()-> new IllegalArgumentException("Channel with id: " + request.channelId() + " not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Channel with id: " + request.channelId() + " not found"));
 
         boolean isDuplication = readStatusRepository.findAll().stream()
                 .anyMatch(rs ->
                         rs.getUser().getId().equals(user.getId())
                                 && rs.getChannel().getId().equals(channel.getId()));
-        if(isDuplication) {
+        if (isDuplication) {
             throw new DuplicateFormatFlagsException("Duplicate Read Status");
         }
 
-        ReadStatus readStatus = readStatusRepository.save(new ReadStatus(channel,user));
+        ReadStatus readStatus = readStatusRepository.save(new ReadStatus(channel, user));
 
         return readStatusMapper.toDto(readStatus);
     }
@@ -66,7 +65,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         readStatus.update(newLastReadAt);
         readStatusRepository.save(readStatus);
-        return  readStatusMapper.toDto(readStatus);
+        return readStatusMapper.toDto(readStatus);
     }
 
     @Override

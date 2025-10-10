@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
-@ConditionalOnExpression("'${discodeit.repository.type}'='local'")
+@ConditionalOnExpression("'${discodeit.repository.type}'=='local'")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
     private final Path root;
 

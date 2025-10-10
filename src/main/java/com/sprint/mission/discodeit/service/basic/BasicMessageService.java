@@ -43,10 +43,10 @@ public class BasicMessageService implements MessageService {
     public MessageDto create(List<MultipartFile> multipartFiles, MessageCreateRequest messageCreateRequest) {
 
         User user = userRepository.findById(messageCreateRequest.authorId())
-                .orElseThrow(()-> new IllegalArgumentException("User with id: " + messageCreateRequest.authorId() + " not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User with id: " + messageCreateRequest.authorId() + " not found"));
 
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-                .orElseThrow(()-> new IllegalArgumentException("Channel with id: " + messageCreateRequest.channelId() + " not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Channel with id: " + messageCreateRequest.channelId() + " not found"));
 
         if (!multipartFiles.isEmpty()) {
             List<BinaryContentSave> messageBinaryContents = getBinaryContents(multipartFiles);
@@ -54,14 +54,14 @@ public class BasicMessageService implements MessageService {
 
             for (BinaryContentSave binaryContentSave : messageBinaryContents) {
                 binaryContents.add(binaryContentSave.binaryContent());
-                binaryContentStorage.put(binaryContentSave.binaryContent().getId(),binaryContentSave.data());
+                binaryContentStorage.put(binaryContentSave.binaryContent().getId(), binaryContentSave.data());
             }
 
             binaryContentRepository.saveAll(binaryContents);
             Message message = new Message(user, channel, messageCreateRequest.content(), binaryContents);
             messageRepository.save(message);
 
-            return  messageMapper.toDto(message);
+            return messageMapper.toDto(message);
         }
 
         Message message = messageRepository.save(new Message(user, channel, messageCreateRequest.content()));
@@ -70,7 +70,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<PageResponse<Message>> findAllByChannelId(UUID channelId, Pageable pageable) {
-        Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable, Limit.of(50));
+        Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
 
         return messages.stream()
                 .map(message -> pageResponseMapper.fromSlice(messages))

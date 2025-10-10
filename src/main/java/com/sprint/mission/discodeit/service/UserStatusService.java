@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.UserStatus.CreateUserStatusDTO;
 import com.sprint.mission.discodeit.dto.UserStatus.UpdateUserStatusDTO;
 import com.sprint.mission.discodeit.dto.UserStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.UserStatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.List;
 import java.util.UUID;
