@@ -22,8 +22,9 @@ spring:
     open-in-view: true
 discodeit:
   repository:
-    type: file # jcf | file
-    file-discodeit: .discodeit
+    type: local
+    local:
+      root-path: /Users/mac/myWs/uploadedFilesimg
 
 file:
   upload:
