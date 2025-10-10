@@ -7,15 +7,19 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
 
+@Component
+@AllArgsConstructor
 public class ChannelMapper {
 
-    MessageRepository messageRepository;
-    ReadStatusRepository readStatusRepository;
-    UserMapper userMapper;
+    private final MessageRepository messageRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final UserMapper userMapper;
 
     public ChannelDto toDto(Channel channel) {
         List<UserDto> users = readStatusRepository.findAll().stream()
