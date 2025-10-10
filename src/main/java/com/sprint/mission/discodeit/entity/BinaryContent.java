@@ -26,17 +26,13 @@ public class BinaryContent extends BaseEntity{
     @Column(nullable = false, length = 100)
     private String contentType;
 
-    @Column(nullable = false)
-    private byte[] bytes;
-
 
     //채널에 파일 업로드
-    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+    public BinaryContent(String fileName, Long size, String contentType) {
         super();
         this.fileName = fileName;
         this.size = size;
         this.contentType= contentType;
-        this.bytes = bytes;
     }
 
 
