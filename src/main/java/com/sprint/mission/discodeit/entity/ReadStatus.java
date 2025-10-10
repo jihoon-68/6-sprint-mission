@@ -3,26 +3,29 @@ package com.sprint.mission.discodeit.entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.time.Instant;
 
-
+@Entity
 @Getter
 @Setter(AccessLevel.PACKAGE)
 @Table(name = "read_statuses")
+@NoArgsConstructor
 public class ReadStatus extends BaseUpdatableEntity{
 
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "channel_id")
+    @JoinColumn(name = "channel_id", unique = true)
     private Channel channel;
 
     @Column(nullable = false)

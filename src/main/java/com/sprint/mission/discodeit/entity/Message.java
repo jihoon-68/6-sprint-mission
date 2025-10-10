@@ -1,31 +1,27 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 
+@Entity
 @Getter
 @Setter(AccessLevel.PACKAGE)
 @Table(name = "messages")
+@NoArgsConstructor
 public class Message extends BaseUpdatableEntity {
 
     @Column
     private String content;
 
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @Column(nullable = false)
-    @JoinColumn(name = "channel_id")
+    @JoinColumn(name = "channel_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Channel channel;
 
@@ -59,6 +55,7 @@ public class Message extends BaseUpdatableEntity {
         this.content = content;
         this.attachmentIds = new ArrayList<>(attachmentIds);
     }
+
 
     public void update(String content) {
         boolean anyValueUpdated = false;

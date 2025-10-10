@@ -4,14 +4,17 @@ import com.sprint.mission.discodeit.dto.User.UpdateUserDTO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 
+@Entity
 @Getter
 @Setter(AccessLevel.PACKAGE)
 @Table(name = "users")
+@NoArgsConstructor
 public class User extends BaseUpdatableEntity{
 
     @Column(unique = true,length = 50, nullable = false)
@@ -23,7 +26,7 @@ public class User extends BaseUpdatableEntity{
     @Column(length = 60, nullable = false)
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private BinaryContent profile;

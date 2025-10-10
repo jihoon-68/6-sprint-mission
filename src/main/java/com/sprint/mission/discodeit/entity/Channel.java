@@ -4,14 +4,10 @@ import com.sprint.mission.discodeit.enumtype.ChannelType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
-
+@Entity
 @Getter
 @Setter(AccessLevel.PACKAGE)
 @Table(name = "channels")
@@ -38,8 +34,6 @@ public class Channel extends BaseUpdatableEntity{
         this.name = "";
         this.description = "";
     }
-
-
 
     public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
