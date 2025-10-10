@@ -1,10 +1,9 @@
-package com.sprint.mission.discodeit.DTO.Channel;
-import com.sprint.mission.discodeit.Enum.ChannelType;
+package com.sprint.mission.discodeit.dto.Channel;
+
 
 public record CreatePublicChannelDTO(
-        String channelName,
-        String description,
-        ChannelType channelType
+        String name,
+        String description
 ) {
 
 }
