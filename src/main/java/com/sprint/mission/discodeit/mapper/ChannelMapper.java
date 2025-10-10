@@ -28,7 +28,7 @@ public class ChannelMapper {
                 .map(userMapper::toDto)
                 .toList();
 
-        Message message = messageRepository.findByChannelIdOrderByCreatedAtDesc(channel.getId())
+        Message message = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channel.getId())
                 .orElse(null);
 
         Instant lastMessageAt = null;

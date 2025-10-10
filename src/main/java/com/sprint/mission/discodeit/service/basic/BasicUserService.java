@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.BinaryContent.BinaryContentSave;
 import com.sprint.mission.discodeit.dto.User.*;
 import com.sprint.mission.discodeit.entity.BaseEntity;
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -54,7 +52,7 @@ public class BasicUserService implements UserService {
         BinaryContent profile = null;
         if (profileBinaryContent != null) {
             profile = binaryContentRepository.save(profileBinaryContent.binaryContent());
-            binaryContentStorage.put(profile.getId(),profileBinaryContent.data());
+            binaryContentStorage.put(profile.getId(), profileBinaryContent.data());
         }
 
 
@@ -99,7 +97,7 @@ public class BasicUserService implements UserService {
         BinaryContent profile = null;
         if (profileBinaryContent != null) {
             profile = binaryContentRepository.save(profileBinaryContent.binaryContent());
-            binaryContentStorage.put(profile.getId(),profileBinaryContent.data());
+            binaryContentStorage.put(profile.getId(), profileBinaryContent.data());
         }
 
         user.update(UpdateUserDTO.getUpdateUser(
@@ -138,7 +136,7 @@ public class BasicUserService implements UserService {
                         multipartFile.getContentType()
                 );
 
-                return new BinaryContentSave(binaryContent,multipartFile.getBytes());
+                return new BinaryContentSave(binaryContent, multipartFile.getBytes());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

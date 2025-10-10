@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.dto.Message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.Page.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -82,7 +84,8 @@ public interface MessageApi {
           content = @Content(array = @ArraySchema(schema = @Schema(implementation = Message.class)))
       )
   })
-  ResponseEntity<List<MessageDto>> findAllByChannelId(
-      @Parameter(description = "조회할 Channel ID") UUID channelId
+  ResponseEntity<List<PageResponse<Message>>> findAllByChannelId(
+      @Parameter(description = "조회할 Channel ID") UUID channelId,
+      @Parameter(description = "페이징 정보", example = "OrderedMap { \"size\": 50, \"page\": 0, \"sort\": \"createdAt,desc\" }") Pageable pageable
   );
 } 

@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.Message.CreateMessageDTO;
+import com.sprint.mission.discodeit.dto.BinaryContent.BinaryContentSave;
 import com.sprint.mission.discodeit.dto.Message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Message.MessageDto;
+import com.sprint.mission.discodeit.dto.Page.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -15,6 +17,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Limit;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +37,7 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final PageResponseMapper pageResponseMapper;
 
     @Override
     public MessageDto create(List<MultipartFile> multipartFiles, MessageCreateRequest messageCreateRequest) {
@@ -43,7 +49,14 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(()-> new IllegalArgumentException("Channel with id: " + messageCreateRequest.channelId() + " not found"));
 
         if (!multipartFiles.isEmpty()) {
-            List<BinaryContent> binaryContents = getBinaryContents(multipartFiles);
+            List<BinaryContentSave> messageBinaryContents = getBinaryContents(multipartFiles);
+            List<BinaryContent> binaryContents = new ArrayList<>();
+
+            for (BinaryContentSave binaryContentSave : messageBinaryContents) {
+                binaryContents.add(binaryContentSave.binaryContent());
+                binaryContentStorage.put(binaryContentSave.binaryContent().getId(),binaryContentSave.data());
+            }
+
             binaryContentRepository.saveAll(binaryContents);
             Message message = new Message(user, channel, messageCreateRequest.content(), binaryContents);
             messageRepository.save(message);
@@ -56,12 +69,11 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDto> findAllByChannelId(UUID channelId) {
-        List<Message> messages = messageRepository.findAll();
+    public List<PageResponse<Message>> findAllByChannelId(UUID channelId, Pageable pageable) {
+        Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable, Limit.of(50));
 
         return messages.stream()
-                .filter(message -> message.getChannel().getId().equals(channelId))
-                .map(messageMapper::toDto)
+                .map(message -> pageResponseMapper.fromSlice(messages))
                 .toList();
     }
 
@@ -85,8 +97,8 @@ public class BasicMessageService implements MessageService {
         messageRepository.deleteById(id);
     }
 
-    private List<BinaryContent> getBinaryContents(List<MultipartFile> multipartFiles) {
-        List<BinaryContent> binaryContents = new ArrayList<>();
+    private List<BinaryContentSave> getBinaryContents(List<MultipartFile> multipartFiles) {
+        List<BinaryContentSave> binaryContents = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
             try {
                 BinaryContent binaryContent = new BinaryContent(
@@ -94,7 +106,7 @@ public class BasicMessageService implements MessageService {
                         multipartFile.getSize(),
                         multipartFile.getContentType()
                 );
-                binaryContents.add(binaryContent);
+                binaryContents.add(new BinaryContentSave(binaryContent, multipartFile.getBytes()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
