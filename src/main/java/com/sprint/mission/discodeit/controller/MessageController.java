@@ -1,12 +1,18 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContentType;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +32,7 @@ import java.util.UUID;
 public class MessageController {
 
     private final MessageService messageService;
+    private final MessageRepository messageRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageResponseDto> create(@RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
@@ -53,9 +61,19 @@ public class MessageController {
                 .body(message);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<MessageResponseDto>> findAllByChannelId(@PathVariable UUID id) {
-        return ResponseEntity.ok(messageService.findByChannelId(id));
+    @GetMapping("/{channelId}/all")
+    public ResponseEntity<List<MessageResponseDto>> findByChannelId(@PathVariable UUID channelId) {
+        return ResponseEntity.ok(messageService.findByChannelId(channelId));
+    }
+
+    @GetMapping("/{channelId}")
+    public ResponseEntity<PageResponse<MessageResponseDto>> findByChannelId(
+            @PathVariable UUID channelId,
+            @RequestParam(required = false) Instant cursor, // 마지막 메시지 createdAt
+            @RequestParam(defaultValue = "50") int size) {
+
+        PageResponse<MessageResponseDto> response = messageService.findByChannelId(channelId, cursor, size);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}")

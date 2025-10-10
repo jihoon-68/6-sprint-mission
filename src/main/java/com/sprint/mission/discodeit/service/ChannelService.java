@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import lombok.Locked;
@@ -28,6 +29,7 @@ public class ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final ChannelMapper channelMapper;
 
     // 채널 생성 및 저장
     public ChannelResponseDto createPrivateChannel(PrivateChannelCreateRequestDto dto) {
@@ -223,6 +225,11 @@ public class ChannelService {
                 .orElse(null);
     }
 
+    public ChannelResponseDto getChannelDto(Channel channel, List<UserResponseDto> participants, Instant lastMessageAt) {
+        // MapStruct가 생성한 ChannelMapperImpl 클래스의 toDto 메서드를 사용
+        return channelMapper.toDto(channel, participants, lastMessageAt);
+    }
+
     public static List<UserResponseDto> getUserResponseDtos(UUID channelId,
                                                             ReadStatusRepository readStatusRepository,
                                                             UserStatusRepository userStatusRepository) {
@@ -254,19 +261,4 @@ public class ChannelService {
                 )
                 .toList();
     }
-
-    // TODO 추후 개선 필요
-    // 수정/삭제 시 유저 검증
-//    public void validateCreator(User user, Channel channel){
-//        if (!channel.getUserId().equals(user.getId())) {
-//            throw new IllegalStateException("채널 수정 또는 삭제는 생성한 사람만 가능합니다.");
-//        }
-//    }
-
-    // 채널 참여중인 사람인지 검증
-//    public void validateParticipant(User user, Channel channel) {
-//        if (!channel.getParticipants().contains(user)) {
-//            throw new IllegalStateException("채널에 참여하지 않은 유저입니다.");
-//        }
-//    }
 }

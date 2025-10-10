@@ -10,10 +10,12 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -24,6 +26,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 
+    @Transactional
     public UserResponseDto login(LoginRequestDto request){
 
         User user = userRepository.findByUsername(request.username())
@@ -33,21 +36,27 @@ public class AuthService {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
 
-        boolean isUserOnline = userStatusRepository.findByUserId(user.getId())
-                .map(UserStatus::isOnline)
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
-                    log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다: " +  user.getUsername());
-                    return false;
+                    // UserStatus가 없다면 새로 생성하여 저장합니다.
+                    log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다: " + user.getUsername());
+                    UserStatus newUserStatus = userStatusRepository.save(UserStatus.builder()
+                            .user(user)
+                            .lastActiveAt(Instant.now())
+                            .build());
+                    log.warn("UserStatus를 새로 생성했습니다: " + newUserStatus.getId());
+                    return newUserStatus;
                 });
 
-        log.info("로그인 되었습니다.");
+        userStatus.setLastActiveAt(Instant.now());
+
+        log.info("로그인 되었습니다: " +  user.getId());
         return UserResponseDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
-                .online(isUserOnline)
+                .online(true)
                 .build();
-
     }
 }

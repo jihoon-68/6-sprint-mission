@@ -29,14 +29,14 @@ public class Message extends BaseUpdatableEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User author;
 
     @ManyToOne
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
     @OneToMany(mappedBy = "message")
-    private List<BinaryContent> binaryContents;
+    private List<BinaryContent> attachments;
 
     @Column(nullable = false)
     private String content; // 내용. 수정 가능.
@@ -47,7 +47,6 @@ public class Message extends BaseUpdatableEntity implements Serializable {
 
     @LastModifiedDate
     private Instant updatedAt;
-
 
 
 //    public Message(UUID userId, UUID channelId, String content){

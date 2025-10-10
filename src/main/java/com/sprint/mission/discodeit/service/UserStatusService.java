@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -25,78 +26,74 @@ public class UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final UserStatusMapper userStatusMapper;
 
+    @Transactional
     public UserStatusResponseDto create(UserStatusCreateRequestDto dto){
-        User user = userRepository.findById(dto.userId()).orElseThrow(
-                () -> new NotFoundException("존재하지 않는 유저입니다."));
 
-        if (userStatusRepository.findById(dto.userId()).isPresent()){
+        if (userStatusRepository.existsById(dto.userId())) {
             throw new IllegalStateException("해당 유저에 대해 UserStatus가 이미 존재합니다.");
         }
 
-        UserStatus userStatus = UserStatus.builder()
-                .user(user)
-                .lastActiveAt(Instant.now())
-                .build();
+        User user = userRepository.findById(dto.userId()).orElseThrow(
+                () -> new NotFoundException("존재하지 않는 유저입니다."));
+
+        UserStatus userStatus = userStatusMapper.toEntity(dto);
+        userStatus.setLastActiveAt(Instant.now());
 
         userStatusRepository.save(userStatus);
+        log.info("UserStatus 생성 완료: " +  userStatus.getId());
 
-        return UserStatusResponseDto.builder()
-                .id(userStatus.getId())
-                .userId(userStatus.getUser().getId())
-                .lastActiveAt(userStatus.getLastActiveAt())
-                .build();
+        return userStatusMapper.toDto(userStatus);
     }
 
+    @Transactional(readOnly = true)
     public UserStatusResponseDto findById(UUID id){
         UserStatus userStatus = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
-        return UserStatusResponseDto.builder()
-                .id(userStatus.getId())
-                .userId(userStatus.getUser().getId())
-                .lastActiveAt(userStatus.getLastActiveAt())
-                .build();
+        return userStatusMapper.toDto(userStatus);
     }
 
+    @Transactional(readOnly = true)
     public List<UserStatusResponseDto> findAll(){
         List<UserStatus> userStatuses = userStatusRepository.findAll();
         return userStatuses.stream()
-                .map(UserStatusMapper::toDto)
+                .map(userStatusMapper::toDto)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public UserStatusResponseDto update(UUID id, UserStatusUpdateRequestDto dto){
         UserStatus userStatus = userStatusRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
         userStatus.setLastActiveAt(Instant.now());
-        userStatusRepository.save(userStatus);
-        return UserStatusResponseDto.builder()
-                .id(userStatus.getId())
-                .userId(userStatus.getUser().getId())
-                .lastActiveAt(userStatus.getLastActiveAt())
-                .build();
+        log.info("UserStatus 번경 완료: " + userStatus.getId());
+        userStatusRepository.save(userStatus); // 트랜잭션 종료 시 자동으로 update되지만 가독성을 위해 명시함.
+
+        return userStatusMapper.toDto(userStatus);
     }
 
+    @Transactional
     public UserStatusResponseDto updateByUserId(UUID userId) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+                .orElseThrow(() -> new NotFoundException("해당 유저에 대해 UserStatus가 존재하지 않습니다."));
 
         userStatus.setLastActiveAt(Instant.now());
-        userStatusRepository.save(userStatus);
-        return UserStatusResponseDto.builder()
-                .id(userStatus.getId())
-                .userId(userStatus.getUser().getId())
-                .lastActiveAt(userStatus.getLastActiveAt())
-                .build();
+        log.info("UserStatus 번경 완료: " + userStatus.getId());
+        userStatusRepository.save(userStatus); // 트랜잭션 종료 시 자동으로 update되지만 가독성을 위해 명시함.
+
+        return userStatusMapper.toDto(userStatus);
     }
 
+    @Transactional
     public void deleteById(UUID id){
-        userStatusRepository.deleteById(id); // 존재하지 않는 경우의 예외처리는 리포지토리에 구현됨.
+        userStatusRepository.deleteById(id);
         log.info("UserStatus 삭제 완료: " + id);
     }
 
+    @Transactional
     public void clear(){
         userStatusRepository.clear();
     }

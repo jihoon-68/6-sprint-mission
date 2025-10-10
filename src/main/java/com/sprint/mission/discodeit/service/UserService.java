@@ -13,10 +13,10 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -88,11 +88,12 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDto findByUsername(String name) {
         User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
 
-        boolean isUserOnline = checkUserOnlineStatus(user.getId());
+        boolean isUserOnline = isUserOnline(user.getId());
 
         return UserResponseDto.builder()
                 .id(user.getId())
@@ -103,11 +104,12 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDto findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
 
-        boolean isUserOnline = checkUserOnlineStatus(user.getId());
+        boolean isUserOnline = isUserOnline(user.getId());
 
         return UserResponseDto.builder()
                 .id(user.getId())
@@ -118,11 +120,12 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDto findById(UUID id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
 
-        boolean isUserOnline = checkUserOnlineStatus(user.getId());
+        boolean isUserOnline = isUserOnline(user.getId());
 
         return UserResponseDto.builder()
                 .id(user.getId())
@@ -133,12 +136,13 @@ public class UserService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponseDto> findAll(){
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAllWithStatusAndProfile(); // N+1 문제 해결 위해 fetch join 쿼리 사용
 
         return users.stream()
                 .map(user -> {
-                    boolean isUserOnline = checkUserOnlineStatus(user.getId());
+                    boolean isUserOnline = isUserOnline(user.getId());
 
                     return UserResponseDto.builder()
                             .id(user.getId())
@@ -148,7 +152,7 @@ public class UserService {
                             .online(isUserOnline)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 수정
@@ -183,34 +187,27 @@ public class UserService {
 
         optionalProfileCreateRequest
                 .ifPresent(profileRequest -> {
-                    byte[] bytes = profileRequest.bytes();
-
                     BinaryContent binaryContent = BinaryContent.builder()
                             .user(user)
                             .fileName(profileRequest.fileName())
                             .extension(profileRequest.extension())
                             .type(BinaryContentType.PROFILE_IMAGE)
-                            .data(bytes)
-                            .size((long) bytes.length)
+                            .data(profileRequest.bytes())
+                            .size((long) profileRequest.bytes().length)
                             .build();
 
                     binaryContentRepository.save(binaryContent);
                     user.setProfileImage(binaryContent);
                 });
 
-        userRepository.save(user);
+//        userRepository.save(user);
 
-        boolean isUserOnline = userStatusRepository.findByUserId(id)
+        boolean isUserOnline = userStatusRepository.findByUserId(user.getId())
                 .map(UserStatus::isOnline)
-                .orElse(false);
-
-        try {
-            isUserOnline = userStatusRepository.findByUserId(user.getId())
-                    .map(UserStatus::isOnline)
-                    .orElse(false);
-        } catch (Exception e) {
-            log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다.");
-        }
+                .orElseGet(() -> {
+                    log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다: {}", user.getId());
+                    return false;
+                });
 
         log.info("수정 및 저장 완료 : " + user.getUsername());
         return UserResponseDto.builder()
@@ -223,22 +220,18 @@ public class UserService {
     }
 
     // 유저 삭제
+    @Transactional
     public void delete(UUID id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
-
-        userStatusRepository.findByUserId(id)
-                .ifPresentOrElse(
-                        userStatus -> userStatusRepository.deleteById(userStatus.getId()), // userStatus -> userStatusRepository.delete(userStatus)와 동일
-                        () -> log.info("해당 유저에 대해 UserStatus가 없습니다.")
-                );
 
         userRepository.delete(user);
         log.info("유저 삭제 완료: " + id);
     }
 
     // 유저 모두 삭제
+    @Transactional
     public void clear(){
         userRepository.clear();
     }
@@ -250,7 +243,7 @@ public class UserService {
      * @param userId 확인할 유저의 UUID
      * @return 유저가 온라인 상태인지 여부
      */
-    private boolean checkUserOnlineStatus(UUID userId) {
+    private boolean isUserOnline(UUID userId) {
         return userStatusRepository.findByUserId(userId)
                 .map(UserStatus::isOnline)
                 .orElseGet(() -> {

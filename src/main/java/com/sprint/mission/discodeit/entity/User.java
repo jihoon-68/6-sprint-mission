@@ -32,10 +32,10 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @OneToMany(mappedBy = "user")
     private List<Message> messages; // 작성한 메시지
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", orphanRemoval = true)
     private UserStatus userStatus;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", orphanRemoval = true)
     private BinaryContent profileImage;
 
     @Column(nullable = false, unique = true)

@@ -42,8 +42,8 @@ public class BinaryContent extends BaseEntity implements Serializable{
     @Column(nullable = false, updatable = false)
     private Long size;
 
-    @Column(nullable = false, updatable = false)
-    private byte[] data;
+//    @Column(nullable = false, updatable = false)
+//    private byte[] data;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
