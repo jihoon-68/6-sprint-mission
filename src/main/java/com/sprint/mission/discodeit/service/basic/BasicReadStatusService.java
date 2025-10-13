@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -26,14 +28,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public ReadStatus create(CreateReadStatusRequest createReadStatusRequest) {
-    if (!userRepository.existsById(createReadStatusRequest.userId())) {
-      throw new NotFoundException("유저가 없습니다: " + createReadStatusRequest.userId());
-    }
-    if (!channelRepository.existsById(createReadStatusRequest.channelId())) {
-      throw new NotFoundException("채널이 없습니다: " + createReadStatusRequest.channelId());
-    }
-    ReadStatus readStatus = new ReadStatus(createReadStatusRequest.userId(),
-        createReadStatusRequest.channelId(), createReadStatusRequest.lastReadAt());
+    User user = userRepository.findById(createReadStatusRequest.userId())
+        .orElseThrow(() -> new NotFoundException(
+            "유저가 없습니다: " + createReadStatusRequest.userId()));
+    Channel channel = channelRepository.findById(createReadStatusRequest.channelId())
+        .orElseThrow(() -> new NotFoundException(
+            "채널이 없습니다: " + createReadStatusRequest.channelId()));
+    ReadStatus readStatus = new ReadStatus(user, channel, createReadStatusRequest.lastReadAt());
     return readStatusRepository.save(readStatus);
   }
 

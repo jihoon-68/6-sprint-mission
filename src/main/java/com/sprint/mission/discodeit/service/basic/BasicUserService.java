@@ -53,11 +53,11 @@ public class BasicUserService implements UserService {
           }
         }
     );
-    UUID profileId = binaryContent.map(BinaryContent::getId).orElse(null);
-    user = createUserRequest.toEntity(profileId);
+//    UUID profileId = binaryContent.map(BinaryContent::getId).orElse(null);
+    user = createUserRequest.toEntity(binaryContent.orElse(null));
     User createdUser = userRepository.save(user);
 
-    userStatusRepository.save(UserStatus.fromUser(createdUser.getId(), Instant.now()));
+    userStatusRepository.save(UserStatus.fromUser(createdUser, Instant.now()));
     return createdUser;
   }
 
@@ -94,7 +94,7 @@ public class BasicUserService implements UserService {
     Optional<BinaryContent> binaryContent = profile.map(
         file -> {
           try {
-            BinaryContent bc = binaryContentRepository.findById(user.getProfileId())
+            BinaryContent bc = binaryContentRepository.findById(user.getProfile().getId())
                 .orElse(null);
             if (bc == null) {
               bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
@@ -110,8 +110,7 @@ public class BasicUserService implements UserService {
           }
         }
     );
-    UUID profileId = binaryContent.map(BinaryContent::getId).orElse(null);
-    user.update(profileId);
+    user.update(binaryContent.orElse(null));
 
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NotFoundException("유저 상태 업데이트 도중에 유저 아이디를 찾지 못했습니다"));
@@ -139,13 +138,13 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NotFoundException("UserService delete: userId 없음"));
     List<BinaryContent> binaryContentsInUser = binaryContentRepository.findAll().stream()
-        .filter(binaryContent -> binaryContent.getId().equals(user.getProfileId())).toList();
+        .filter(binaryContent -> binaryContent.getId().equals(user.getProfile().getId())).toList();
     for (BinaryContent binaryContent : binaryContentsInUser) {
       binaryContentRepository.deleteById(binaryContent.getId());
     }
     // 유저 상태들 삭제
     List<UserStatus> userStatusesInUser = userStatusRepository.findAll().stream()
-        .filter(userStatus -> userStatus.getUserId().equals(userId)).toList();
+        .filter(userStatus -> userStatus.getUser().getId().equals(userId)).toList();
     for (UserStatus userStatus : userStatusesInUser) {
       userStatusRepository.deleteById(userStatus.getId());
     }

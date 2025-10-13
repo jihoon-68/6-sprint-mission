@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userstatus.CreateUserStatus;
 import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -24,13 +25,13 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatus create(CreateUserStatus createUserStatus) {
-    if (userRepository.existsById(createUserStatus.userId())) {
-      throw new NotFoundException("유저가 없습니다: " + createUserStatus.userId());
-    }
     if (userStatusRepository.existsById(createUserStatus.userId())) {
       throw new IllegalArgumentException("이미 유저상태 객체가 있습니다");
     }
-    return userStatusRepository.save(UserStatus.fromUser(createUserStatus.userId(), Instant.now()));
+    User user = userRepository.findById(createUserStatus.userId())
+        .orElseThrow(() -> new NotFoundException(
+            "유저가 없습니다: " + createUserStatus.userId()));
+    return userStatusRepository.save(UserStatus.fromUser(user, Instant.now()));
   }
 
   @Override

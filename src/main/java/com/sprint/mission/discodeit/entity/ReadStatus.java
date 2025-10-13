@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import java.io.Serializable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,24 +17,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ReadStatus implements Serializable {
+public class ReadStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  @Id
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private UUID userId;
-  private UUID channelId;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
+  @ManyToOne
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
+  @Column(nullable = false)
   private Instant lastReadAt;
-
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    this.userId = userId;
-    this.channelId = channelId;
-    this.lastReadAt = lastReadAt;
-  }
 
   public void update(Instant newLastReadAt) {
     boolean anyValueUpdated = false;

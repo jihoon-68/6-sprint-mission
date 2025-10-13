@@ -1,42 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import java.io.Serializable;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.action.internal.OrphanRemovalAction;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserStatus implements Serializable {
+public class UserStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  @Id
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private UUID userId;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
   private Instant lastActiveAt;
 
-  private UserStatus(UUID userId, Instant lastActiveAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
-    this.userId = userId;
-    this.lastActiveAt = lastActiveAt;
-  }
-
-  public static UserStatus fromUser(UUID userId, Instant lastActiveAt) {
-    return new UserStatus(userId, lastActiveAt);
+  public static UserStatus fromUser(User user, Instant lastActiveAt) {
+    return new UserStatus(user, lastActiveAt);
   }
 
   public boolean isOnline() {

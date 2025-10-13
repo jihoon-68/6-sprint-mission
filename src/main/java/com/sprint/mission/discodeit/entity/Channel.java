@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,14 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Channel implements Serializable {
+public class Channel extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  @Id
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
   @Enumerated(EnumType.STRING)
   private ChannelType type;
   private String name;
@@ -35,8 +28,6 @@ public class Channel implements Serializable {
   public static Channel createPublic(String name, String description) {
     return Channel
         .builder()
-        .id(UUID.randomUUID())
-        .createdAt(Instant.now())
         .type(ChannelType.PUBLIC)
         .name(name)
         .description(description)
@@ -46,8 +37,6 @@ public class Channel implements Serializable {
   public static Channel createPrivate() {
     return Channel
         .builder()
-        .id(UUID.randomUUID())
-        .createdAt(Instant.now())
         .type(ChannelType.PRIVATE)
         .build();
   }

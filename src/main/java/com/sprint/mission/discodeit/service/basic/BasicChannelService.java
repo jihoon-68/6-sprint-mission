@@ -4,25 +4,26 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Set;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -32,6 +33,7 @@ public class BasicChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
+  private final UserRepository userRepository;   //
 
   @Override
   public Channel createPublic(CreatePublicChannelRequest createPublicChannelRequest) {
@@ -44,8 +46,10 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.createPrivate();
     Channel createdChannel = channelRepository.save(channel);
     for (UUID userId : createPrivateChannelRequest.participantIds()) {
+      User user = userRepository.findById(userId)
+          .orElseThrow(() -> new NotFoundException("유저가 없습니다: " + userId));
       readStatusRepository.save(
-          new ReadStatus(userId, createdChannel.getId(), channel.getCreatedAt()));
+          new ReadStatus(user, createdChannel, channel.getCreatedAt()));
     }
     return createdChannel;
   }
@@ -62,7 +66,7 @@ public class BasicChannelService implements ChannelService {
 
     // 유저가 속한 채널 ID 리스트
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-        .map(ReadStatus::getChannelId)
+        .map(readStatus -> readStatus.getChannel().getId())
         .toList();
 
     // 유저가 속한 채널 리스트
@@ -83,7 +87,8 @@ public class BasicChannelService implements ChannelService {
       List<UUID> participantIds = new ArrayList<>();
       if (channel.getType().equals(ChannelType.PRIVATE)) {
         participantIds = readStatusRepository.findAllByChannelId(channel.getId()).stream()
-            .map(ReadStatus::getUserId).distinct().collect(Collectors.toList());
+            .map(readStatus -> readStatus.getUser().getId()).distinct()
+            .collect(Collectors.toList());
       }
 
       return new ChannelResponse(channel.getId(), channel.getType(), channel.getName(),

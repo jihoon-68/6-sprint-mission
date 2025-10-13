@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -35,12 +37,12 @@ public class BasicMessageService implements MessageService {
   @Override
   public Message create(CreateMessageRequest createMessageRequest,
       List<MultipartFile> attachments) {
-    if (!channelRepository.existsById(createMessageRequest.channelId())) {
-      throw new NotFoundException("채널이 없습니다 " + createMessageRequest.channelId());
-    }
-    if (!userRepository.existsById(createMessageRequest.authorId())) {
-      throw new NotFoundException("해당 유저가 없습니다 " + createMessageRequest.authorId());
-    }
+    Channel channel = channelRepository.findById(createMessageRequest.channelId())
+        .orElseThrow(() -> new NotFoundException(
+            "채널이 없습니다 " + createMessageRequest.channelId()));
+    User author = userRepository.findById(createMessageRequest.authorId())
+        .orElseThrow(() -> new NotFoundException(
+            "해당 유저가 없습니다 " + createMessageRequest.authorId()));
 
     List<MultipartFile> attachmentsNotNull =
         attachments != null ? attachments : Collections.emptyList();
@@ -58,8 +60,8 @@ public class BasicMessageService implements MessageService {
           }
         }
     ).map(BinaryContent::getId).toList();
-    Message message = new Message(createMessageRequest.content(), createMessageRequest.channelId(),
-        createMessageRequest.authorId(), binaryContentIds);
+    Message message = new Message(createMessageRequest.content(), channel, author,
+        binaryContentIds);
     return messageRepository.save(message);
   }
 
