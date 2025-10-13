@@ -21,11 +21,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -47,25 +49,25 @@ public class BasicMessageService implements MessageService {
     List<MultipartFile> attachmentsNotNull =
         attachments != null ? attachments : Collections.emptyList();
 
-    List<UUID> binaryContentIds = attachmentsNotNull.stream().map(
+    List<BinaryContent> binaryContents = attachmentsNotNull.stream().map(
         file -> {
           try {
-            BinaryContent bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
+            return new BinaryContent(file.getOriginalFilename(), file.getSize(),
                 file.getContentType(),
                 file.getBytes());
-            return binaryContentRepository.save(bc);
           } catch (IOException e) {
             log.error("첨부파일 처리 실패", e);
             throw new RuntimeException("첨부파일 처리 실패");
           }
         }
-    ).map(BinaryContent::getId).toList();
-    Message message = new Message(createMessageRequest.content(), channel, author,
-        binaryContentIds);
+    ).toList();
+
+    Message message = new Message(createMessageRequest.content(), channel, author, binaryContents);
     return messageRepository.save(message);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Message find(UUID messageId) {
     return messageRepository.findById(messageId)
         .orElseThrow(
@@ -73,6 +75,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Message> findAllByChannelId(UUID channelId) {
     return messageRepository.findAllByChannelId(channelId);
   }
@@ -93,9 +96,9 @@ public class BasicMessageService implements MessageService {
     }
     // 메시지의 첨부파일들 객체 삭제
     Message message = messageRepository.findById(messageId).orElse(null);
-    if (message.getAttachmentIds() != null) {
-      message.getAttachmentIds()
-          .forEach(attachmentId -> binaryContentRepository.deleteById(attachmentId));
+    if (message.getAttachments() != null) {
+      message.getAttachments()
+          .forEach(attachment -> binaryContentRepository.deleteById(attachment.getId()));
     }
     // 메시지 id로 삭제
     messageRepository.deleteById(messageId);

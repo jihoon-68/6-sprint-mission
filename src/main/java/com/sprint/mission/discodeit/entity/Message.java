@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +28,8 @@ public class Message extends BaseUpdatableEntity {
   @ManyToOne
   @JoinColumn(name = "author_id")
   private User author;
-  private List<UUID> attachmentIds;
+  @OneToMany
+  private List<BinaryContent> attachments;
 
   public void update(String newContent) {
     boolean anyValueUpdated = false;

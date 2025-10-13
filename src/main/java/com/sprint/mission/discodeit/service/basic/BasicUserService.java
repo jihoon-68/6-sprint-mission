@@ -13,17 +13,18 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
@@ -53,7 +54,6 @@ public class BasicUserService implements UserService {
           }
         }
     );
-//    UUID profileId = binaryContent.map(BinaryContent::getId).orElse(null);
     user = createUserRequest.toEntity(binaryContent.orElse(null));
     User createdUser = userRepository.save(user);
 
@@ -62,6 +62,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public User find(UUID userId) {
     return userRepository.findById(userId)
         .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
@@ -69,6 +70,7 @@ public class BasicUserService implements UserService {
 
   // 유저 목록 새로고침할때마다 상태 업데이트
   @Override
+  @Transactional(readOnly = true)
   public List<User> findAll() {
     List<User> userList = userRepository.findAll();
 

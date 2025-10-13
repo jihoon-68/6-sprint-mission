@@ -5,20 +5,22 @@ import com.sprint.mission.discodeit.dto.binarycontent.CreateProfileImage;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicBinaryContentService implements BinaryContentService {
 
   public final BinaryContentRepository binaryContentRepository;
+  private final ReadStatusRepository readStatusRepository; //
 
   @Override
   public BinaryContent createAttachmentImage(CreateAttachmentImage createAttachmentImage) {
@@ -33,6 +35,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public BinaryContent find(UUID binaryContentId) {
     return binaryContentRepository.findById(binaryContentId)
         .orElseThrow(
@@ -40,6 +43,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIdList) {
     List<BinaryContent> binaryContentList = new ArrayList<>();
     for (UUID binaryContentId : binaryContentIdList) {
