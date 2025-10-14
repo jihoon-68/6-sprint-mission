@@ -7,29 +7,34 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.time.Instant;
 
 @Entity
 @Getter
 @Setter(AccessLevel.PACKAGE)
-@Table(name = "read_statuses")
+@Table(name = "read_statuses",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "read_status_unique_channel_id_key",
+                        columnNames = {"channel_id", "user_id"}
+                )
+        })
 @NoArgsConstructor
-public class ReadStatus extends BaseUpdatableEntity{
+public class ReadStatus extends BaseUpdatableEntity {
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", unique = true)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "channel_id", unique = true)
+    @JoinColumn(name = "channel_id")
     private Channel channel;
 
     @Column(nullable = false)
-    private Instant lastReadAt ;
+    private Instant lastReadAt;
 
     public ReadStatus(Channel channel, User user) {
         this.user = user;
