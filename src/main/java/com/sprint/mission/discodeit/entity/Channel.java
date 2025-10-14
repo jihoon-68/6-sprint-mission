@@ -11,9 +11,9 @@ import lombok.Setter;
 @Getter
 @Setter(AccessLevel.PACKAGE)
 @Table(name = "channels")
-public class Channel extends BaseUpdatableEntity{
+public class Channel extends BaseUpdatableEntity {
 
-    @Column(nullable = false,length = 10)
+    @Column(nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
     private ChannelType type;
 

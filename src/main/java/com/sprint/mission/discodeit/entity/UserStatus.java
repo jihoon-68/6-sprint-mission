@@ -15,10 +15,10 @@ import java.time.Instant;
 @Setter(AccessLevel.PACKAGE)
 @Table(name = "user_statuses")
 @NoArgsConstructor
-public class UserStatus extends BaseUpdatableEntity{
+public class UserStatus extends BaseUpdatableEntity {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false,unique = true)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
@@ -26,7 +26,6 @@ public class UserStatus extends BaseUpdatableEntity{
     private Instant lastAccessAt;
 
     public UserStatus(User user) {
-        super();
         this.user = user;
         this.lastAccessAt = Instant.now();
     }
@@ -34,11 +33,11 @@ public class UserStatus extends BaseUpdatableEntity{
     public void update(Instant lastAccessAt) {
         boolean anyValueUpdated = false;
 
-        if (lastAccessAt != null && !lastAccessAt.equals(this.lastAccessAt)){
+        if (lastAccessAt != null && !lastAccessAt.equals(this.lastAccessAt)) {
             this.lastAccessAt = lastAccessAt;
             anyValueUpdated = true;
         }
-        if(anyValueUpdated){
+        if (anyValueUpdated) {
             this.updatedAtNow();
         }
     }

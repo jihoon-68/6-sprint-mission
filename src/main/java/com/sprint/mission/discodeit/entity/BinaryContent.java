@@ -27,7 +27,6 @@ public class BinaryContent extends BaseEntity{
 
     //채널에 파일 업로드
     public BinaryContent(String fileName, Long size, String contentType) {
-        super();
         this.fileName = fileName;
         this.size = size;
         this.contentType= contentType;

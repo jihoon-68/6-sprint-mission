@@ -15,12 +15,12 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter(AccessLevel.PACKAGE)
 @Table(name = "users")
 @NoArgsConstructor
-public class User extends BaseUpdatableEntity{
+public class User extends BaseUpdatableEntity {
 
-    @Column(unique = true,length = 50, nullable = false)
+    @Column(unique = true, length = 50, nullable = false)
     private String username;
 
-    @Column(unique = true,length = 100, nullable = false)
+    @Column(unique = true, length = 100, nullable = false)
     private String email;
 
     @Column(length = 60, nullable = false)
@@ -34,7 +34,7 @@ public class User extends BaseUpdatableEntity{
     @OneToOne(mappedBy = "user")
     private UserStatus status;
 
-    public User(String username, String email, String password,  BinaryContent profile) {
+    public User(String username, String email, String password, BinaryContent profile) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -45,29 +45,34 @@ public class User extends BaseUpdatableEntity{
     public void update(UpdateUserDTO updateUserDTO) {
         boolean anyValueUpdated = false;
 
-        if ( updateUserDTO.username() != null
+        if (updateUserDTO.username() != null
                 && !updateUserDTO.username().isEmpty()
                 && !updateUserDTO.username().equals(this.username)) {
             this.username = updateUserDTO.username();
             anyValueUpdated = true;
         }
 
-        if ( updateUserDTO.email() != null
+        if (updateUserDTO.email() != null
                 && !updateUserDTO.email().isEmpty()
                 && !updateUserDTO.email().equals(this.email)) {
             this.email = updateUserDTO.email();
             anyValueUpdated = true;
         }
 
-        if (  updateUserDTO.password() != null
+        if (updateUserDTO.password() != null
                 && !updateUserDTO.password().isEmpty()
                 && !updateUserDTO.password().equals(this.password)) {
             this.password = updateUserDTO.password();
             anyValueUpdated = true;
         }
 
-        if (updateUserDTO.profile()!= null && !updateUserDTO.profile().equals(this.profile)) {
+        if (updateUserDTO.profile() != null && !updateUserDTO.profile().equals(this.profile)) {
             this.profile = updateUserDTO.profile();
+            anyValueUpdated = true;
+        }
+
+        if (updateUserDTO.status() != null) {
+            this.status = updateUserDTO.status();
             anyValueUpdated = true;
         }
 

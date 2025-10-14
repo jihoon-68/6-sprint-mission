@@ -14,7 +14,8 @@ import java.time.Instant;
 public abstract class BaseUpdatableEntity extends BaseEntity {
     @LastModifiedDate
     private Instant updatedAt;
-    public void  updatedAtNow(){
+
+    public void updatedAtNow() {
         this.updatedAt = Instant.now();
     }
 

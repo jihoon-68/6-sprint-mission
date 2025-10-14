@@ -20,17 +20,17 @@ public class Message extends BaseUpdatableEntity {
     @Column
     private String content;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Channel channel;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User author;
 
-    @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinTable(
             name = "message_attachments",
             joinColumns = @JoinColumn(name = "message_id"),
@@ -39,9 +39,7 @@ public class Message extends BaseUpdatableEntity {
     private List<BinaryContent> attachmentIds;
 
 
-
     public Message(User author, Channel channel, String content) {
-        super();
         this.channel = channel;
         this.author = author;
         this.content = content;
@@ -49,7 +47,6 @@ public class Message extends BaseUpdatableEntity {
     }
 
     public Message(User author, Channel channel, String content, List<BinaryContent> attachmentIds) {
-        super();
         this.channel = channel;
         this.author = author;
         this.content = content;
