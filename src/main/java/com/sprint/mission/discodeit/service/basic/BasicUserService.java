@@ -78,13 +78,7 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
-        List<UserStatus> userStatuses = userStatusRepository.findAll();
-        Map<UUID, UserStatus> userStatusMap = userStatuses.stream()
-                .collect(Collectors.toMap(BaseEntity::getId, Function.identity()));
-
-        return users.stream()
-                .map(userMapper::toDto)
-                .toList();
+        return userMapper.toDtoList(users);
     }
 
     @Override

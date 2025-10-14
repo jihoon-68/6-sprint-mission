@@ -55,11 +55,11 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-
+        List<Channel> channels = channelRepository.findAll();
         //공개 채널부터 다넣음
-        List<Channel> channels = channelRepository.findAll().stream()
+        List<Channel> publicChannels = new ArrayList<>(channels.stream()
                 .filter(c -> c.getType().equals(ChannelType.PUBLIC))
-                .collect(Collectors.toList());
+                .toList());
 
         //유저 읽음 싱테 들고옴
         List<ReadStatus> readStatusesUser = readStatusRepository.findAll().stream()
@@ -68,19 +68,15 @@ public class BasicChannelService implements ChannelService {
 
         //리드 상태로 비공개 채널 전채 채널 리스트에 추가
         for (ReadStatus readStatuses : readStatusesUser) {
-            Channel channel = channelRepository.findById(readStatuses.getChannel().getId())
-                    .orElseThrow(() -> new NoSuchElementException("channel not found"));
-            if (channel.getType().equals(ChannelType.PUBLIC)) {
+            Channel privaeChannel = channels.get(channels.indexOf(readStatuses.getChannel()));
+            if (privaeChannel.getType().equals(ChannelType.PUBLIC)) {
                 continue;
             }
-            channels.add(channel);
+            publicChannels.add(privaeChannel);
         }
 
         //에티티 디티오로 변환
-        List<ChannelDto> findChannelDTOS = new ArrayList<>();
-        for (Channel channel : channels) {
-            findChannelDTOS.add(channelMapper.toDto(channel));
-        }
+        List<ChannelDto> findChannelDTOS = channelMapper.toDtoList(publicChannels);
 
         return List.copyOf(findChannelDTOS);
     }
