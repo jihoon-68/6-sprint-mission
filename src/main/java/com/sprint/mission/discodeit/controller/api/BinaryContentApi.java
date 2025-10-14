@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.BinaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.Encoder;
+import org.hibernate.engine.jdbc.BinaryStream;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -23,7 +27,7 @@ public interface BinaryContentApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "첨부 파일 조회 성공",
-          content = @Content(schema = @Schema(implementation = BinaryContent.class))
+          content = @Content(schema = @Schema(implementation = BinaryContentDto.class))
       ),
       @ApiResponse(
           responseCode = "404", description = "첨부 파일을 찾을 수 없음",
@@ -38,7 +42,7 @@ public interface BinaryContentApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "첨부 파일 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class)))
+          content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContentDto.class)))
       )
   })
   ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
@@ -49,7 +53,7 @@ public interface BinaryContentApi {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200", description = "파일 다운로드 성공",
-                    content = @Content(schema = @Schema(contentSchema = String.class))
+                    content = @Content(schema = @Schema(implementation = String.class))
             )
     })
     ResponseEntity<?> downloadBinaryContent(

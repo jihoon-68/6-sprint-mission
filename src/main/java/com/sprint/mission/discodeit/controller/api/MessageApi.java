@@ -29,7 +29,7 @@ public interface MessageApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "201", description = "Message가 성공적으로 생성됨",
-          content = @Content(schema = @Schema(implementation = Message.class))
+          content = @Content(schema = @Schema(implementation = MessageDto.class))
       ),
       @ApiResponse(
           responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
@@ -51,7 +51,7 @@ public interface MessageApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "Message가 성공적으로 수정됨",
-          content = @Content(schema = @Schema(implementation = Message.class))
+          content = @Content(schema = @Schema(implementation = MessageDto.class))
       ),
       @ApiResponse(
           responseCode = "404", description = "Message를 찾을 수 없음",
@@ -81,10 +81,10 @@ public interface MessageApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "Message 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = Message.class)))
+          content = @Content(array = @ArraySchema(schema = @Schema(implementation = PageResponse.class)))
       )
   })
-  ResponseEntity<List<PageResponse<Message>>> findAllByChannelId(
+  ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @Parameter(description = "조회할 Channel ID") UUID channelId,
       @Parameter(description = "페이징 정보", example = "OrderedMap { \"size\": 50, \"page\": 0, \"sort\": \"createdAt,desc\" }") Pageable pageable
   );
