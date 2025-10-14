@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.UUID;
 
-public record UpdateUserDTO(
+public record UpdateUserDto(
         UUID id,
         String username,
         String email,
@@ -14,8 +14,8 @@ public record UpdateUserDTO(
         UserStatus status
 ) {
 
-    public static UpdateUserDTO getStatus(UserStatus status) {
-        return new UpdateUserDTO(
+    public static UpdateUserDto getStatus(UserStatus status) {
+        return new UpdateUserDto(
                 null,
                 null,
                 null,
@@ -25,8 +25,8 @@ public record UpdateUserDTO(
 
         );
     }
-    public static UpdateUserDTO getUpdateUser(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContent binaryContent ) {
-        return new UpdateUserDTO(
+    public static UpdateUserDto getUpdateUser(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContent binaryContent ) {
+        return new UpdateUserDto(
                 userId,
                 userUpdateRequest.newUsername(),
                 userUpdateRequest.newEmail(),

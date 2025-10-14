@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -68,7 +67,7 @@ public class BasicUserService implements UserService {
 
         //유저에 유저 상태 추가
         UserStatus userStatus = new UserStatus(user);
-        user.update(UpdateUserDTO.getStatus(userStatus));
+        user.update(UpdateUserDto.getStatus(userStatus));
 
         if (profile != null) {binaryContentRepository.save(profile);}
         userRepository.save(user);
@@ -106,7 +105,7 @@ public class BasicUserService implements UserService {
             binaryContentStorage.put(profile.getId(), profileBinaryContent.data());
         }
 
-        user.update(UpdateUserDTO.getUpdateUser(
+        user.update(UpdateUserDto.getUpdateUser(
                 user.getId(),
                 userUpdateRequest,
                 profile

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.User.UpdateUserDTO;
+import com.sprint.mission.discodeit.dto.User.UpdateUserDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,7 +42,7 @@ public class User extends BaseUpdatableEntity {
     }
 
 
-    public void update(UpdateUserDTO updateUserDTO) {
+    public void update(UpdateUserDto updateUserDTO) {
         boolean anyValueUpdated = false;
 
         if (updateUserDTO.username() != null
