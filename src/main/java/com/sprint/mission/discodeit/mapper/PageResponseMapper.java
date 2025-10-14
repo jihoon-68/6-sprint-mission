@@ -11,7 +11,7 @@ public class PageResponseMapper {
     public <T> PageResponse<T> fromSlice (Slice<T> slice) {
         return new PageResponse<>(
                 slice.getContent(),
-                slice.getNumber(),
+                slice.getContent().get(slice.getContent().size() - 1),
                 slice.getSize(),
                 slice.hasNext(),
                 slice.stream().count()

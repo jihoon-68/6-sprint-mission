@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -22,5 +24,21 @@ public class UserMapper {
                 binaryContentDto,
                 user.getStatus().isConnecting(Instant.now())
         );
+    }
+    public List<UserDto> toDtoList(List<User> users) {
+        List<UserDto> userDtoList = new ArrayList<>();
+        for (User user : users) {
+            BinaryContentDto binaryContentDto = binaryContentMapper.toDto(user.getProfile());
+
+            UserDto userDto = new UserDto(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    binaryContentDto,
+                    user.getStatus().isConnecting(Instant.now())
+                    );
+            userDtoList.add(userDto);
+        }
+        return userDtoList;
     }
 }
