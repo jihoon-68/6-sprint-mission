@@ -17,18 +17,17 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
@@ -48,7 +47,7 @@ public class BasicMessageService implements MessageService {
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
                 .orElseThrow(() -> new IllegalArgumentException("Channel with id: " + messageCreateRequest.channelId() + " not found"));
 
-        if (!multipartFiles.isEmpty()) {
+        if (multipartFiles != null && !multipartFiles.get(0).isEmpty()) {
             List<BinaryContentSave> messageBinaryContents = getBinaryContents(multipartFiles);
             List<BinaryContent> binaryContents = new ArrayList<>();
 
@@ -64,17 +63,18 @@ public class BasicMessageService implements MessageService {
             return messageMapper.toDto(message);
         }
 
-        Message message = messageRepository.save(new Message(user, channel, messageCreateRequest.content()));
+        Message message = new Message(user, channel, messageCreateRequest.content());
+        messageRepository.save(message);
+
         return messageMapper.toDto(message);
     }
 
     @Override
-    public List<PageResponse<Message>> findAllByChannelId(UUID channelId, Pageable pageable) {
-        Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
-
-        return messages.stream()
-                .map(message -> pageResponseMapper.fromSlice(messages))
-                .toList();
+    @Transactional(readOnly = true)
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+        Slice<Message> slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+        Slice<MessageDto> messageDtoSlice = slice.map(messageMapper::toDto);
+        return pageResponseMapper.fromSlice(messageDtoSlice);
     }
 
     @Override
@@ -99,16 +99,18 @@ public class BasicMessageService implements MessageService {
 
     private List<BinaryContentSave> getBinaryContents(List<MultipartFile> multipartFiles) {
         List<BinaryContentSave> binaryContents = new ArrayList<>();
-        for (MultipartFile multipartFile : multipartFiles) {
-            try {
-                BinaryContent binaryContent = new BinaryContent(
-                        multipartFile.getOriginalFilename(),
-                        multipartFile.getSize(),
-                        multipartFile.getContentType()
-                );
-                binaryContents.add(new BinaryContentSave(binaryContent, multipartFile.getBytes()));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
+            for (MultipartFile multipartFile : multipartFiles) {
+                try {
+                    BinaryContent binaryContent = new BinaryContent(
+                            multipartFile.getOriginalFilename(),
+                            multipartFile.getSize(),
+                            multipartFile.getContentType()
+                    );
+                    binaryContents.add(new BinaryContentSave(binaryContent, multipartFile.getBytes()));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return binaryContents;
