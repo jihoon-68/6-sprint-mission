@@ -14,15 +14,18 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
+@Transactional
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -51,22 +54,25 @@ public class BasicUserService implements UserService {
         BinaryContentSave profileBinaryContent = getBinaryContent(multipartFile);
         BinaryContent profile = null;
         if (profileBinaryContent != null) {
-            profile = binaryContentRepository.save(profileBinaryContent.binaryContent());
+            profile = profileBinaryContent.binaryContent();
             binaryContentStorage.put(profile.getId(), profileBinaryContent.data());
         }
 
-
         //유저 생성
-        User user = userRepository.save(new User(
-                        userCreateRequest.username(),
-                        userCreateRequest.email(),
-                        userCreateRequest.password(),
-                        profile
-                )
+        User user = new User(
+                userCreateRequest.username(),
+                userCreateRequest.email(),
+                userCreateRequest.password(),
+                profile
         );
+
         //유저에 유저 상태 추가
-        user.update(UpdateUserDTO.getStatus(userStatusRepository.save(new UserStatus(user))));
+        UserStatus userStatus = new UserStatus(user);
+        user.update(UpdateUserDTO.getStatus(userStatus));
+
+        if (profile != null) {binaryContentRepository.save(profile);}
         userRepository.save(user);
+        userStatusRepository.save(userStatus);
         return userMapper.toDto(user);
     }
 
@@ -96,7 +102,7 @@ public class BasicUserService implements UserService {
         BinaryContentSave profileBinaryContent = getBinaryContent(multipartFile);
         BinaryContent profile = null;
         if (profileBinaryContent != null) {
-            profile = binaryContentRepository.save(profileBinaryContent.binaryContent());
+            profile = profileBinaryContent.binaryContent();
             binaryContentStorage.put(profile.getId(), profileBinaryContent.data());
         }
 
@@ -105,6 +111,8 @@ public class BasicUserService implements UserService {
                 userUpdateRequest,
                 profile
         ));
+
+        if (profile != null) {binaryContentRepository.save(profile);}
         userRepository.save(user);
         return userMapper.toDto(user);
     }
@@ -137,7 +145,7 @@ public class BasicUserService implements UserService {
                 );
 
                 return new BinaryContentSave(binaryContent, multipartFile.getBytes());
-            } catch (Exception e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
