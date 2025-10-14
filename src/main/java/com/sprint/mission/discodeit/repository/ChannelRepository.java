@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
+
 }
