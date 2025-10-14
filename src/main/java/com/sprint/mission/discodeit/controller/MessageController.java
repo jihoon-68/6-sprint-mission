@@ -29,7 +29,7 @@ public class MessageController implements MessageApi {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<MessageDto> create(
             @RequestPart(name = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
-            @RequestPart(name = "attachments",required = false) List<MultipartFile> attachments) {
+            @RequestPart(name = "attachments", required = false) List<MultipartFile> attachments) {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.create(attachments, messageCreateRequest));
     }
 
@@ -51,10 +51,10 @@ public class MessageController implements MessageApi {
 
 
     @GetMapping
-    public ResponseEntity<List<PageResponse<Message>>> findAllByChannelId(
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
             @RequestParam("channelId") UUID id,
-            @RequestParam("pageable") Pageable pageable) {
-        List<PageResponse<Message>> messageList = messageService.findAllByChannelId(id,pageable);
+            Pageable pageable) {
+        PageResponse<MessageDto> messageList = messageService.findAllByChannelId(id, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(messageList);
     }
 }

@@ -29,7 +29,7 @@ public class UserController implements UserApi {
     private final UserStatusService userStatusService;
 
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserDto> create(
             @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
             @RequestPart(name = "profile", required = false) MultipartFile profile) {
@@ -38,7 +38,7 @@ public class UserController implements UserApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(profile, userCreateRequest));
     }
 
-    @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserDto> update(
             @PathVariable UUID userId,
             @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,

@@ -14,12 +14,12 @@ spring:
     password: discodeit1234
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: ture
     show_sql: true
-    open-in-view: true
+    open-in-view: false
 discodeit:
   repository:
     type: local

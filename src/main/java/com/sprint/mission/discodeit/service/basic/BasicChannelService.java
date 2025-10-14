@@ -11,11 +11,13 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
@@ -43,6 +45,7 @@ public class BasicChannelService implements ChannelService {
         List<ReadStatus> readStatuses = users.stream()
                 .map(user -> new ReadStatus(channel, user))
                 .toList();
+
         readStatusRepository.saveAll(readStatuses);
 
         channelRepository.save(channel);
@@ -90,6 +93,7 @@ public class BasicChannelService implements ChannelService {
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             throw new UnsupportedOperationException("Private channel not supported");
         }
+
         channel.update(request.newName(), request.newDescription());
         channelRepository.save(channel);
         return channelMapper.toDto(channel);

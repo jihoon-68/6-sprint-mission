@@ -21,6 +21,7 @@ public class MessageMapper {
         List<BinaryContentDto> binaryContentDtoList = message.getAttachmentIds().stream()
                 .map(binaryContentMapper::toDto)
                 .toList();
+
         return new MessageDto(
                 message.getId(),
                 message.getCreatedAt(),
