@@ -3,12 +3,18 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.dto.BinaryContent.BinaryContentDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.UUID;
 
 @Service
@@ -22,11 +28,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     private Path resolvePath(UUID id) {
-        return root.resolve(id + ".ser");
+        return root.resolve(id.toString());
     }
 
     void init() {
-        File directory = new File(root.toUri());
+        System.out.println(root.toString());
+        File directory = new File(root.toString());
         if (!directory.exists()) {
             // 경로가 존재하지 않을 때
             boolean ok = directory.mkdirs();
@@ -39,11 +46,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     @Override
     public UUID put(UUID id, byte[] data) {
         Path path = resolvePath(id);
-        try (
-                FileOutputStream fos = new FileOutputStream(path.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(data);
+        try (FileOutputStream fos = new FileOutputStream(path.toFile());) {
+            fos.write(data);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -55,8 +59,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         InputStream stream = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
-            try (FileInputStream fis = new FileInputStream(path.toFile())) {
-                stream = fis;
+            try {
+                stream = new FileInputStream(path.toFile());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -66,13 +70,22 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public ResponseEntity<?> download(BinaryContentDto binaryContentDto) {
-        Path path = resolvePath(binaryContentDto.id());
-        byte[] data = null;
-        try {
-            data = get(binaryContentDto.id()).readAllBytes();
-        }catch (IOException e) {
-            throw new RuntimeException(e);
+        try (InputStream stream = get(binaryContentDto.id())){
+
+            byte[] bytes = stream.readAllBytes();
+            String encodedFileName = URLEncoder.encode(
+                    binaryContentDto.fileName(),
+                    StandardCharsets.UTF_8
+            ).replace("\\+", "%20");
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.parseMediaType(binaryContentDto.contentType()))
+                    .contentLength(binaryContentDto.size())
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+                    .body(bytes);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok(new BinaryContentDto(binaryContentDto, data));
     }
 }
