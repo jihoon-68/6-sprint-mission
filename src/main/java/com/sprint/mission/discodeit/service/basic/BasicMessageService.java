@@ -23,8 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 
 @Service
 @Transactional
@@ -71,8 +75,15 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-        Slice<Message> slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+        Slice<Message> slice;
+        if (cursor == null) {
+            slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+        }else{
+            slice = messageRepository.findByCourseIdAndIdLessThanOrderByIdDesc(channelId, cursor, pageable);
+        }
+        System.out.println(slice.toString());
+
         Slice<MessageDto> messageDtoSlice = slice.map(messageMapper::toDto);
         return pageResponseMapper.fromSlice(messageDtoSlice);
     }

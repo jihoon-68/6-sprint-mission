@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.Message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.Page.PageResponse;
-import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -19,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,6 +87,7 @@ public interface MessageApi {
   })
   ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @Parameter(description = "조회할 Channel ID") UUID channelId,
+      @Parameter(description = "페이징 커서 정보") Instant cursor,
       @Parameter(description = "페이징 정보", example = "OrderedMap { \"size\": 50, \"page\": 0, \"sort\": \"createdAt,desc\" }") Pageable pageable
   );
 } 
