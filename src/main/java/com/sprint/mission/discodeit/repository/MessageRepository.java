@@ -6,17 +6,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface MessageRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
 
-  Message save(Message message);
-
-  Optional<Message> findById(UUID id);
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   List<Message> findAllByChannelId(UUID channelId);
 
-  boolean existsById(UUID id);
-
-  void deleteById(UUID id);
+  Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId);
 
   void deleteAllByChannelId(UUID channelId);
 }

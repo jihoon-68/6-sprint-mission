@@ -30,7 +30,6 @@ public class SwaggerConfig {
                 new Tag().name("ReadStatus").description("Message 읽음 상태 API"),
                 new Tag().name("Message").description("Message API"),
                 new Tag().name("User").description("User API"),
-                new Tag().name("UserStatus").description("UserStatus API"),
                 new Tag().name("BinaryContent").description("첨부 파일 API"),
                 new Tag().name("Auth").description("인증 API")
             )

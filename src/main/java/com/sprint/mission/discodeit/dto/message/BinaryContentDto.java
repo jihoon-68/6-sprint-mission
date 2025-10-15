@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.dto.message;
 import java.util.UUID;
 
 public record BinaryContentDto(
-        UUID userId,
-        String contentType,
-        String filename,
-        byte[] data
+    UUID id,
+    String contentType,
+    String filename,
+    Long size,
+    byte[] bytes
 ) {
+
 }

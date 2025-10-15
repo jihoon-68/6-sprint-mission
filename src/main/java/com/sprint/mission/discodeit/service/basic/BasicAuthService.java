@@ -4,13 +4,15 @@ import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
@@ -21,11 +23,11 @@ public class BasicAuthService implements AuthService {
     String password = loginRequest.password();
 
     User user = userRepository.findByUsername(username)
-        .orElseThrow(
-            () -> new NoSuchElementException("User with username " + username + " not found"));
+
+        .orElseThrow(() -> new EntityNotFoundException("Invalid credentials: User not found with name " + username));
 
     if (!user.getPassword().equals(password)) {
-      throw new IllegalArgumentException("Wrong password");
+      throw new IllegalArgumentException("Invalid credentials: Password mismatch.");
     }
 
     return user;

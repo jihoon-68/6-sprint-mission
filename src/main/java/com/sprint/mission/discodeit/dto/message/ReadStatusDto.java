@@ -4,9 +4,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ReadStatusDto(
-        UUID userId,
-        boolean isRead,
-        UUID channelId,
-        Instant updatedAt
+    UUID userId,
+    UUID channelId,
+    Instant lastReadAt
 ) {
 }
