@@ -20,22 +20,20 @@ import lombok.NoArgsConstructor;
 @Builder
 public class User extends BaseUpdatableEntity {
 
-  @OneToOne
+  @OneToOne(optional = true, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(mappedBy = "user")
   private UserStatus userStatus;
   //
   private String username;
   private String email;
   private String password;
-  private boolean online;
 
   public User(String username, String email, String password) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.online = true;
   }
 
   public User(String username, String email, String password, BinaryContent profile) {
@@ -70,9 +68,5 @@ public class User extends BaseUpdatableEntity {
     if (profile != null && profile != this.profile) {
       this.profile = profile;
     }
-  }
-
-  public void update(boolean online) {
-    this.online = online;
   }
 }
