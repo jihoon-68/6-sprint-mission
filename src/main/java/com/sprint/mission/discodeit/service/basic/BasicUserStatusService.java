@@ -24,7 +24,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
-    private final UserStatusMapper userStatusMapper;
     private final UserRepository userRepository;
 
     @Override
@@ -36,13 +35,13 @@ public class BasicUserStatusService implements UserStatusService {
             throw new DuplicateFormatFlagsException("Duplicate UserStatus");
         }
         UserStatus userStatus = new UserStatus(user);
-        return userStatusMapper.toDto(userStatusRepository.save(userStatus));
+        return UserStatusMapper.INSTANCE.toDto(userStatusRepository.save(userStatus));
     }
 
     @Override
     public List<UserStatusDto> findAll() {
         return userStatusRepository.findAll().stream()
-                .map(userStatusMapper::toDto)
+                .map(UserStatusMapper.INSTANCE::toDto)
                 .toList();
     }
 
@@ -61,7 +60,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         userStatus.isConnecting(userStatusUpdateRequest.newLastActiveAt());
         userStatusRepository.save(userStatus);
-        return userStatusMapper.toDto(userStatus);
+        return UserStatusMapper.INSTANCE.toDto(userStatusRepository.save(userStatus));
     }
 
     @Override

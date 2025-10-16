@@ -19,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,16 +67,18 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(user);
         user.update(UpdateUserDto.getStatus(userStatus));
 
-        if (profile != null) {binaryContentRepository.save(profile);}
+        if (profile != null) {
+            binaryContentRepository.save(profile);
+        }
         userRepository.save(user);
         userStatusRepository.save(userStatus);
-        return userMapper.toDto(user);
+        return UserMapper.INSTANCE.toDto(user);
     }
 
     @Override
     public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
-        return userMapper.toDtoList(users);
+        return UserMapper.INSTANCE.toDtoList(users);
     }
 
     @Override
@@ -105,9 +105,11 @@ public class BasicUserService implements UserService {
                 profile
         ));
 
-        if (profile != null) {binaryContentRepository.save(profile);}
+        if (profile != null) {
+            binaryContentRepository.save(profile);
+        }
         userRepository.save(user);
-        return userMapper.toDto(user);
+        return UserMapper.INSTANCE.toDto(user);
     }
 
     @Override

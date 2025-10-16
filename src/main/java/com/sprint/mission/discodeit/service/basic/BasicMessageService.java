@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.*;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 
@@ -35,7 +34,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
-    private final MessageMapper messageMapper;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
@@ -64,13 +62,13 @@ public class BasicMessageService implements MessageService {
             Message message = new Message(user, channel, messageCreateRequest.content(), binaryContents);
             messageRepository.save(message);
 
-            return messageMapper.toDto(message);
+            return MessageMapper.INSTANCE.toDto(message);
         }
 
         Message message = new Message(user, channel, messageCreateRequest.content());
         messageRepository.save(message);
 
-        return messageMapper.toDto(message);
+        return MessageMapper.INSTANCE.toDto(message);
     }
 
     @Override
@@ -84,7 +82,7 @@ public class BasicMessageService implements MessageService {
         }
         System.out.println(slice.toString());
 
-        Slice<MessageDto> messageDtoSlice = slice.map(messageMapper::toDto);
+        Slice<MessageDto> messageDtoSlice = slice.map(MessageMapper.INSTANCE::toDto);
         return pageResponseMapper.fromSlice(messageDtoSlice);
     }
 
@@ -96,7 +94,7 @@ public class BasicMessageService implements MessageService {
         messageUpdated.update(newContent);
         messageRepository.save(messageUpdated);
 
-        return messageMapper.toDto(messageUpdated);
+        return MessageMapper.INSTANCE.toDto(messageUpdated);
     }
 
     @Override
@@ -104,7 +102,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository
                 .findById(id).orElseThrow(() -> new NoSuchElementException("Message not found"));
 
-        message.getAttachmentIds().forEach(attachment -> messageRepository.deleteById(attachment.getId()));
+        message.getAttachments().forEach(attachment -> messageRepository.deleteById(attachment.getId()));
         messageRepository.deleteById(id);
     }
 

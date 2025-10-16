@@ -18,7 +18,6 @@ import java.util.NoSuchElementException;
 public class AuthService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
-    private final UserMapper userMapper;
 
     public UserDto login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.username())
@@ -34,6 +33,6 @@ public class AuthService {
         //로그인시 오프라인 -> 온라인으로
         userStatus.update(Instant.now());
         userStatusRepository.save(userStatus);
-        return userMapper.toDto(user);
+        return UserMapper.INSTANCE.toDto(user);
     }
 }
