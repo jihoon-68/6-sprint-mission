@@ -2,17 +2,18 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.ReadStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Component
-public class ReadStatusMapper {
+import java.util.List;
 
-    public ReadStatusDto toDto(ReadStatus readStatus){
-        return new ReadStatusDto(
-                readStatus.getId(),
-                readStatus.getUser().getId(),
-                readStatus.getChannel().getId(),
-                readStatus.getLastReadAt()
-        );
-    }
+
+@Mapper(componentModel = "spring")
+public interface ReadStatusMapper {
+
+    ReadStatusMapper INSTANCE = Mappers.getMapper(ReadStatusMapper.class);
+
+    ReadStatusDto toDto(ReadStatus readStatus);
+
+    List<ReadStatusDto> toDtoList(List<ReadStatus> readStatuses);
 }
