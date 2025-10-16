@@ -18,7 +18,5 @@ public interface UserService {
 
   User update(UUID userId, UpdateUserRequest updateUserRequest, Optional<MultipartFile> profile);
 
-  User updateState(UUID userId, boolean online);
-
   void delete(UUID userId);
 }

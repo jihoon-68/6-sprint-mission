@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage storage;
 
   @GetMapping("/{binaryContentId}")
   public ResponseEntity<BinaryContent> readBinaryContent(
@@ -36,4 +40,16 @@ public class BinaryContentController {
     return ResponseEntity.ok(binaryContentList);
   }
 
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<?> downloadBinaryContent(
+      @PathVariable UUID binaryContentId
+  ) {
+    try {
+      BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+      byte[] bytes = storage.get(binaryContent.getId()).readAllBytes();
+      return ResponseEntity.ok(bytes);
+    } catch (Exception e) {
+      throw new RuntimeException("파일 다운로드 실패", e);
+    }
+  }
 }

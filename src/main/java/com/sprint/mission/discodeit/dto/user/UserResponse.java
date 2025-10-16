@@ -11,8 +11,7 @@ public record UserResponse(
     Instant updatedAt,
     String username,
     String email,
-    UUID profileId,
-    boolean online
+    UUID profileId
 ) {
 
   public static UserResponse fromEntity(User user) {
@@ -22,8 +21,7 @@ public record UserResponse(
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfile().getId(),
-        user.isOnline()
+        user.getProfile().getId()
     );
   }
 }

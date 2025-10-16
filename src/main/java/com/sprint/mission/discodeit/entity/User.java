@@ -29,11 +29,13 @@ public class User extends BaseUpdatableEntity {
   private String username;
   private String email;
   private String password;
+  private Boolean online;
 
   public User(String username, String email, String password) {
     this.username = username;
     this.email = email;
     this.password = password;
+    this.online = true;
   }
 
   public User(String username, String email, String password, BinaryContent profile) {
@@ -68,5 +70,9 @@ public class User extends BaseUpdatableEntity {
     if (profile != null && profile != this.profile) {
       this.profile = profile;
     }
+  }
+
+  public void update(boolean online) {
+    this.online = online;
   }
 }

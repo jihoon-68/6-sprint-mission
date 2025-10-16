@@ -6,12 +6,15 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage storage;
 
   @Override
   public Message create(CreateMessageRequest createMessageRequest,
@@ -52,9 +56,13 @@ public class BasicMessageService implements MessageService {
     List<BinaryContent> binaryContents = attachmentsNotNull.stream().map(
         file -> {
           try {
-            return new BinaryContent(file.getOriginalFilename(), file.getSize(),
-                file.getContentType(),
-                file.getBytes());
+            BinaryContent binaryContent = new BinaryContent(
+                file.getOriginalFilename(),
+                file.getSize(),
+                file.getContentType()
+            );
+            storage.put(binaryContent.getId(), file.getBytes());
+            return binaryContentRepository.save(binaryContent);
           } catch (IOException e) {
             log.error("첨부파일 처리 실패", e);
             throw new RuntimeException("첨부파일 처리 실패");
@@ -77,7 +85,7 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional(readOnly = true)
   public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId);
+    return messageRepository.findAllByChannel_Id(channelId);
   }
 
   @Override
@@ -96,10 +104,11 @@ public class BasicMessageService implements MessageService {
     }
     // 메시지의 첨부파일들 객체 삭제
     Message message = messageRepository.findById(messageId).orElse(null);
-    if (message.getAttachments() != null) {
-      message.getAttachments()
-          .forEach(attachment -> binaryContentRepository.deleteById(attachment.getId()));
-    }
+    List<UUID> binaryContentIds = message.getAttachments()
+        .stream()
+        .map(BaseEntity::getId)
+        .toList();
+    binaryContentRepository.deleteAllById(binaryContentIds);
     // 메시지 id로 삭제
     messageRepository.deleteById(messageId);
   }

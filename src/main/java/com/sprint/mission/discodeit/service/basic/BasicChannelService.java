@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -69,7 +70,7 @@ public class BasicChannelService implements ChannelService {
   public List<ChannelResponse> findAllByUserId(UUID userId) {
 
     // 유저가 속한 채널 ID 리스트
-    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
         .map(readStatus -> readStatus.getChannel().getId())
         .toList();
 
@@ -81,7 +82,7 @@ public class BasicChannelService implements ChannelService {
 
     return channelInUser.stream().map(channel -> {
       // 생성 시간 역순에서 첫번째가 마지막 메시지 시간
-      Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
+      Instant lastMessageAt = messageRepository.findAllByChannel_Id(channel.getId()).stream()
           .map(Message::getCreatedAt)
           .sorted(Comparator.reverseOrder())
           .limit(1)
@@ -90,7 +91,7 @@ public class BasicChannelService implements ChannelService {
       // 해당 private 채널의 모든 participantIds
       List<UUID> participantIds = new ArrayList<>();
       if (channel.getType().equals(ChannelType.PRIVATE)) {
-        participantIds = readStatusRepository.findAllByChannelId(channel.getId()).stream()
+        participantIds = readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
             .map(readStatus -> readStatus.getUser().getId()).distinct()
             .collect(Collectors.toList());
       }
@@ -117,15 +118,17 @@ public class BasicChannelService implements ChannelService {
       throw new NotFoundException("Channel with id " + channelId + " not found");
     }
     // 같은 채널에서 나온 읽기상태들 삭제
-    List<ReadStatus> readStatusesInChannel = readStatusRepository.findAllByChannelId(channelId);
-    for (ReadStatus readStatus : readStatusesInChannel) {
-      readStatusRepository.deleteById(readStatus.getId());
-    }
+    List<UUID> readStatusIds = readStatusRepository.findAllByChannel_Id(channelId)
+        .stream()
+        .map(BaseEntity::getId)
+        .toList();
+    readStatusRepository.deleteAllById(readStatusIds);
     // 같은 채널에서 나온 메시지들 삭제
-    List<Message> messagesInChannel = messageRepository.findAllByChannelId(channelId);
-    for (Message message : messagesInChannel) {
-      messageRepository.deleteById(message.getId());
-    }
+    List<UUID> messageIds = messageRepository.findAllByChannel_Id(channelId)
+        .stream()
+        .map(BaseEntity::getId)
+        .toList();
+    messageRepository.deleteAllById(messageIds);
     // 채널 id로 삭제
     channelRepository.deleteById(channelId);
   }

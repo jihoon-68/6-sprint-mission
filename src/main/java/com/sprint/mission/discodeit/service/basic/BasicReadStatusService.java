@@ -21,9 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BasicReadStatusService implements ReadStatusService {
 
-  public final ReadStatusRepository readStatusRepository;
-  public final UserRepository userRepository;
-  public final ChannelRepository channelRepository;
+  private final ReadStatusRepository readStatusRepository;
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
 
 
   @Override
@@ -49,7 +49,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional(readOnly = true)
   public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
+    return readStatusRepository.findAllByUser_Id(userId);
   }
 
   @Override

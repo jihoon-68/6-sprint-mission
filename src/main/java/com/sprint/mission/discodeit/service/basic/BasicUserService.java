@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -10,6 +12,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
@@ -30,23 +33,26 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage storage;
 
   @Override
-  public User create(CreateUserRequest createUserRequest, Optional<MultipartFile> profile) {
+  public User create(CreateUserRequest request, Optional<MultipartFile> profile) {
     User user;
-    User userByUserName = userRepository.findByUsername(createUserRequest.username()).orElse(null);
-    User userByEmail = userRepository.findAll().stream()
-        .filter(users -> users.getEmail().equals(createUserRequest.email())).findAny().orElse(null);
+    User userByUserName = userRepository.findByUsername(request.username()).orElse(null);
+    User userByEmail = userRepository.findByEmail(request.email()).orElse(null);
     if (userByUserName != null || userByEmail != null) {
-      throw new IllegalArgumentException("유저네임 혹은 이메일이 같은 유저가 존재합니다.");
+      throw new IllegalArgumentException("유저 이름 혹은 이메일이 같은 유저가 존재합니다.");
     }
 
     Optional<BinaryContent> binaryContent = profile.map(
         file -> {
           try {
-            BinaryContent bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
-                file.getContentType(),
-                file.getBytes());
+            BinaryContent bc = new BinaryContent(     // todo toEntity
+                file.getOriginalFilename(),
+                file.getSize(),
+                file.getContentType()
+            );
+            storage.put(bc.getId(), file.getBytes());
             return binaryContentRepository.save(bc);
           } catch (IOException e) {
             log.error("유저 프로필 사진 처리 실패", e);
@@ -54,7 +60,12 @@ public class BasicUserService implements UserService {
           }
         }
     );
-    user = createUserRequest.toEntity(binaryContent.orElse(null));
+    user = new User(        // todo toEntity
+        request.username(),
+        request.email(),
+        request.password(),
+        binaryContent.orElse(null)
+    );
     User createdUser = userRepository.save(user);
 
     userStatusRepository.save(UserStatus.fromUser(createdUser, Instant.now()));
@@ -75,7 +86,7 @@ public class BasicUserService implements UserService {
     List<User> userList = userRepository.findAll();
 
     userList.forEach(user -> {
-          userStatusRepository.findByUserId(user.getId())
+          userStatusRepository.findByUser_Id(user.getId())
               .ifPresent(userStatus -> user.update(userStatus.isOnline()));
           userRepository.save(user);
         }
@@ -100,11 +111,12 @@ public class BasicUserService implements UserService {
                 .orElse(null);
             if (bc == null) {
               bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
-                  file.getContentType(),
-                  file.getBytes());
+                  file.getContentType()
+              );
+              storage.put(bc.getId(), file.getBytes());
             } else {
-              bc.update(file.getOriginalFilename(), file.getSize(), file.getContentType(),
-                  file.getBytes());
+              bc.update(file.getOriginalFilename(), file.getSize(), file.getContentType());
+              storage.put(bc.getId(), file.getBytes());     // todo 덮어쓰기, 로직 구현할때 확인
             }
             return binaryContentRepository.save(bc);
           } catch (IOException e) {
@@ -114,20 +126,14 @@ public class BasicUserService implements UserService {
     );
     user.update(binaryContent.orElse(null));
 
-    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+    UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
         .orElseThrow(() -> new NotFoundException("유저 상태 업데이트 도중에 유저 아이디를 찾지 못했습니다"));
     userStatus.update(Instant.now());
     userStatusRepository.save(userStatus);
-    user.update(userStatus.isOnline());
 
-    return userRepository.save(user);
-  }
+    userRepository.findByUsername(user.getUsername())
+        .ifPresent(u -> user.update(userStatus.isOnline()));
 
-  @Override
-  public User updateState(UUID userId, boolean online) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
-    user.update(online);
     return userRepository.save(user);
   }
 
@@ -136,20 +142,13 @@ public class BasicUserService implements UserService {
     if (!userRepository.existsById(userId)) {
       throw new NotFoundException("User with id " + userId + " not found");
     }
-    // 유저의 프로필 사진들 객체 삭제
+    // 유저의 프로필 사진 객체 삭제
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NotFoundException("UserService delete: userId 없음"));
-    List<BinaryContent> binaryContentsInUser = binaryContentRepository.findAll().stream()
-        .filter(binaryContent -> binaryContent.getId().equals(user.getProfile().getId())).toList();
-    for (BinaryContent binaryContent : binaryContentsInUser) {
-      binaryContentRepository.deleteById(binaryContent.getId());
-    }
+    binaryContentRepository.deleteById(user.getProfile().getId());
     // 유저 상태들 삭제
-    List<UserStatus> userStatusesInUser = userStatusRepository.findAll().stream()
-        .filter(userStatus -> userStatus.getUser().getId().equals(userId)).toList();
-    for (UserStatus userStatus : userStatusesInUser) {
-      userStatusRepository.deleteById(userStatus.getId());
-    }
+    UserStatus userStatus = user.getUserStatus();
+    userStatusRepository.deleteById(userStatus.getId());
     // 유저 id로 삭제
     userRepository.deleteById(userId);
   }

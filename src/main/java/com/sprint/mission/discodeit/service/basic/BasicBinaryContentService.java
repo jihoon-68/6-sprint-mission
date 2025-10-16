@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.binarycontent.CreateAttachmentImage;
 import com.sprint.mission.discodeit.dto.binarycontent.CreateProfileImage;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,18 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class BasicBinaryContentService implements BinaryContentService {
 
-  public final BinaryContentRepository binaryContentRepository;
-  private final ReadStatusRepository readStatusRepository; //
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage storage;
 
   @Override
-  public BinaryContent createAttachmentImage(CreateAttachmentImage createAttachmentImage) {
-    BinaryContent binaryContent = new BinaryContent(createAttachmentImage.bytes());
-    return binaryContentRepository.save(binaryContent);
-  }
-
-  @Override
-  public BinaryContent createProfileImage(CreateProfileImage createProfileImage) {
-    BinaryContent binaryContent = new BinaryContent(createProfileImage.bytes());
+  public BinaryContent createBinaryContent(BinaryContentDto request) {
+    BinaryContent binaryContent = new BinaryContent(
+        request.fileName(),
+        request.size(),
+        request.contentType()
+    );
+    storage.put(binaryContent.getId(), request.bytes());
     return binaryContentRepository.save(binaryContent);
   }
 

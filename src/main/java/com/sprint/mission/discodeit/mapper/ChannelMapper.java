@@ -23,10 +23,10 @@ public class ChannelMapper {
         channel.getType(),
         channel.getName(),
         channel.getDescription(),
-        readStatusRepository.findAllByChannelId(channel.getId()).stream()
+        readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
             .map(readStatus -> userMapper.toDto(readStatus.getUser()))
             .toList(),
-        messageRepository.findAllByChannelId(channel.getId()).stream()
+        messageRepository.findAllByChannel_Id(channel.getId()).stream()
             .map(BaseUpdatableEntity::getUpdatedAt)
             .max(Comparator.naturalOrder())
             .orElse(channel.getCreatedAt())

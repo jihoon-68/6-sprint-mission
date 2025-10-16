@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.binarycontent.CreateAttachmentImage;
 import com.sprint.mission.discodeit.dto.binarycontent.CreateProfileImage;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -8,9 +9,7 @@ import java.util.UUID;
 
 public interface BinaryContentService {
 
-  BinaryContent createAttachmentImage(CreateAttachmentImage createAttachmentImage);
-
-  BinaryContent createProfileImage(CreateProfileImage createProfileImage);
+  BinaryContent createBinaryContent(BinaryContentDto request);
 
   BinaryContent find(UUID binaryContentId);
 
