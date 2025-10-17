@@ -4,18 +4,22 @@ spring:
   messages:
     basename: messages
     encoding: UTF-8
+  sql:
+    init:
+      mode: never        # 첫 실행시에만 always로 설정, 이후에는 never로 변경
+      platform: postgres
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     driver-class-name: org.postgresql.Driver
-    username: discodeit_user
-    password: discodeit1234
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
-    show-sql: false
+        show-sql: true
     open-in-view: false
 
 discodeit:

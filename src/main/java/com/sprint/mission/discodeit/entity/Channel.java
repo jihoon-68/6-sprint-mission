@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,15 +14,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "channels")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Channel extends BaseUpdatableEntity {
 
-  @Enumerated(EnumType.STRING)
+  @Enumerated(EnumType.STRING)      // type 필드를 문자열로 저장
+  @Column(name = "channel_type", nullable = false)
   private ChannelType type;
+  @Column
   private String name;
+  @Column
   private String description;
 
   // 정적 팩토리 메서드

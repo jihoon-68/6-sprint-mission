@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "read_statuses")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -25,7 +27,7 @@ public class ReadStatus extends BaseUpdatableEntity {
   @ManyToOne
   @JoinColumn(name = "channel_id")
   private Channel channel;
-  @Column(nullable = false)
+  @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
 
   public void update(Instant newLastReadAt) {

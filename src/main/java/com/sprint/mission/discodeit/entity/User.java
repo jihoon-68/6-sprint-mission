@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,6 +18,7 @@ import lombok.NoArgsConstructor;
 
 
 @Entity
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -26,9 +31,13 @@ public class User extends BaseUpdatableEntity {
   @OneToOne(mappedBy = "user")
   private UserStatus userStatus;
   //
+  @Column(unique = true, nullable = false)
   private String username;
+  @Column(unique = true, nullable = false)
   private String email;
+  @Column(nullable = false)
   private String password;
+  @Transient
   private Boolean online;
 
   public User(String username, String email, String password) {
