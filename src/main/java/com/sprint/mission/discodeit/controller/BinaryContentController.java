@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -44,12 +45,7 @@ public class BinaryContentController {
   public ResponseEntity<?> downloadBinaryContent(
       @PathVariable UUID binaryContentId
   ) {
-    try {
-      BinaryContent binaryContent = binaryContentService.find(binaryContentId);
-      byte[] bytes = storage.get(binaryContent.getId()).readAllBytes();
-      return ResponseEntity.ok(bytes);
-    } catch (Exception e) {
-      throw new RuntimeException("파일 다운로드 실패", e);
-    }
+    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+    return storage.download(binaryContentMapper.toDto(binaryContent));
   }
 }
