@@ -6,7 +6,7 @@ spring:
     encoding: UTF-8
   sql:
     init:
-      mode: never        # 첫 실행시에만 always로 설정, 이후에는 never로 변경
+      mode: always        # 첫 실행시에만 always로 설정, 이후에는 never로 변경
       platform: postgres
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit

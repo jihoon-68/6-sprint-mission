@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -29,32 +31,33 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController {
 
   private final MessageService messageService;
+  private final MessageMapper messageMapper;
 
   @GetMapping
-  public ResponseEntity<List<Message>> readMessageByChannelId(
+  public ResponseEntity<List<MessageDto>> readMessageByChannelId(
       @RequestParam UUID channelId
   ) {
     List<Message> messageList = messageService.findAllByChannelId(channelId);
-    return ResponseEntity.ok(messageList);
+    return ResponseEntity.ok(messageMapper.toDtoList(messageList));
   }
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
       MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<Message> createMessage(
+  public ResponseEntity<MessageDto> createMessage(
       @RequestPart("messageCreateRequest") @Valid CreateMessageRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
     Message message = messageService.create(request, attachments);
-    return ResponseEntity.status(HttpStatus.CREATED).body(message);
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageMapper.toDto(message));
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<Message> updateMessage(
+  public ResponseEntity<MessageDto> updateMessage(
       @PathVariable UUID messageId,
       @RequestBody @Valid UpdateMessageRequest request
   ) {
     Message message = messageService.update(messageId, request);
-    return ResponseEntity.ok(message);
+    return ResponseEntity.ok(messageMapper.toDto(message));
   }
 
   @DeleteMapping("/{messageId}")

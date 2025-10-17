@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -33,4 +34,9 @@ public class ChannelMapper {
     );
   }
 
+  public List<ChannelDto> toDtoList(List<Channel> channelList) {
+    return channelList.stream()
+        .map(this::toDto)
+        .toList();
+  }
 }

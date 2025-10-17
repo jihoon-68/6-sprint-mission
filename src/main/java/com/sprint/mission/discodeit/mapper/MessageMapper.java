@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,4 +27,9 @@ public class MessageMapper {
     );
   }
 
+  public List<MessageDto> toDtoList(List<Message> messageList) {
+    return messageList.stream()
+        .map(this::toDto)
+        .toList();
+  }
 }

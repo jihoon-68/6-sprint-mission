@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
@@ -16,12 +14,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,7 +61,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<ChannelResponse> findAllByUserId(UUID userId) {
+  public List<Channel> findAllByUserId(UUID userId) {
 
     // 유저가 속한 채널 ID 리스트
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
@@ -75,31 +69,10 @@ public class BasicChannelService implements ChannelService {
         .toList();
 
     // 유저가 속한 채널 리스트
-    List<Channel> channelInUser = channelRepository.findAll().stream().filter(channel ->
+    return channelRepository.findAll().stream().filter(channel ->
             channel.getType().equals(ChannelType.PUBLIC) || mySubscribedChannelIds.contains(
                 channel.getId()))
         .toList();
-
-    return channelInUser.stream().map(channel -> {
-      // 생성 시간 역순에서 첫번째가 마지막 메시지 시간
-      Instant lastMessageAt = messageRepository.findAllByChannel_Id(channel.getId()).stream()
-          .map(Message::getCreatedAt)
-          .sorted(Comparator.reverseOrder())
-          .limit(1)
-          .findFirst().orElse(Instant.MIN);
-
-      // 해당 private 채널의 모든 participantIds
-      List<UUID> participantIds = new ArrayList<>();
-      if (channel.getType().equals(ChannelType.PRIVATE)) {
-        participantIds = readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
-            .map(readStatus -> readStatus.getUser().getId()).distinct()
-            .collect(Collectors.toList());
-      }
-
-      return new ChannelResponse(channel.getId(), channel.getType(), channel.getName(),
-          channel.getDescription(), participantIds, lastMessageAt);
-
-    }).toList();
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,4 +23,9 @@ public class UserMapper {
     );
   }
 
+  public List<UserDto> toDtoList(List<User> userList) {
+    return userList.stream()
+        .map(this::toDto)
+        .toList();
+  }
 }

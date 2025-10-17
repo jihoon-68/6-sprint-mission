@@ -33,6 +33,11 @@ public class UserStatus extends BaseUpdatableEntity {
     return new UserStatus(user, lastActiveAt);
   }
 
+  /*
+   * 사용자가 온라인 상태인지 확인하는 메서드
+   * instantFiveMinutesAgo은 현재 시간에서 5분을 뺀 시간을 나타냄
+   * 뺀 시간이 lastActiveAt 이전이면 false, 이후면 true 반환
+   */
   public boolean isOnline() {
     Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 

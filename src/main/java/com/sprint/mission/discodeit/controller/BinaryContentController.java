@@ -26,19 +26,19 @@ public class BinaryContentController {
   private final BinaryContentStorage storage;
 
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContent> readBinaryContent(
+  public ResponseEntity<BinaryContentDto> readBinaryContent(
       @PathVariable UUID binaryContentId
   ) {
     BinaryContent binaryContent = binaryContentService.find(binaryContentId);
-    return ResponseEntity.ok(binaryContent);
+    return ResponseEntity.ok(binaryContentMapper.toDto(binaryContent));
   }
 
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> readBinaryContents(
+  public ResponseEntity<List<BinaryContentDto>> readBinaryContents(
       @RequestParam List<UUID> binaryContentIds
   ) {
     List<BinaryContent> binaryContentList = binaryContentService.findAllByIdIn(binaryContentIds);
-    return ResponseEntity.ok(binaryContentList);
+    return ResponseEntity.ok(binaryContentMapper.toDtoList(binaryContentList));
   }
 
   @GetMapping("/{binaryContentId}/download")

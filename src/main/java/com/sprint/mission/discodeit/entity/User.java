@@ -25,10 +25,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class User extends BaseUpdatableEntity {
 
-  @OneToOne(optional = true, cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(optional = true, orphanRemoval = true)
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
-  @OneToOne(mappedBy = "user")
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus userStatus;
   //
   @Column(unique = true, nullable = false)
