@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -84,8 +86,8 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannel_Id(channelId);
+  public Page<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
+    return messageRepository.findAllByChannel_Id(channelId, pageable);
   }
 
   @Override

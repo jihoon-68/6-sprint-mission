@@ -3,13 +3,19 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +38,17 @@ public class MessageController {
 
   private final MessageService messageService;
   private final MessageMapper messageMapper;
+  private final PageResponseMapper<MessageDto> pageResponseMapper;
 
   @GetMapping
-  public ResponseEntity<List<MessageDto>> readMessageByChannelId(
-      @RequestParam UUID channelId
+  public ResponseEntity<PageResponse<MessageDto>> readMessageByChannelId(
+      @RequestParam UUID channelId,
+      @PageableDefault(size = 50) Pageable pageable
   ) {
-    List<Message> messageList = messageService.findAllByChannelId(channelId);
-    return ResponseEntity.ok(messageMapper.toDtoList(messageList));
+    Page<MessageDto> dtoPage = messageService.findAllByChannelId(channelId, pageable)
+        .map(messageMapper::toDto);
+    PageResponse<MessageDto> pageResponse = pageResponseMapper.fromPage(dtoPage);
+    return ResponseEntity.ok(pageResponse);
   }
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
