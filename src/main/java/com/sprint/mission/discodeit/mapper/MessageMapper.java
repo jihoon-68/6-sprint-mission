@@ -5,9 +5,11 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+//@Transactional(readOnly = true)     // lazy 로딩된 연관 엔티티를 조회하기 위해 readOnly = true 설정
 public class MessageMapper {
 
   private final BinaryContentMapper binaryContentMapper;

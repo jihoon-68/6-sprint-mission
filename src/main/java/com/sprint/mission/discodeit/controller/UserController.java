@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -52,7 +51,7 @@ public class UserController {
   public ResponseEntity<UserDto> createUser(
       // @RequestPart의 경우 js 파일에서 맞는 변수명을 찾아 넣어야함
       // 멀티파일과 dto를 함께 쓸 경우 @RequestPart 사용, postman 테스트할때는 form-data로  { "request" : { "username" : "test" , ... } }
-      @RequestPart("userCreateRequest") @Valid CreateUserRequest request,
+      @Valid @RequestPart("userCreateRequest") CreateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     User user = userService.create(request, Optional.ofNullable(profile));
@@ -63,7 +62,7 @@ public class UserController {
       MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<UserDto> updateUser(
       @PathVariable UUID userId,
-      @RequestPart("userUpdateRequest") @Valid UpdateUserRequest request,
+      @RequestPart("userUpdateRequest") UpdateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     User user = userService.update(userId, request,

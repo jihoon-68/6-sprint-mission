@@ -15,11 +15,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "users")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -28,7 +30,7 @@ public class User extends BaseUpdatableEntity {
   @OneToOne(optional = true, orphanRemoval = true)
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(mappedBy = "user", optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus userStatus;
   //
   @Column(unique = true, nullable = false)
@@ -47,9 +49,11 @@ public class User extends BaseUpdatableEntity {
     this.online = true;
   }
 
-  public User(String username, String email, String password, BinaryContent profile) {
-    this(username, email, password);
-    this.profile = profile;
+  public void setUserStatus(UserStatus userStatus) {
+    this.userStatus = userStatus;
+    if (userStatus != null && userStatus.getUser() != this) {
+      userStatus.setUser(this);
+    }
   }
 
   // 프론트엔드에서 유저이름과 이메일을 같은값으로 수정하면 null로 들어옴. null 체크

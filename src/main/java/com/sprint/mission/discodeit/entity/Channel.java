@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class Channel extends BaseUpdatableEntity {
 
   @Enumerated(EnumType.STRING)      // type 필드를 문자열로 저장
-  @Column(name = "channel_type", nullable = false)
+  @Column(name = "type", nullable = false)
   private ChannelType type;
   @Column
   private String name;

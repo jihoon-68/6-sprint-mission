@@ -29,13 +29,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   @Transactional(readOnly = true)
   public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIdList) {
-    List<BinaryContent> binaryContentList = new ArrayList<>();
-    for (UUID binaryContentId : binaryContentIdList) {
-      binaryContentList.add(binaryContentRepository.findAll().stream()
-          .filter(binaryContent -> binaryContent.getId().equals(binaryContentId)).findAny()
-          .orElse(null));
-    }
-    return binaryContentList;
+    return binaryContentRepository.findAllByIdIn((binaryContentIdList));
   }
 
   @Override

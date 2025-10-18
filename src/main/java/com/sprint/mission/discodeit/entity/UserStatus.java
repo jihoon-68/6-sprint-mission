@@ -14,10 +14,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "user_statuses")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -28,10 +30,6 @@ public class UserStatus extends BaseUpdatableEntity {
   private User user;
   @Column(name = "last_active_at", nullable = false)
   private Instant lastActiveAt;
-
-  public static UserStatus fromUser(User user, Instant lastActiveAt) {
-    return new UserStatus(user, lastActiveAt);
-  }
 
   /*
    * 사용자가 온라인 상태인지 확인하는 메서드

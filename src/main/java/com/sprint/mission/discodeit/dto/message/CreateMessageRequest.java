@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import jakarta.validation.constraints.NotBlank;
-
 import java.util.List;
 import java.util.UUID;
 
 public record CreateMessageRequest(
-    @NotBlank String content,
+    String content,
     UUID channelId,
     UUID authorId,
     List<UUID> attachmentIds

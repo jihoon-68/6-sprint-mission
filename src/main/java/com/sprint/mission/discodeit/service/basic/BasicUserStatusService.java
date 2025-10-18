@@ -32,7 +32,9 @@ public class BasicUserStatusService implements UserStatusService {
     User user = userRepository.findById(createUserStatus.userId())
         .orElseThrow(() -> new NotFoundException(
             "유저가 없습니다: " + createUserStatus.userId()));
-    return userStatusRepository.save(UserStatus.fromUser(user, Instant.now()));
+    UserStatus userStatus = new UserStatus(user, Instant.now());
+    user.setUserStatus(userStatus);
+    return userStatusRepository.save(userStatus);
   }
 
   @Override

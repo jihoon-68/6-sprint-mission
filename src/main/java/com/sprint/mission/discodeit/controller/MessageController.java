@@ -54,7 +54,7 @@ public class MessageController {
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(
       @PathVariable UUID messageId,
-      @RequestBody @Valid UpdateMessageRequest request
+      @RequestBody UpdateMessageRequest request
   ) {
     Message message = messageService.update(messageId, request);
     return ResponseEntity.ok(messageMapper.toDto(message));

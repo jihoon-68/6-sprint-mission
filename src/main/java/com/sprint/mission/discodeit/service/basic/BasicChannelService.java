@@ -30,7 +30,7 @@ public class BasicChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
-  private final UserRepository userRepository;   //
+  private final UserRepository userRepository;
 
   @Override
   public Channel createPublic(CreatePublicChannelRequest createPublicChannelRequest) {

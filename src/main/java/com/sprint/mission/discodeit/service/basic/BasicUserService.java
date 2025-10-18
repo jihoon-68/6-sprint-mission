@@ -47,7 +47,7 @@ public class BasicUserService implements UserService {
     Optional<BinaryContent> binaryContent = profile.map(
         file -> {
           try {
-            BinaryContent bc = new BinaryContent(     // todo toEntity
+            BinaryContent bc = new BinaryContent(
                 file.getOriginalFilename(),
                 file.getSize(),
                 file.getContentType()
@@ -60,16 +60,16 @@ public class BasicUserService implements UserService {
           }
         }
     );
-    user = new User(        // todo toEntity
+    user = new User(
         request.username(),
         request.email(),
-        request.password(),
-        binaryContent.orElse(null)
+        request.password()
     );
-    User createdUser = userRepository.save(user);
+    UserStatus userStatus = new UserStatus(user, Instant.now());
+    user.setUserStatus(userStatus);
+    user.setProfile(binaryContent.orElse(null));
 
-    userStatusRepository.save(UserStatus.fromUser(createdUser, Instant.now()));
-    return createdUser;
+    return userRepository.save(user);
   }
 
   @Override
@@ -107,18 +107,18 @@ public class BasicUserService implements UserService {
     Optional<BinaryContent> binaryContent = profile.map(
         file -> {
           try {
-            BinaryContent bc = binaryContentRepository.findById(user.getProfile().getId())
-                .orElse(null);
-            if (bc == null) {
-              bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
+            if (user.getProfile() == null) {
+              BinaryContent bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
                   file.getContentType()
               );
               storage.put(bc.getId(), file.getBytes());
+              return binaryContentRepository.save(bc);
             } else {
-              bc.update(file.getOriginalFilename(), file.getSize(), file.getContentType());
-              storage.put(bc.getId(), file.getBytes());     // todo 덮어쓰기, 로직 구현할때 확인
+              user.getProfile()
+                  .update(file.getOriginalFilename(), file.getSize(), file.getContentType());
+              storage.put(user.getProfile().getId(), file.getBytes());     // 기존 프로필 사진 덮어쓰기
+              return binaryContentRepository.save(user.getProfile());
             }
-            return binaryContentRepository.save(bc);
           } catch (IOException e) {
             throw new RuntimeException("이미지 가져오는데 실패");
           }
