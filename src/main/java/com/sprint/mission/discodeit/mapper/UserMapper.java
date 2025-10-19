@@ -2,30 +2,19 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import java.io.IOException;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
-@Component
-@RequiredArgsConstructor
-public class UserMapper {
+@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class})
+public interface UserMapper {
 
-  private final BinaryContentMapper binaryContentMapper;
+  // User의 profile을 BinaryContentMapper.todto를 이용해 UserDto의 profile로 매핑
+  @Mapping(source = "profile", target = "profile", qualifiedByName = "binaryContentToDto")
+  @Mapping(source = "userStatus.online", target = "online")
+  @Named("userToDto")
+  UserDto toDto(User user);
 
-  public UserDto toDto(User user) {
-    return new UserDto(
-        user.getId(),
-        user.getUsername(),
-        user.getEmail(),
-        binaryContentMapper.toDto(user.getProfile()),
-        user.getUserStatus().isOnline()
-    );
-  }
-
-  public List<UserDto> toDtoList(List<User> userList) {
-    return userList.stream()
-        .map(this::toDto)
-        .toList();
-  }
+  List<UserDto> toDtoList(List<User> userList);
 }

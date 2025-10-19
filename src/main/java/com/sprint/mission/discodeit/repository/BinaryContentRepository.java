@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BinaryContentRepository extends JpaRepository<BinaryContent, UUID> {
 
-  List<BinaryContent> findAllByIdIn(Collection<UUID> ids);
+  List<BinaryContent> findAllByIdIn(Collection<UUID> ids);    // Collection은 List, Set 등 모두 가능
 }

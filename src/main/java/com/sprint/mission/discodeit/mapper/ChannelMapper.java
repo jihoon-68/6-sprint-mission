@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -30,16 +31,18 @@ public class ChannelMapper {
           .toList();
     }
 
+    Instant lastMessageAt = messageRepository.findAllByChannel_Id(channel.getId()).stream()
+        .map(BaseUpdatableEntity::getUpdatedAt)
+        .max(Comparator.naturalOrder())
+        .orElse(channel.getCreatedAt());
+
     return new ChannelDto(
         channel.getId(),
         channel.getType(),
         channel.getName(),
         channel.getDescription(),
         participants,
-        messageRepository.findAllByChannel_Id(channel.getId()).stream()
-            .map(BaseUpdatableEntity::getUpdatedAt)
-            .max(Comparator.naturalOrder())
-            .orElse(channel.getCreatedAt())
+        lastMessageAt
     );
   }
 
