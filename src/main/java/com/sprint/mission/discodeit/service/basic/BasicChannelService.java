@@ -1,20 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.Channel.*;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.User.UserDto;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.enumtype.ChannelType;
-import com.sprint.mission.discodeit.entity.Channel;
-
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Service
 @Transactional
@@ -25,12 +26,13 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
 
     @Override
     public ChannelDto createPublic(PublicChannelCreateRequest request) {
         Channel channel = channelRepository.save(new Channel(request.name(), request.description()));
-        return channelMapper.toDto(channel);
+        return channelMapper.toDto(channel, new ArrayList<>(), null);
     }
 
     @Override
@@ -50,33 +52,39 @@ public class BasicChannelService implements ChannelService {
 
         channelRepository.save(channel);
 
-        return channelMapper.toDto(channel);
+        return channelMapper.toDto(channel, UserMapper.INSTANCE.toDtoList(users), null);
     }
 
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        List<Channel> channels = channelRepository.findAll();
-        //공개 채널부터 다넣음
-        List<Channel> publicChannels = new ArrayList<>(channels.stream()
-                .filter(c -> c.getType().equals(ChannelType.PUBLIC))
-                .toList());
+        //공개 채널부터 조회
+        List<Channel> channels = channelRepository.findByType(ChannelType.PUBLIC);
 
-        //유저 읽음 싱테 들고옴
-        List<ReadStatus> readStatusesUser = readStatusRepository.findAll().stream()
-                .filter(rs -> rs.getUser().getId().equals(userId))
+        //유저로 읽음 싱테 조회
+        //읽음 상태로 타켓 유저가 있는 비공개 채널 전채 채널 리스트에 추가
+        readStatusRepository.findByUserId(userId).stream()
+                .filter(rs -> rs.getChannel().getType().equals(ChannelType.PRIVATE))
+                .forEach(rs -> channels.add(rs.getChannel()));
+
+        //디비에 검색을 위해 채널 아이디만 추출
+        List<UUID> channelIds = channels.stream()
+                .map(Channel::getId)
                 .toList();
 
-        //리드 상태로 비공개 채널 전채 채널 리스트에 추가
-        for (ReadStatus readStatuses : readStatusesUser) {
-            Channel privaeChannel = channels.get(channels.indexOf(readStatuses.getChannel()));
-            if (privaeChannel.getType().equals(ChannelType.PUBLIC)) {
-                continue;
-            }
-            publicChannels.add(privaeChannel);
-        }
+        //타겟 유저가 포함된 비공개 체널에 있는 유저를 체널로 읽음 상태에서 조회
+        Map<UUID, List<UserDto>> privateChannelDtoUser = readStatusRepository.findByChannelIdIn(channelIds).stream()
+                .collect(Collectors.groupingBy(
+                        readStatus -> readStatus.getChannel().getId(),
+                        Collectors.mapping(readStatus -> userMapper.toDto(readStatus.getUser()), Collectors.toList())
+                ));
 
-        //에티티 디티오로 변환
-        List<ChannelDto> findChannelDTOS = channelMapper.toDtoList(publicChannels);
+        //타겟 유저가 포함된 모든 체널에 최근 메시지 시간 조회
+        Map<UUID, Instant> lastMessageAt = messageRepository.findByChannelIdInOrderByCreatedAtDesc(channelIds).stream()
+                .collect(Collectors.toMap(message -> message.getChannel().getId(), Message::getCreatedAt));
+
+
+        //엔티티 디티오로 변환
+        List<ChannelDto> findChannelDTOS = channelMapper.toDtoList(channels, privateChannelDtoUser, lastMessageAt);
 
         return List.copyOf(findChannelDTOS);
     }
@@ -90,9 +98,14 @@ public class BasicChannelService implements ChannelService {
             throw new UnsupportedOperationException("Private channel not supported");
         }
 
+        Message lastMessage = messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channel.getId())
+                .orElse(null);
+
+        Instant lastMessageAt = lastMessage != null ? lastMessage.getCreatedAt() : null;
+
         channel.update(request.newName(), request.newDescription());
         channelRepository.save(channel);
-        return channelMapper.toDto(channel);
+        return channelMapper.toDto(channel, new ArrayList<>(), lastMessageAt);
     }
 
     @Override
