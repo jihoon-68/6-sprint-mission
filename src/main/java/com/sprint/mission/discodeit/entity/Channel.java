@@ -9,7 +9,6 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,7 +17,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 public class Channel extends BaseUpdatableEntity {
 
   @Enumerated(EnumType.STRING)      // type 필드를 문자열로 저장
@@ -31,19 +29,11 @@ public class Channel extends BaseUpdatableEntity {
 
   // 정적 팩토리 메서드
   public static Channel createPublic(String name, String description) {
-    return Channel
-        .builder()
-        .type(ChannelType.PUBLIC)
-        .name(name)
-        .description(description)
-        .build();
+    return new Channel(ChannelType.PUBLIC, name, description);
   }
 
   public static Channel createPrivate() {
-    return Channel
-        .builder()
-        .type(ChannelType.PRIVATE)
-        .build();
+    return new Channel(ChannelType.PRIVATE, null, null);
   }
 
 

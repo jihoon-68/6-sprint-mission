@@ -9,11 +9,14 @@ import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -43,11 +46,12 @@ public class MessageController {
   @GetMapping
   public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
       @RequestParam UUID channelId,
-      @PageableDefault(sort = "created_at", direction = Direction.DESC, size = 50) Pageable pageable
+      @RequestParam(required = false) Instant cursor,
+      @PageableDefault(sort = "createdAt", direction = Direction.DESC, size = 50) Pageable pageable
   ) {
-    Page<MessageDto> dtoPage = messageService.findAllByChannelId(channelId, pageable)
+    Slice<MessageDto> dtoSlice = messageService.findAllByChannelId(channelId, cursor, pageable)
         .map(messageMapper::toDto);
-    return ResponseEntity.ok(pageResponseMapper.fromPage(dtoPage));
+    return ResponseEntity.ok(pageResponseMapper.fromSlice(dtoSlice));
   }
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,

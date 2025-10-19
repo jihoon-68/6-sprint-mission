@@ -16,11 +16,13 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -86,8 +88,12 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
-    return messageRepository.findAllByChannel_Id(channelId, pageable);
+  public Slice<Message> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+    return messageRepository.findAllByChannel_IdAndCreatedAtBefore(
+        channelId,
+        cursor != null ? cursor : Instant.now(),
+        pageable
+    );
   }
 
   @Override
