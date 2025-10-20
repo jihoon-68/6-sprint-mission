@@ -44,7 +44,7 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("유저 이름 혹은 이메일이 같은 유저가 존재합니다.");
     }
 
-    Optional<BinaryContent> binaryContent = profile.map(
+    Optional<BinaryContent> binaryContentOptional = profile.map(
         file -> {
           try {
             BinaryContent bc = new BinaryContent(
@@ -52,8 +52,10 @@ public class BasicUserService implements UserService {
                 file.getSize(),
                 file.getContentType()
             );
-            storage.put(bc.getId(), file.getBytes());
-            return binaryContentRepository.save(bc);
+            System.out.println(bc.getId() + " bc의 id");       // 여기 id는 null
+            BinaryContent saved = binaryContentRepository.save(bc);
+            storage.put(saved.getId(), file.getBytes());      // id는 영속화 이후 발생
+            return saved;
           } catch (IOException e) {
             log.error("유저 프로필 사진 처리 실패", e);
             throw new RuntimeException("유저 프로필 사진 처리 실패");
@@ -67,7 +69,7 @@ public class BasicUserService implements UserService {
     );
     UserStatus userStatus = new UserStatus(user, Instant.now());
     user.setUserStatus(userStatus);
-    user.setProfile(binaryContent.orElse(null));
+    user.setProfile(binaryContentOptional.orElse(null));
 
     return userRepository.save(user);
   }

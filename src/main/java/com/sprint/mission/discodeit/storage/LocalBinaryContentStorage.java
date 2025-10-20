@@ -33,15 +33,17 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public void init() {
     this.root = Paths.get(System.getProperty("user.dir"), this.fileDirectory);
 
-    try {
-      Files.createDirectories(this.root);
-    } catch (IOException e) {
-      throw new RuntimeException("로컬 파일 저장소 초기화 실패");
+    if (!Files.exists(this.root)) {
+      try {
+        Files.createDirectories(this.root);
+      } catch (IOException e) {
+        throw new RuntimeException("로컬 파일 저장소 초기화 실패");
+      }
     }
   }
 
   private Path resolvePath(UUID id) {
-    return this.root.resolve(id + ".byte");
+    return this.root.resolve(id + "");
   }
 
   @Override
@@ -58,6 +60,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Override
   public InputStream get(UUID binaryContentId) throws IOException {
     Path filePath = resolvePath(binaryContentId);
+    // 여긴 문제가 아님
     return Files.newInputStream(filePath);
   }
 

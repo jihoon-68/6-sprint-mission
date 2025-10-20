@@ -65,8 +65,9 @@ public class BasicMessageService implements MessageService {
                 file.getSize(),
                 file.getContentType()
             );
-            storage.put(binaryContent.getId(), file.getBytes());
-            return binaryContentRepository.save(binaryContent);
+            BinaryContent saved = binaryContentRepository.save(binaryContent);
+            storage.put(saved.getId(), file.getBytes());
+            return saved;
           } catch (IOException e) {
             log.error("첨부파일 처리 실패", e);
             throw new RuntimeException("첨부파일 처리 실패");
