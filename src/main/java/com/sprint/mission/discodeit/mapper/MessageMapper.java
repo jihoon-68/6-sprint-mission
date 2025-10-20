@@ -31,7 +31,7 @@ public interface MessageMapper {
 //        message.getContent(),
 //        message.getChannel().getId(),
 //        userMapper.toDto(message.getAuthor()),
-//        binaryContentMapper.toDtoList(message.getAttachments())
+//        binaryContentMapper.toDtoList(message.getAttachments())      // 1대다 관계에서 lazy로 설정하면 lazy 에러 발생
 //    );
 //  }
 //}

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
@@ -33,7 +34,7 @@ public class Message extends BaseUpdatableEntity {
   @ManyToOne
   @JoinColumn(name = "author_id")
   private User author;
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
