@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@EnableJpaAuditing  //@CreatedDate 와 @LastModifiedDate 사용
+@EnableJpaAuditing
 @SpringBootApplication
 public class DiscodeitApplication {
 

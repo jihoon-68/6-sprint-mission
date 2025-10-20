@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name="BinaryContent")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/binary_contents")
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
@@ -45,4 +45,13 @@ public class BinaryContentController {
         .status(HttpStatus.OK)
         .body(responseList);
   }
+
+    @Operation(summary = "파일 다운로드", operationId = "downloadBinaryContent")
+    @GetMapping(path = "/{pathBinaryContentId}/download")
+    public ResponseEntity<?> download(
+            @PathVariable("pathBinaryContentId") UUID pathBinaryContentId,
+            @RequestParam("binaryContentId") UUID paramBinaryContentId) {
+        return binaryContentService.download(paramBinaryContentId);
+    }
 }
+

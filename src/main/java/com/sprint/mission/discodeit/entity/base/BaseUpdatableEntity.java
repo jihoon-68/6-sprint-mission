@@ -6,9 +6,9 @@ import lombok.Getter;
 import org.springframework.data.annotation.LastModifiedDate;
 
 @Getter
-public class BaseUpdatableEntity extends BaseEntity {
+public abstract class BaseUpdatableEntity<T> extends BaseEntity<T> {
 
   @LastModifiedDate
-  @Column(name="updatedAt", nullable=false)
+  @Column(name="updated_at", nullable=false)
   private Instant updatedAt;
 }

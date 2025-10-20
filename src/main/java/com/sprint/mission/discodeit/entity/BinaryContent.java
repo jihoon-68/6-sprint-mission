@@ -1,36 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "binary_contents")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BinaryContent extends BaseEntity {
+public class BinaryContent extends BaseEntity<UUID> {
 
-  @Column(nullable = false, length = 255)
-  private String fileName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
-  @Column(nullable = false)
-  private Long size;
+    @Override
+    public UUID getId() {
+        return id;
+    }
 
-  @Column(nullable = false, length = 100)
-  private String contentType;
+    @Column(name = "file_name", nullable = false, length = 255)
+    private String fileName;
 
-  @Column(nullable = false)
-  private byte[] bytes;
+    @Column(name = "file_size", nullable = false)
+    private Long size;
 
-  public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
-    this.fileName = fileName;
-    this.size = size;
-    this.contentType = contentType;
-    this.bytes = bytes;
-  }
+    @Column(name = "content_type", nullable = false, length = 100)
+    private String contentType;
+
+    public BinaryContent(String fileName, Long size, String contentType) {
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+    }
 }

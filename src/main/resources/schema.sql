@@ -1,12 +1,10 @@
-
 -- 1. binary_contents 테이블 (외래키 참조되는 테이블 우선 생성)
 CREATE TABLE binary_contents (
   id UUID PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   file_name VARCHAR(255) NOT NULL,
   file_size BIGINT NOT NULL,
-  content_type VARCHAR(100) NOT NULL,
-  bytes BYTEA NOT NULL
+  content_type VARCHAR(100) NOT NULL
 );
 
 -- 2. user 테이블

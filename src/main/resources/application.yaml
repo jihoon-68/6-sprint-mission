@@ -23,12 +23,16 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
     show-sql: true
 
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
 
 springdoc:
   swagger-ui:
@@ -38,3 +42,10 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   packagesToScan: com.sprint.mission.discodeit
+
+
+discodeit:
+  storage:
+    type: memory
+    local:
+      root-path: /storage

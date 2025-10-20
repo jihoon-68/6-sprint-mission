@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.message.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
@@ -15,7 +15,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +34,8 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public User create(UserCreateRequest userCreateRequest,
-      Optional<BinaryContentDto> profileCreateRequest) {
+  public UserDto create(UserCreateRequest userCreateRequest,
+      Optional<MultipartFile> profile) {
 
     if (userRepository.existsByEmail(userCreateRequest.email())) {
       throw new IllegalArgumentException(
@@ -44,26 +46,37 @@ public class BasicUserService implements UserService {
           "User with username " + userCreateRequest.username() + " already exists");
     }
 
-    BinaryContent profile = profileCreateRequest
-        .map(req -> new BinaryContent(req.filename(), req.size(), req.contentType(), req.bytes()))
-        .orElse(null);
+      BinaryContent profileAttachment = profile
+              .filter(p -> !p.isEmpty())
+              .map(p -> {
+                  try {
+                      BinaryContentDto dto = BinaryContentDto.from(p, UUID.randomUUID());
+                      return new BinaryContent(
+                              dto.filename(),
+                              dto.size(),
+                              dto.contentType()
+                      );
+                  } catch (IOException e) {
+                      throw new RuntimeException("Failed to read profile file data", e);
+                  }
+              })
+              .orElse(null);
 
-    String plainPassword = userCreateRequest.password();
+      String plainPassword = userCreateRequest.password();
+      User user = new User(
+              userCreateRequest.username(),
+              userCreateRequest.email(),
+              plainPassword,
+              profileAttachment
+      );
 
-    User user = new User(
-        userCreateRequest.username(),
-        userCreateRequest.email(),
-        plainPassword,
-        profile
-    );
-    UserStatus userStatus = new UserStatus(
-        user,
-        Instant.now(),
-        Boolean.TRUE
-    );
-    user.setUserStatus(userStatus);
-    User savedUser = userRepository.save(user);
-    return savedUser;
+      UserStatus userStatus = new UserStatus(
+              user,
+              Instant.now()
+      );
+      user.setUserStatus(userStatus);
+      User savedUser = userRepository.save(user);
+      return userMapper.toDto(savedUser);
   }
 
   @Override
@@ -82,8 +95,8 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
-      Optional<BinaryContentDto> profileCreateRequest) {
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<MultipartFile> profile) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
@@ -101,18 +114,29 @@ public class BasicUserService implements UserService {
     }
 
     String plainNewPassword = newPassword;
+      BinaryContent newProfile = profile
+              .filter(p -> !p.isEmpty())
+              .map(p -> {
+                  try {
+                      BinaryContentDto dto = BinaryContentDto.from(p, UUID.randomUUID());
+                      return new BinaryContent(
+                              dto.filename(),
+                              dto.size(),
+                              dto.contentType()
+                      );
+                  } catch (IOException e) {
+                      throw new RuntimeException("Failed to read profile file data", e);
+                  }
+              })
+              .orElse(null);
 
-    BinaryContent newProfile = profileCreateRequest
-        .map(req -> new BinaryContent(req.filename(), req.size(), req.contentType(), req.bytes()))
-        .orElse(null);
-
-    user.update(
-        newUsername,
-        newEmail,
-        plainNewPassword,
-        newProfile
-    );
-    return user;
+      user.update(
+              newUsername,
+              newEmail,
+              plainNewPassword,
+              newProfile
+      );
+      return userMapper.toDto(user);
   }
 
   @Override

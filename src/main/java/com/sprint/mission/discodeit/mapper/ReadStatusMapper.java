@@ -13,8 +13,8 @@ public class ReadStatusMapper {
     }
 
     return new ReadStatusDto(
-        entity.getUser().getId(),
-        entity.getChannel().getId(),
+        entity.getPkUser().getId(),
+        entity.getPkChannel().getId(),
         entity.getLastReadAt()
     );
   }

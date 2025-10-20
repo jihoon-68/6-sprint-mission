@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -79,8 +78,8 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
-    List<Channel> privateChannels = readStatusRepository.findAllByUserId(userId).stream()
-        .map(ReadStatus::getChannel)
+    List<Channel> privateChannels = readStatusRepository.findAllByPkUser_Id(userId).stream()
+        .map(ReadStatus::getPkChannel)
         .toList();
 
     List<Channel> publicChannels = channelRepository.findAll().stream()
@@ -101,7 +100,6 @@ public class BasicChannelService implements ChannelService {
   public Channel update(UUID channelId, PublicChannelUpdateRequest request) {
     String newName = request.newName();
     String newDescription = request.newDescription();
-
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
             () -> new EntityNotFoundException("Channel with id " + channelId + " not found"));
@@ -109,9 +107,7 @@ public class BasicChannelService implements ChannelService {
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
-
     channel.update(newName, newDescription);
-
     return channel;
   }
 
@@ -119,7 +115,6 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public void delete(UUID channelId) {
-
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
             () -> new EntityNotFoundException("Channel with id " + channelId + " not found"));
@@ -135,9 +130,9 @@ public class BasicChannelService implements ChannelService {
 
   public List<UserDto> getParticipants(Channel channel) {
     if (channel.getType().equals(ChannelType.PRIVATE)) {
-      return readStatusRepository.findAllByChannelId(channel.getId())
+      return readStatusRepository.findAllByPkChannel_Id(channel.getId())
           .stream()
-          .map(ReadStatus::getUser)
+          .map(ReadStatus::getPkUser)
           .map(userMapper::toDto)
           .toList();
     }
