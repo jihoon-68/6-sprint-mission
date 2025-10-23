@@ -19,26 +19,26 @@ public record ChannelResponseDto(
         Instant lastMessageAt // null 허용
 ){
     // PUBLIC 채널용
-    public static ChannelResponseDto publicChannel(UUID id, String name, String description) {
+    public static ChannelResponseDto publicChannel(UUID id, String name, String description, Instant lastMessageAt) {
         return new ChannelResponseDto(
                 id,
                 ChannelType.PUBLIC,
                 name,
                 description,
                 List.of(),
-                null
+                lastMessageAt
         );
     }
 
     // PRIVATE 채널용
-    public static ChannelResponseDto privateChannel(UUID id, List<UserResponseDto> participants) {
+    public static ChannelResponseDto privateChannel(UUID id, List<UserResponseDto> participants, Instant lastMessageAt) {
         return new ChannelResponseDto(
                 id,
                 ChannelType.PRIVATE,
                 "", // private 채널은 name이 없음.
                 "", // private 채널은 description이 없음.
                 participants,
-                null
+                lastMessageAt
         );
     }
 }

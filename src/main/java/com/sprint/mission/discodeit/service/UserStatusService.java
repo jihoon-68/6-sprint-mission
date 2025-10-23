@@ -74,13 +74,13 @@ public class UserStatusService {
     }
 
     @Transactional
-    public UserStatusResponseDto updateByUserId(UUID userId) {
+    public UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateRequestDto dto) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("해당 유저에 대해 UserStatus가 존재하지 않습니다."));
 
-        userStatus.setLastActiveAt(Instant.now());
+        userStatus.setLastActiveAt(dto.newLastActiveAt());
         log.info("UserStatus 번경 완료: " + userStatus.getId());
         userStatusRepository.save(userStatus); // 트랜잭션 종료 시 자동으로 update되지만 가독성을 위해 명시함.
 
@@ -93,8 +93,8 @@ public class UserStatusService {
         log.info("UserStatus 삭제 완료: " + id);
     }
 
-    @Transactional
-    public void clear(){
-        userStatusRepository.clear();
-    }
+//    @Transactional
+//    public void clear(){
+//        userStatusRepository.clear();
+//    }
 }

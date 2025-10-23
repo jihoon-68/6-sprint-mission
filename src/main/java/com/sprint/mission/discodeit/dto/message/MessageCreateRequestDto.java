@@ -8,6 +8,6 @@ import java.util.UUID;
 public record MessageCreateRequestDto(
         UUID userId,
         UUID channelId,
-        String content,
-        List<BinaryContent> binaryContents // null 허용
+        String content
+        // List<BinaryContent> binaryContents // null 허용
 ) {}

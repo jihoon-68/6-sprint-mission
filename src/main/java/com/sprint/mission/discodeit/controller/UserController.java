@@ -62,7 +62,7 @@ public class UserController {
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusResponseDto> updateUserStatusByUserId(@PathVariable UUID userId,
                                                                           @RequestPart UserStatusUpdateRequestDto dto) {
-        return ResponseEntity.ok(userStatusService.updateByUserId(userId));
+        return ResponseEntity.ok(userStatusService.updateByUserId(userId, dto));
     }
 
     @DeleteMapping("/{id}")

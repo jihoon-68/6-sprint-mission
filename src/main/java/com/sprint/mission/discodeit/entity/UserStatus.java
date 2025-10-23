@@ -23,7 +23,7 @@ public class UserStatus extends BaseUpdatableEntity {
     private UUID id = UUID.randomUUID();
 
     @OneToOne
-    @JoinColumn(name = "user_status_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     private Instant lastActiveAt; // NULL 허용, 수정 가능.

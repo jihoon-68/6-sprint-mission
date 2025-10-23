@@ -34,6 +34,9 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
     @OneToMany(mappedBy = "channel")
     private List<Message> messages;
 
+    @OneToMany(mappedBy = "channel")
+    private List<ReadStatus> readStatuses;
+
     @Column(nullable = false)
     private String name;
 

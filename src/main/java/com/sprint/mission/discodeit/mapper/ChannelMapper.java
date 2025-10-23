@@ -10,12 +10,14 @@ import org.mapstruct.factory.Mappers;
 import java.time.Instant;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface ChannelMapper {
 
-    @Mapping(target = "participants", ignore = true)
-    @Mapping(target = "lastMessageAt", ignore = true)
-    ChannelResponseDto toDto(Channel channel);
+    @Mapping(target = "participants", source = "participants")
+    @Mapping(target = "lastMessageAt", source = "lastMessageAt")
+    ChannelResponseDto toDto(Channel channel,
+                             List<UserResponseDto> participants,
+                             Instant lastMessageAt);
 
 //    public static ChannelResponseDto toDto(Channel channel, List<UserResponseDto> participants, Instant lastMessageAt) {
 //        return ChannelResponseDto.builder()

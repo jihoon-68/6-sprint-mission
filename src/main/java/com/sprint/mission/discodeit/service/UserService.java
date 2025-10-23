@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
@@ -10,6 +11,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -32,6 +34,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentMapper binaryContentMapper;
+    private final UserMapper userMapper;
 
     // 유저 생성
     @Transactional
@@ -68,12 +72,12 @@ public class UserService {
                             .fileName(profileRequest.fileName())
                             .extension(profileRequest.extension())
                             .type(BinaryContentType.PROFILE_IMAGE)
-                            .data(bytes)
+                            // .data(bytes)
                             .size((long) bytes.length)
                             .build();
 
                     binaryContentRepository.save(binaryContent);
-                    user.setProfileImage(binaryContent);
+                    user.setProfile(binaryContent);
                 });
 
         userRepository.save(user);
@@ -83,7 +87,7 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .username(user.getUsername())
-                .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
+                // .profile(binaryContentMapper.toDto(user.getProfile()))
                 .online(true)
                 .build();
     }
@@ -93,15 +97,10 @@ public class UserService {
         User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
 
-        boolean isUserOnline = isUserOnline(user.getId());
+//        boolean isUserOnline = isUserOnline(user.getId());
+        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
 
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
-                .online(isUserOnline)
-                .build();
+        return userMapper.toDto(user, user.getUserStatus(), profileImage);
     }
 
     @Transactional(readOnly = true)
@@ -109,15 +108,10 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
 
-        boolean isUserOnline = isUserOnline(user.getId());
+//        boolean isUserOnline = isUserOnline(user.getId());
+        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
 
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
-                .online(isUserOnline)
-                .build();
+        return userMapper.toDto(user, user.getUserStatus(), profileImage);
     }
 
     @Transactional(readOnly = true)
@@ -125,15 +119,10 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
 
-        boolean isUserOnline = isUserOnline(user.getId());
+//        boolean isUserOnline = isUserOnline(user.getId());
+        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
 
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
-                .online(isUserOnline)
-                .build();
+        return userMapper.toDto(user, user.getUserStatus(), profileImage);
     }
 
     @Transactional(readOnly = true)
@@ -142,15 +131,10 @@ public class UserService {
 
         return users.stream()
                 .map(user -> {
-                    boolean isUserOnline = isUserOnline(user.getId());
+//                    boolean isUserOnline = isUserOnline(user.getId());
+                    BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
 
-                    return UserResponseDto.builder()
-                            .id(user.getId())
-                            .email(user.getEmail())
-                            .username(user.getUsername())
-                            .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
-                            .online(isUserOnline)
-                            .build();
+                    return userMapper.toDto(user, user.getUserStatus(), profileImage);
                 })
                 .toList();
     }
@@ -158,7 +142,7 @@ public class UserService {
     // 수정
     @Transactional
     public UserResponseDto update(UUID id, UserUpdateRequestDto dto,
-        Optional<BinaryContentCreateRequestDto> optionalProfileCreateRequest) {
+                                  Optional<BinaryContentCreateRequestDto> optionalProfileCreateRequest) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
@@ -192,31 +176,18 @@ public class UserService {
                             .fileName(profileRequest.fileName())
                             .extension(profileRequest.extension())
                             .type(BinaryContentType.PROFILE_IMAGE)
-                            .data(profileRequest.bytes())
+                            // .data(profileRequest.bytes())
                             .size((long) profileRequest.bytes().length)
                             .build();
-
                     binaryContentRepository.save(binaryContent);
-                    user.setProfileImage(binaryContent);
+                    user.setProfile(binaryContent);
                 });
 
-//        userRepository.save(user);
-
-        boolean isUserOnline = userStatusRepository.findByUserId(user.getId())
-                .map(UserStatus::isOnline)
-                .orElseGet(() -> {
-                    log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다: {}", user.getId());
-                    return false;
-                });
-
+        userRepository.save(user); // 명시적 저장
         log.info("수정 및 저장 완료 : " + user.getUsername());
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .profileImage(BinaryContentMapper.toDto(user.getProfileImage()))
-                .online(isUserOnline)
-                .build();
+
+        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
+        return userMapper.toDto(user, user.getUserStatus(), profileImage);
     }
 
     // 유저 삭제
@@ -230,25 +201,25 @@ public class UserService {
         log.info("유저 삭제 완료: " + id);
     }
 
-    // 유저 모두 삭제
-    @Transactional
-    public void clear(){
-        userRepository.clear();
-    }
+//    // 유저 모두 삭제
+//    @Transactional
+//    public void clear(){
+//        userRepository.clear();
+//    }
 
-    /**
-     * 특정 유저의 온라인 상태를 확인합니다.
-     * UserStatus가 존재하지 않으면 false를 반환합니다.
-     *
-     * @param userId 확인할 유저의 UUID
-     * @return 유저가 온라인 상태인지 여부
-     */
-    private boolean isUserOnline(UUID userId) {
-        return userStatusRepository.findByUserId(userId)
-                .map(UserStatus::isOnline)
-                .orElseGet(() -> {
-                    log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다: " +  userId);
-                    return false;
-                });
-    }
+//    /**
+//     * 특정 유저의 온라인 상태를 확인합니다.
+//     * UserStatus가 존재하지 않으면 false를 반환합니다.
+//     *
+//     * @param userId 확인할 유저의 UUID
+//     * @return 유저가 온라인 상태인지 여부
+//     */
+//    private boolean isUserOnline(UUID userId) {
+//        return userStatusRepository.findByUserId(userId)
+//                .map(UserStatus::isOnline)
+//                .orElseGet(() -> {
+//                    log.warn("해당 유저에 대해 UserStatus가 존재하지 않습니다: " +  userId);
+//                    return false;
+//                });
+//    }
 }

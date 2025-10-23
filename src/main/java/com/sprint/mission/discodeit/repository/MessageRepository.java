@@ -27,5 +27,5 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             Pageable pageable);
 
     void delete(Message message);
-    void clear();
+    // void clear();
 }

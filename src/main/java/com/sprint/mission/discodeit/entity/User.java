@@ -17,6 +17,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "users")
 public class User extends BaseUpdatableEntity implements Serializable {
 
 //    @Serial
@@ -26,17 +27,20 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @Builder.Default
     private UUID id = UUID.randomUUID();
 
-    @OneToMany(mappedBy = "user")
-    private List<Channel> channels; // 속해있는 채널
+//    @OneToMany(mappedBy = "")
+//    private List<Channel> channels; // 속해있는 채널
+
+    @OneToMany(mappedBy = "author")
+    private List<Message> messages; // 작성한 메시지
 
     @OneToMany(mappedBy = "user")
-    private List<Message> messages; // 작성한 메시지
+    private List<ReadStatus> readStatuses;
 
     @OneToOne(mappedBy = "user", orphanRemoval = true)
     private UserStatus userStatus;
 
     @OneToOne(mappedBy = "user", orphanRemoval = true)
-    private BinaryContent profileImage;
+    private BinaryContent profile;
 
     @Column(nullable = false, unique = true)
     private String email;

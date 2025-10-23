@@ -48,10 +48,10 @@ public class MessageService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다: " + dto.channelId()));
 
         Message message = Message.builder()
-                .user(user)
+                .author(user)
                 .channel(channel)
                 .content(dto.content())
-                .binaryContents(dto.binaryContents())
+                // .attachments(dto.binaryContents())
                 .build();
 
         binaryContentCreateRequests
@@ -109,6 +109,7 @@ public class MessageService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public PageResponse<MessageResponseDto> findByChannelId(UUID channelId, Instant cursor, int size) {
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         List<Message> messages = messageRepository.findByChannelIdAndCursor(channelId, cursor, pageable);
@@ -151,8 +152,8 @@ public class MessageService {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
 
-        List<UUID> binaryContentIds = message.getBinaryContents().stream().map(BinaryContent::getId).toList();
-        if (message.getBinaryContents() != null) {
+        List<UUID> binaryContentIds = message.getAttachments().stream().map(BinaryContent::getId).toList();
+        if (message.getAttachments() != null) {
             for (UUID binaryContentId : binaryContentIds) {
                 binaryContentRepository.deleteById(id);
             }
@@ -162,8 +163,8 @@ public class MessageService {
         log.info("메시지 삭제 완료: " + id);
     }
 
-    @Transactional
-    public void clear() {
-        messageRepository.clear();
-    }
+//    @Transactional
+//    public void clear() {
+//        messageRepository.clear();
+//    }
 }

@@ -74,11 +74,11 @@ public class ReadStatusService {
     }
 
     @Transactional
-    public ReadStatusResponseDto update(UUID id){
+    public ReadStatusResponseDto update(UUID id, ReadStatusUpdateRequestDto dto){
         ReadStatus readStatus = readStatusRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
-        readStatus.setLastReadAt(Instant.now());
-        // readStatusRepository.save(readStatus);
+        readStatus.setLastReadAt(dto.newLastReadAt());
+        readStatusRepository.save(readStatus); // 명시적 저장
         return readStatusMapper.toDto(readStatus);
     }
 
@@ -88,9 +88,9 @@ public class ReadStatusService {
         log.info("ReadStatus 삭제 완료: " + id);
     }
 
-    @Transactional
-    public void clear(){
-        readStatusRepository.clear();
-    }
+//    @Transactional
+//    public void clear(){
+//        readStatusRepository.clear();
+//    }
 
 }

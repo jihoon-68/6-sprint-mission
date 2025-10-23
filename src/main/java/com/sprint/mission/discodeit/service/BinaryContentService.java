@@ -22,6 +22,7 @@ public class BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentMapper binaryContentMapper;
 
 
     @Transactional
@@ -36,7 +37,7 @@ public class BinaryContentService {
         binaryContentRepository.save(binaryContent);
         binaryContentStorage.put(binaryContent.getId(), bytes);
 
-        return BinaryContentMapper.toDto(binaryContent);
+        return binaryContentMapper.toDto(binaryContent);
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +45,7 @@ public class BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 BinaryContent입니다."));
 
-        return BinaryContentMapper.toDto(binaryContent);
+        return binaryContentMapper.toDto(binaryContent);
     }
 
     @Transactional(readOnly = true)
@@ -54,7 +55,7 @@ public class BinaryContentService {
             throw new NotFoundException("해당하는 BinaryContent가 존재하지 않습니다.");
         }
         return contents.stream()
-                .map(BinaryContentMapper::toDto)
+                .map(binaryContentMapper::toDto)
                 .toList();
     }
 
@@ -64,8 +65,8 @@ public class BinaryContentService {
         log.info("BinaryContent 삭제 완료: " + id);
     }
 
-    @Transactional
-    public void clear(){
-        binaryContentRepository.clear();
-    }
+//    @Transactional
+//    public void clear(){
+//        binaryContentRepository.clear();
+//    }
 }

@@ -22,7 +22,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
 
     Path root;
 
-    @Value("${discodeit.storage.local.root-path}")
+    @Value("${discodeit.storage.local.root-path:./uploads}")
     private String rootPath;
 
     public LocalBinaryContentStorage(){

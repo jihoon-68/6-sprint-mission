@@ -10,7 +10,7 @@ public record UserResponseDto(
         UUID id,
         String email,
         String username,
-        BinaryContentResponseDto profileImage,
+        //BinaryContentResponseDto profile,
         Boolean online
 ) {
 }

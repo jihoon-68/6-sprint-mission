@@ -10,8 +10,8 @@ import java.util.UUID;
 public record BinaryContentResponseDto(
         UUID id,
         String fileName,
-        String extension,
-        Long size,
-        BinaryContentType type
+        // String extension,
+        Long size
+        // BinaryContentType type
         // byte[] data
 ) {}
