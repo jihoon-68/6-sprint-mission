@@ -1,13 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDTO;
+import com.sprint.mission.discodeit.dto.ReadStatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.ReadStatus.ReadStatusDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.DuplicateFormatFlagsException;
@@ -16,6 +21,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
@@ -24,47 +30,43 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
     @Override
-    public ReadStatus create(CreateReadStatusDTO createReadStatusDTO) {
+    public ReadStatusDto create(ReadStatusCreateRequest request) {
 
-        if(!userRepository.existsById(createReadStatusDTO.userId())
-                ||!channelRepository.existsById(createReadStatusDTO.channelId())){
-            throw new NoSuchElementException("User Or Channel channels are mandatory");
-        }
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(() -> new IllegalArgumentException("User with id: " + request.userId() + " not found"));
+        Channel channel = channelRepository.findById(request.channelId())
+                .orElseThrow(() -> new IllegalArgumentException("Channel with id: " + request.channelId() + " not found"));
 
         boolean isDuplication = readStatusRepository.findAll().stream()
                 .anyMatch(rs ->
-                        rs.getUserId().equals(createReadStatusDTO.userId())
-                                && rs.getChannelId().equals(createReadStatusDTO.channelId()));
-        if(isDuplication) {
+                        rs.getUser().getId().equals(user.getId())
+                                && rs.getChannel().getId().equals(channel.getId()));
+        if (isDuplication) {
             throw new DuplicateFormatFlagsException("Duplicate Read Status");
         }
 
+        ReadStatus readStatus = readStatusRepository.save(new ReadStatus(channel, user));
 
-        return readStatusRepository.save(new ReadStatus(createReadStatusDTO.channelId(),createReadStatusDTO.userId()));
+        return ReadStatusMapper.INSTANCE.toDto(readStatus);
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
-        return  readStatusRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus not found") );
-    }
-
-
-    @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
+    public List<ReadStatusDto> findAllByUserId(UUID userId) {
 
         return readStatusRepository.findAll().stream()
-                .filter(sr -> sr.getUserId().equals(userId))
+                .filter(sr -> sr.getUser().getId().equals(userId))
+                .map(ReadStatusMapper.INSTANCE::toDto)
                 .toList();
     }
 
     @Override
-    public ReadStatus update(UUID readStatusId, Instant newLastReadAt) {
+    public ReadStatusDto update(UUID readStatusId, Instant newLastReadAt) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus not found"));
 
-        readStatus.messageRead(newLastReadAt);
-        return readStatusRepository.save(readStatus);
+        readStatus.update(newLastReadAt);
+        readStatusRepository.save(readStatus);
+        return ReadStatusMapper.INSTANCE.toDto(readStatus);
     }
 
     @Override

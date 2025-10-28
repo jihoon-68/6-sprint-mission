@@ -1,31 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.enumtype.ReadType;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
+@Entity
 @Getter
-public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+@Setter(AccessLevel.PACKAGE)
+@Table(name = "read_statuses",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "read_status_unique_channel_id_key",
+                        columnNames = {"channel_id", "user_id"}
+                )
+        })
+@NoArgsConstructor
+public class ReadStatus extends BaseUpdatableEntity {
 
-    private final UUID userId;
-    private final UUID channelId;
-    private ReadType type;
-    private Instant lastReadAt ;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public ReadStatus(UUID channelId, UUID userId) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.channelId = channelId;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
 
-        this.type = ReadType.UNREAD;
-        this.createdAt = Instant.now();
+    @Column(nullable = false)
+    private Instant lastReadAt;
+
+    public ReadStatus(Channel channel, User user) {
+        this.user = user;
+        this.channel = channel;
         this.lastReadAt = Instant.now();
     }
 
@@ -37,13 +50,8 @@ public class ReadStatus implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
+            this.updatedAtNow();
         }
     }
 
-    public void messageRead(Instant lastReadAt){
-        this.lastReadAt = lastReadAt;
-        this.updatedAt = Instant.now();
-        this.type = ReadType.READ;
-    }
 }

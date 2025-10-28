@@ -1,67 +1,54 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.UserStatus.UpdateUserStatusDTO;
-import com.sprint.mission.discodeit.enumtype.UserStatusType;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
+@Entity
 @Getter
-public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final UUID userId;
-    private final Instant createdAt;
-    private Instant updatedAt;
-    private Instant lastAccessAt;
-    private UserStatusType accessType;
+@Setter(AccessLevel.PACKAGE)
+@Table(name = "user_statuses")
+@NoArgsConstructor
+public class UserStatus extends BaseUpdatableEntity {
 
-    public UserStatus(UUID userId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.accessType = UserStatusType.OFFLINE;
-        this.userId = userId;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
+
+    @Column(nullable = false)
+    private Instant lastAccessAt;
+
+    public UserStatus(User user) {
+        this.user = user;
         this.lastAccessAt = Instant.now();
     }
 
-    public void update(UpdateUserStatusDTO updateUserStatusDTO) {
+    public void update(Instant lastAccessAt) {
         boolean anyValueUpdated = false;
 
-        if (updateUserStatusDTO.lastActiveAt() != null && !updateUserStatusDTO.lastActiveAt().equals(this.lastAccessAt)){
-            this.lastAccessAt = updateUserStatusDTO.lastActiveAt();
+        if (lastAccessAt != null && !lastAccessAt.equals(this.lastAccessAt)) {
+            this.lastAccessAt = lastAccessAt;
             anyValueUpdated = true;
         }
-
-        if (updateUserStatusDTO.online() != this.accessType.getValue()){
-            this.accessType = updateUserStatusDTO.online()?UserStatusType.ONLINE:UserStatusType.OFFLINE;
-            anyValueUpdated = true;
-        }
-
-        if(anyValueUpdated){
-            this.updatedAt = Instant.now();
+        if (anyValueUpdated) {
+            this.updatedAtNow();
         }
     }
 
-    public void connect() {
-        this.lastAccessAt = Instant.now();
-        this.accessType = UserStatusType.ONLINE;
-        this.updatedAt = Instant.now();
-    }
-
-    public void disconnect() {
-        this.accessType = UserStatusType.OFFLINE;
-        this.updatedAt = Instant.now();
-    }
-
-    public void isConnecting(Instant newLastAccessAt) {
+    //접속 학인
+    public boolean isConnecting(Instant newLastAccessAt) {
         long duration = newLastAccessAt.toEpochMilli() - this.lastAccessAt.toEpochMilli();
         if (duration <= 300000) {
             this.lastAccessAt = Instant.now();
-            this.accessType = UserStatusType.ONLINE;
-            return;
+            return true;
         }
-        this.accessType = UserStatusType.OFFLINE;
+        return false;
     }
 }
