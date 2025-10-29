@@ -3,27 +3,38 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -31,39 +42,45 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage storage;
 
   @Override
   public Message create(CreateMessageRequest createMessageRequest,
       List<MultipartFile> attachments) {
-    if (!channelRepository.existsById(createMessageRequest.channelId())) {
-      throw new NotFoundException("채널이 없습니다 " + createMessageRequest.channelId());
-    }
-    if (!userRepository.existsById(createMessageRequest.authorId())) {
-      throw new NotFoundException("해당 유저가 없습니다 " + createMessageRequest.authorId());
-    }
+    Channel channel = channelRepository.findById(createMessageRequest.channelId())
+        .orElseThrow(() -> new NotFoundException(
+            "채널이 없습니다 " + createMessageRequest.channelId()));
+    User author = userRepository.findById(createMessageRequest.authorId())
+        .orElseThrow(() -> new NotFoundException(
+            "해당 유저가 없습니다 " + createMessageRequest.authorId()));
 
     List<MultipartFile> attachmentsNotNull =
         attachments != null ? attachments : Collections.emptyList();
 
-    List<UUID> binaryContentIds = attachmentsNotNull.stream().map(
+    List<BinaryContent> binaryContents = attachmentsNotNull.stream().map(
         file -> {
           try {
-            BinaryContent bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
-                file.getContentType(),
-                file.getBytes());
-            return binaryContentRepository.save(bc);
+            BinaryContent binaryContent = new BinaryContent(
+                file.getOriginalFilename(),
+                file.getSize(),
+                file.getContentType()
+            );
+            BinaryContent saved = binaryContentRepository.save(binaryContent);
+            storage.put(saved.getId(), file.getBytes());
+            return saved;
           } catch (IOException e) {
             log.error("첨부파일 처리 실패", e);
             throw new RuntimeException("첨부파일 처리 실패");
           }
         }
-    ).map(BinaryContent::getId).toList();
-    Message message = new Message(createMessageRequest.content(), createMessageRequest.channelId(),
-        createMessageRequest.authorId(), binaryContentIds);
+    ).toList();
+
+    Message message = new Message(createMessageRequest.content(), channel, author, binaryContents);
     return messageRepository.save(message);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Message find(UUID messageId) {
     return messageRepository.findById(messageId)
         .orElseThrow(
@@ -71,8 +88,13 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId);
+  @Transactional(readOnly = true)
+  public Slice<Message> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+    return messageRepository.findAllByChannel_IdAndCreatedAtBefore(
+        channelId,
+        cursor != null ? cursor : Instant.now(),
+        pageable
+    );
   }
 
   @Override
@@ -91,10 +113,11 @@ public class BasicMessageService implements MessageService {
     }
     // 메시지의 첨부파일들 객체 삭제
     Message message = messageRepository.findById(messageId).orElse(null);
-    if (message.getAttachmentIds() != null) {
-      message.getAttachmentIds()
-          .forEach(attachmentId -> binaryContentRepository.deleteById(attachmentId));
-    }
+    List<UUID> binaryContentIds = message.getAttachments()
+        .stream()
+        .map(BaseEntity::getId)
+        .toList();
+    binaryContentRepository.deleteAllById(binaryContentIds);
     // 메시지 id로 삭제
     messageRepository.deleteById(messageId);
   }

@@ -1,25 +1,21 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import java.util.UUID;
 
 public record CreateUserRequest(
-    @NotBlank(message = "{user.name.notblank}")
+    @NotEmpty(message = "{user.name.notempty}")
+    @Size(max = 50)
     String username,
-    @NotBlank(message = "{user.email.notblank}")
+    @NotEmpty(message = "{user.email.notempty}")
     @Email(message = "{user.email.invalid}")
+    @Size(max = 100)
     String email,
-    @Size(min = 4, message = "{user.password.size}")
+    @Size(min = 4, max = 60, message = "{user.password.size}")
     String password
 ) {
 
-  public User toEntity(UUID profileId) {
-    if (profileId == null) {
-      return new User(username, email, password);
-    }
-    return new User(username, email, password, profileId);
-  }
 }

@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.dto.auth;
 
+import jakarta.validation.constraints.NotEmpty;
+
 public record AuthRequest(
-    String username,
-    String password
+    @NotEmpty String username,
+    @NotEmpty String password
 ) {
 
 }

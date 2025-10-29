@@ -1,34 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus implements Serializable {
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class UserStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private UUID userId;
+  @OneToOne
+  @JoinColumn(name = "user_id", unique = true, nullable = false)
+  private User user;
+  @Column(name = "last_active_at", nullable = false)
   private Instant lastActiveAt;
 
-  private UserStatus(UUID userId, Instant lastActiveAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
-    this.userId = userId;
-    this.lastActiveAt = lastActiveAt;
-  }
-
-  public static UserStatus fromUser(UUID userId, Instant lastActiveAt) {
-    return new UserStatus(userId, lastActiveAt);
-  }
-
+  /*
+   * 사용자가 온라인 상태인지 확인하는 메서드
+   * instantFiveMinutesAgo은 현재 시간에서 5분을 뺀 시간을 나타냄
+   * 뺀 시간이 lastActiveAt 이전이면 false, 이후면 true 반환
+   */
   public boolean isOnline() {
     Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
