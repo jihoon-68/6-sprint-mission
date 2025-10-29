@@ -5,15 +5,13 @@ import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 
-import java.time.Instant;
-
 @Mapper(componentModel = "spring")
 public class PageResponseMapper {
 
-    public <T> PageResponse<T> fromSlice (Slice<T> slice, Instant instant) {
+    public <T> PageResponse<T> fromSlice (Slice<T> slice) {
         return new PageResponse<>(
                 slice.getContent(),
-                instant,
+                slice.getContent().get(slice.getContent().size() - 1),
                 slice.getSize(),
                 slice.hasNext(),
                 slice.stream().count()

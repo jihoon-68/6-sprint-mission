@@ -5,10 +5,8 @@ import com.sprint.mission.discodeit.dto.Message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Message.MessageDto;
 import com.sprint.mission.discodeit.dto.Message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.Page.PageResponse;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
@@ -21,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +32,7 @@ public class MessageController implements MessageApi {
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<MessageDto> create(
-            @Valid @RequestPart(name = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
+            @RequestPart(name = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
             @RequestPart(name = "attachments", required = false) List<MultipartFile> attachments) {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageService.create(attachments, messageCreateRequest));
     }
@@ -42,7 +41,7 @@ public class MessageController implements MessageApi {
     @PatchMapping(value = "/{messageId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageDto> update(
             @PathVariable UUID messageId,
-            @Valid @RequestBody MessageUpdateRequest newContent) {
+            @RequestBody MessageUpdateRequest newContent) {
         return ResponseEntity.status(HttpStatus.OK).body(messageService.update(messageId, newContent.newContent()));
     }
 

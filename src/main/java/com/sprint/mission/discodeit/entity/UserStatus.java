@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -14,7 +17,7 @@ import java.time.Instant;
 @NoArgsConstructor
 public class UserStatus extends BaseUpdatableEntity {
 
-    @OneToOne(orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
@@ -22,7 +25,6 @@ public class UserStatus extends BaseUpdatableEntity {
     @Column(nullable = false)
     private Instant lastAccessAt;
 
-    @Builder
     public UserStatus(User user) {
         this.user = user;
         this.lastAccessAt = Instant.now();

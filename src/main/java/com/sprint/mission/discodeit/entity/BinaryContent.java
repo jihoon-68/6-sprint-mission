@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
-import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -25,7 +26,6 @@ public class BinaryContent extends BaseEntity{
 
 
     //채널에 파일 업로드
-    @Builder
     public BinaryContent(String fileName, Long size, String contentType) {
         this.fileName = fileName;
         this.size = size;

@@ -8,5 +8,7 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface BinaryContentMapper {
 
+    BinaryContentMapper INSTANCE = Mappers.getMapper(BinaryContentMapper.class);
+
     BinaryContentDto toDto(BinaryContent binaryContent);
 }
