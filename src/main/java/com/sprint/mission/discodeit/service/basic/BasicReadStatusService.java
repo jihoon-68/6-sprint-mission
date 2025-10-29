@@ -2,21 +2,27 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.ReadStatusId;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+
+import jakarta.persistence.EntityNotFoundException;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusRepository readStatusRepository;
@@ -24,55 +30,53 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
+  @Transactional
   public ReadStatus create(ReadStatusCreateRequest request) {
-    UUID userId = request.userId();
-    UUID channelId = request.channelId();
+    User user = userRepository.findById(request.userId())
+        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.userId()));
 
-    if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException("User with id " + userId + " does not exist");
-    }
-    if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
-    }
-    if (readStatusRepository.findAllByUserId(userId).stream()
-        .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
-      throw new IllegalArgumentException(
-          "ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
-    }
+    Channel channel = channelRepository.findById(request.channelId())
+        .orElseThrow(() -> new EntityNotFoundException("Channel not found with id: " + request.channelId()));
 
-    Instant lastReadAt = request.lastReadAt();
-    ReadStatus readStatus = new ReadStatus(userId, channelId, lastReadAt);
+    ReadStatus readStatus = new ReadStatus(
+        user,
+        channel,
+        Instant.now()
+    );
+
     return readStatusRepository.save(readStatus);
   }
 
   @Override
-  public ReadStatus find(UUID readStatusId) {
+  public ReadStatus find(UUID userId, UUID channelId) {
+    ReadStatusId readStatusId = new ReadStatusId(userId, channelId);
     return readStatusRepository.findById(readStatusId)
-        .orElseThrow(
-            () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+        .orElseThrow(() -> new EntityNotFoundException("ReadStatus not found for User: " + userId + " and Channel: " + channelId));
   }
 
   @Override
   public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId).stream()
-        .toList();
+    return readStatusRepository.findAllByPkUser_Id(userId);
   }
 
   @Override
-  public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
-    Instant newLastReadAt = request.newLastReadAt();
+  @Transactional
+  public ReadStatus update(UUID userId, UUID channelId, ReadStatusUpdateRequest request) {
+    ReadStatusId readStatusId = new ReadStatusId(userId, channelId);
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(
-            () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
-    readStatus.update(newLastReadAt);
-    return readStatusRepository.save(readStatus);
+        .orElseThrow(() -> new EntityNotFoundException("ReadStatus not found for User: " + userId + " and Channel: " + channelId));
+
+      readStatus.update(Instant.now());
+
+    return readStatus;
   }
 
   @Override
-  public void delete(UUID readStatusId) {
-    if (!readStatusRepository.existsById(readStatusId)) {
-      throw new NoSuchElementException("ReadStatus with id " + readStatusId + " not found");
-    }
-    readStatusRepository.deleteById(readStatusId);
+  @Transactional
+  public void delete(UUID userId, UUID channelId) {
+    ReadStatusId readStatusId = new ReadStatusId(userId, channelId);
+    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+        .orElseThrow(() -> new EntityNotFoundException("ReadStatus not found for User: " + userId + " and Channel: " + channelId));
+    readStatusRepository.delete(readStatus);
   }
 }

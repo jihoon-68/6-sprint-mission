@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,21 +26,32 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
 
   @Operation(summary = "BinaryContentId 로 조회", operationId = "findBinaryContent")
-  @GetMapping(path = "{binaryContentId}")
-  public ResponseEntity<BinaryContent> find(@PathVariable("binaryContentId") UUID binaryContentId) {
+  @GetMapping(path = "/{id}")
+  public ResponseEntity<BinaryContentResponse> find(@PathVariable("id") UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+    BinaryContentResponse response = BinaryContentResponse.from(binaryContent);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(binaryContent);
+        .body(response);
   }
 
   @Operation(summary = "BinaryContentId 의 모든 Content 조회", operationId = "findAllBinaryContentByIdIn")
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+  public ResponseEntity<List<BinaryContentResponse>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
     List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    List<BinaryContentResponse> responseList = BinaryContentResponse.fromList(binaryContents);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(binaryContents);
+        .body(responseList);
   }
+
+    @Operation(summary = "파일 다운로드", operationId = "downloadBinaryContent")
+    @GetMapping(path = "/{pathBinaryContentId}/download")
+    public ResponseEntity<?> download(
+            @PathVariable("pathBinaryContentId") UUID pathBinaryContentId,
+            @RequestParam("binaryContentId") UUID paramBinaryContentId) {
+        return binaryContentService.download(paramBinaryContentId);
+    }
 }
+

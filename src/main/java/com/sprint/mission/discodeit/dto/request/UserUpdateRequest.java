@@ -5,5 +5,4 @@ public record UserUpdateRequest(
     String newEmail,
     String newPassword
 ) {
-
 }

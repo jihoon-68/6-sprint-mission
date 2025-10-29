@@ -11,11 +11,11 @@ public interface ReadStatusService {
 
   ReadStatus create(ReadStatusCreateRequest request);
 
-  ReadStatus find(UUID readStatusId);
+  ReadStatus find(UUID userId, UUID channelId);
 
   List<ReadStatus> findAllByUserId(UUID userId);
 
-  ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request);
+  ReadStatus update(UUID userId, UUID channelId, ReadStatusUpdateRequest request);
 
-  void delete(UUID readStatusId);
+  void delete(UUID userId, UUID channelId);
 }

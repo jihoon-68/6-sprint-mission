@@ -6,17 +6,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface MessageRepository {
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-  Message save(Message message);
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  Optional<Message> findById(UUID id);
+    List<Message> findAllByChannelId(UUID channelId, Pageable pageable);
 
-  List<Message> findAllByChannelId(UUID channelId);
+    Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId);
 
-  boolean existsById(UUID id);
-
-  void deleteById(UUID id);
-
-  void deleteAllByChannelId(UUID channelId);
+    void deleteAllByChannelId(UUID channelId);
 }

@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest.CreateMessageWithContent;
+import com.sprint.mission.discodeit.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.response.PagedResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,14 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "Message")
@@ -35,64 +33,61 @@ import java.util.UUID;
 @RequestMapping("/api/messages")
 public class MessageController {
 
-  private final MessageService messageService;
+    private final MessageService messageService;
 
-  @PostMapping(
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-  )
+    @PostMapping(
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Operation(summary = "Message 생성", operationId = "createMessage")
+    public ResponseEntity<MessageResponse> create(
+            @RequestPart("request") MessageCreateRequest request
+    ) throws IOException {
+        CreateMessageWithContent createRequest = request.toContentDto();
+        MessageResponse createdMessage = messageService.create(createRequest);
 
-  @Operation(summary = "Message 생성", operationId = "createMessage")
-  public ResponseEntity<Message> create(
-      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
-  ) {
-    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
-        .map(files -> files.stream()
-            .map(file -> {
-              try {
-                return new BinaryContentCreateRequest(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getBytes()
-                );
-              } catch (IOException e) {
-                throw new RuntimeException(e);
-              }
-            })
-            .toList())
-        .orElse(new ArrayList<>());
-    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdMessage);
-  }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdMessage);
+    }
 
-  @Operation(summary = "Message 수정", operationId = "updateMessage")
-  @PutMapping(path = "{messageId}")
-  public ResponseEntity<Message> update(@PathVariable("messageId") UUID messageId,
-      @RequestBody MessageUpdateRequest request) {
-    Message updatedMessage = messageService.update(messageId, request);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedMessage);
-  }
+    @Operation(summary = "특정 Message 조회", operationId = "findMessageById")
+    @GetMapping(path = "/{messageId}")
+    public ResponseEntity<MessageResponse> find(@PathVariable("messageId") UUID messageId) {
+        MessageResponse message = messageService.find(messageId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(message);
+    }
 
-  @Operation(summary = "Message 삭제", operationId = "deleteMessage")
-  @DeleteMapping(path = "{messageId}")
-  public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
-    messageService.delete(messageId);
-    return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .build();
-  }
+    @Operation(summary = "Message 수정", operationId = "updateMessage")
+    @PutMapping(path = "/{messageId}")
+    public ResponseEntity<MessageResponse> update(@PathVariable("messageId") UUID messageId,
+                                                  @RequestBody MessageUpdateRequest request) {
+        MessageResponse updatedMessage = messageService.update(messageId, request);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedMessage);
+    }
 
-  @Operation(summary = "채널별 모든 Message 조회", operationId = "findAllMessageByChannelId")
-  @GetMapping(path = "/channel/{channelId}")
-  public ResponseEntity<List<Message>> findAllByChannelId(
-      @PathVariable("channelId") UUID channelId) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(messages);
-  }
+    @Operation(summary = "Message 삭제", operationId = "deleteMessage")
+    @DeleteMapping(path = "/{messageId}")
+    public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
+        messageService.delete(messageId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    @Operation(summary = "채널별 Message 목록 조회 (페이지네이션)", operationId = "findAllMessageByChannelId")
+    @GetMapping(path = "/channel/{channelId}")
+    public ResponseEntity<PagedResponse<MessageResponse>> findAllByChannelId(
+            @PathVariable("channelId") UUID channelId,
+            @RequestParam(value = "page", defaultValue = "0") int page
+    ) {
+
+        PagedResponse<MessageResponse> messages = messageService.findAllByChannelId(channelId, page);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(messages);
+    }
 }
