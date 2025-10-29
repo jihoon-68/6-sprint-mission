@@ -1,31 +1,37 @@
 package com.sprint.mission.discodeit.dto;
 
-import lombok.Builder;
-
+import java.time.Instant;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class ReadStatusDTO {
 
-    @Builder
-    public record CreateReadStatusCommand(UUID channelId, UUID userId, Long lastReadTimestamp){
+  @Builder
+  public record CreateReadStatusCommand(UUID channelId, UUID userId, Instant lastReadTimeAt) {
 
-    }
+  }
 
-    @Builder
-    public record FindReadStatusResult(
-            UUID id,
-            UUID channelId,
-            UUID userId,
-            Long lastReadTimestamp,
-            Long createdAt,
-            Long updatedAt
-    ){
+  @Getter
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class ReadStatus {
 
-    }
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private UUID userId;
+    private UUID channelId;
+    private Instant lastReadAt;
 
-    @Builder
-    public record UpdateReadStatusCommand(UUID id, Long lastReadTimestamp){
+  }
 
-    }
+  @Builder
+  public record UpdateReadStatusCommand(UUID id, Instant lastReadAt) {
+
+  }
 
 }

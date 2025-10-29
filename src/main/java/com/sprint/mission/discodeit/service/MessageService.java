@@ -1,29 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.MessageDTO;
-
-import java.util.List;
+import com.sprint.mission.discodeit.dto.MessageDTO.Message;
+import com.sprint.mission.discodeit.dto.PagingDTO;
+import com.sprint.mission.discodeit.dto.PagingDTO.OffsetPage;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
 
-    void createMessage(MessageDTO.CreateMessageCommand request);
+  MessageDTO.Message createMessage(MessageDTO.CreateMessageCommand request);
 
-    boolean existMessageById(UUID id);
+  boolean existMessageById(UUID id);
 
-    Optional<MessageDTO.FindMessageResult> findMessageById(UUID id);
+  Optional<MessageDTO.Message> findMessageById(UUID id);
 
-    List<MessageDTO.FindMessageResult> findChildMessagesById(UUID id);
+  PagingDTO.OffsetPage<MessageDTO.Message> findMessagesByAuthorId(UUID authorId, PagingDTO.OffsetRequest pageable);
 
-    List<MessageDTO.FindMessageResult> findMessagesByUserId(UUID userId);
+  PagingDTO.OffsetPage<MessageDTO.Message> findMessagesByChannelId(UUID channelId, PagingDTO.OffsetRequest pageable);
 
-    List<MessageDTO.FindMessageResult> findMessagesByChannelId(UUID channelId);
+  PagingDTO.CursorPage<MessageDTO.Message> findMessagesByChannelIdAndCreatedAt(UUID channelId, String createdAt, PagingDTO.CursorRequest pageable);
 
-    List<MessageDTO.FindMessageResult> findAllMessages();
+  PagingDTO.OffsetPage<Message> findAllMessages(PagingDTO.OffsetRequest pageable);
 
-    void updateMessage(MessageDTO.UpdateMessageCommand request);
+  MessageDTO.Message updateMessage(MessageDTO.UpdateMessageCommand request);
 
-    void deleteMessageById(UUID id);
+  void deleteMessageById(UUID id);
 
 }

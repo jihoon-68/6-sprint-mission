@@ -1,146 +1,141 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserStatusDTO;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.UserEntity;
+import com.sprint.mission.discodeit.entity.UserStatusEntity;
+import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.mapper.UserStatusEntityMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
+  private final UserStatusEntityMapper userStatusEntityMapper;
 
-    @Override
-    public void createUserStatus(UserStatusDTO.CreateUserStatusCommand request) {
+  @Transactional
+  @Override
+  public UserStatusDTO.UserStatus createUserStatus(UserStatusDTO.CreateUserStatusCommand request) {
 
-        if (!userRepository.existById(request.userId())) {
-            throw new IllegalArgumentException("No such user.");
-        }
-
-        if (existUserStatusByUserId(request.userId())) {
-            throw new IllegalArgumentException("User status already exists.");
-        }
-
-        UserStatus userStatus = new UserStatus.Builder()
-                .userId(request.userId())
-                .build();
-
-        userStatusRepository.save(userStatus);
-
+    if (!userRepository.existsById(request.userId())) {
+      throw new NoSuchDataBaseRecordException("No such user.");
     }
 
-    @Override
-    public boolean existUserStatusById(UUID id) {
-        return userStatusRepository.existById(id);
+    if (existUserStatusByUserId(request.userId())) {
+      throw new IllegalArgumentException("User status already exists.");
     }
 
-    @Override
-    public boolean existUserStatusByUserId(UUID userId) {
-        return userStatusRepository.existByUserId(userId);
+    UserEntity userEntity = userRepository.findById(request.userId()).get();
+
+    UserStatusEntity userStatusEntity = UserStatusEntity.builder()
+        .user(userEntity)
+        .build();
+
+    return userStatusEntityMapper.entityToUserStatus(userStatusRepository.save(userStatusEntity));
+
+  }
+
+  @Override
+  public boolean existUserStatusById(UUID id) {
+    return userStatusRepository.existsById(id);
+  }
+
+  @Override
+  public boolean existUserStatusByUserId(UUID userId) {
+    return userStatusRepository.existsByUserId(userId);
+  }
+
+  @Override
+  public Optional<UserStatusDTO.UserStatus> findUserStatusById(UUID id) {
+
+    UserStatusEntity userStatusEntity = userStatusRepository.findById(id)
+        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+
+    return Optional.ofNullable(userStatusEntityMapper.entityToUserStatus(userStatusEntity));
+
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public Optional<UserStatusDTO.UserStatus> findUserStatusByUserId(UUID userId) {
+
+    if (!userRepository.existsById(userId)) {
+      throw new NoSuchDataBaseRecordException("No such user.");
     }
 
-    @Override
-    public Optional<UserStatusDTO.FindUserStatusResult> findUserStatusById(UUID id) {
+    UserStatusEntity userStatusEntity = userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
 
-        UserStatus userStatus = userStatusRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No such user status."));
+    return Optional.ofNullable(userStatusEntityMapper.entityToUserStatus(userStatusEntity));
 
-        return Optional.ofNullable(UserStatusDTO.FindUserStatusResult.builder()
-                .id(userStatus.getId())
-                .userId(userStatus.getUserId())
-                .lastActiveTimestamp(userStatus.getLastActiveTimestamp())
-                .createdAt(userStatus.getCreatedAt())
-                .updatedAt(userStatus.getUpdatedAt())
-                .build());
+  }
 
+  @Override
+  public List<UserStatusDTO.UserStatus> findAllUserStatus() {
+    return userStatusRepository.findAll().stream()
+        .map(userStatusEntityMapper::entityToUserStatus)
+        .toList();
+
+  }
+
+  @Transactional
+  @Override
+  public UserStatusDTO.UserStatus updateUserStatus(UserStatusDTO.UpdateUserStatusCommand request) {
+
+    UserStatusEntity userStatusEntity = userStatusRepository.findById(request.id())
+        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+
+    userStatusEntity.updateLastActiveAt(request.lastActiveAt());
+
+    return userStatusEntityMapper.entityToUserStatus(userStatusRepository.save(userStatusEntity));
+
+  }
+
+  @Transactional
+  @Override
+  public void deleteUserStatusById(UUID id) {
+
+    if (!userStatusRepository.existsById(id)) {
+      throw new NoSuchDataBaseRecordException("No such user status.");
     }
 
-    @Override
-    public Optional<UserStatusDTO.FindUserStatusResult> findUserStatusByUserId(UUID userId) {
+    userStatusRepository.deleteById(id);
 
-        if (!userRepository.existById(userId)) {
-            throw new IllegalArgumentException("No such user.");
-        }
+  }
 
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("No such user status."));
+  @Transactional
+  @Override
+  public void deleteUserStatusByUserId(UUID userId) {
 
-        return Optional.ofNullable(UserStatusDTO.FindUserStatusResult.builder()
-                .id(userStatus.getId())
-                .userId(userStatus.getUserId())
-                .lastActiveTimestamp(userStatus.getLastActiveTimestamp())
-                .createdAt(userStatus.getCreatedAt())
-                .updatedAt(userStatus.getUpdatedAt())
-                .build());
-
+    if (!userStatusRepository.existsById(userId)) {
+      throw new NoSuchDataBaseRecordException("No such user status.");
     }
 
-    @Override
-    public List<UserStatusDTO.FindUserStatusResult> findAllUserStatus() {
-        return userStatusRepository.findAll().stream()
-                .map(userStatus -> UserStatusDTO.FindUserStatusResult.builder()
-                        .id(userStatus.getId())
-                        .userId(userStatus.getUserId())
-                        .lastActiveTimestamp(userStatus.getLastActiveTimestamp())
-                        .createdAt(userStatus.getCreatedAt())
-                        .updatedAt(userStatus.getUpdatedAt())
-                        .build())
-                .toList();
+    userStatusRepository.deleteByUserId(userId);
 
-    }
+  }
 
-    @Override
-    public void updateUserStatus(UserStatusDTO.UpdateUserStatusCommand request) {
+  @Transactional
+  @Override
+  public void deleteAllUserStatusByIdIn(List<UUID> uuidList) {
 
-        UserStatus userStatus = userStatusRepository.findById(request.id())
-                .orElseThrow(() -> new IllegalArgumentException("No such user status."));
+    uuidList.forEach(uuid -> {
+      if (!userStatusRepository.existsById(uuid)) {
+        throw new NoSuchDataBaseRecordException("No such user status.");
+      }
+    });
 
-        userStatus.updateLastActiveTimestamp();
+    userStatusRepository.deleteAllByIdIn(uuidList);
 
-        userStatusRepository.save(userStatus);
-    }
-
-    @Override
-    public void deleteUserStatusById(UUID id) {
-
-        if (!userStatusRepository.existById(id)) {
-            throw new IllegalArgumentException("No such user status.");
-        }
-
-        userStatusRepository.deleteById(id);
-
-    }
-
-    @Override
-    public void deleteUserStatusByUserId(UUID userId) {
-
-        if (!userStatusRepository.existById(userId)) {
-            throw new IllegalArgumentException("No such user status.");
-        }
-
-        userStatusRepository.deleteByUserId(userId);
-
-    }
-
-    @Override
-    public void deleteAllUserStatusByIdIn(List<UUID> uuidList) {
-
-        uuidList.forEach(uuid -> {
-            if (!userStatusRepository.existById(uuid)) {
-                throw new IllegalArgumentException("No such user status.");
-            }
-        });
-
-        userStatusRepository.deleteAllByIdIn(uuidList);
-
-    }
+  }
 }

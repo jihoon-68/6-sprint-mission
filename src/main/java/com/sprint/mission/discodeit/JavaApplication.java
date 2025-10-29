@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit;
 @Deprecated
 public class JavaApplication {
 
-    //static String fileDirectory = FILE_PATH;
-    //static final String strongPassword = "fe5A3sad@lks^";
+  //static String fileDirectory = FILE_PATH;
+  //static final String strongPassword = "fe5A3sad@lks^";
 
-    public static void main(String[] args) {
+  public static void main(String[] args) {
 
         /*testJcfUserService();
         testJcfChannelService();
@@ -18,7 +18,7 @@ public class JavaApplication {
         testBasicChannelService();
         testBasicMessageService();*/
 
-    }
+  }
 
     /*public static void testJcfUserService() {
 
@@ -27,13 +27,13 @@ public class JavaApplication {
         //유저 등록
         System.out.println("유저 등록");
         User userOne = new User.Builder()
-                .nickname("Kim")
+                .username("Kim")
                 .email("kimjaewon@gmail.com")
                 .password(strongPassword)
                 .description("Hi")
                 .build();
         User userTwo = new User.Builder()
-                .nickname("Kim2")
+                .username("Kim2")
                 .email("kimjaewon2@gmail.com")
                 .password(strongPassword)
                 .description("Hi")
@@ -55,7 +55,7 @@ public class JavaApplication {
         System.out.println("유저 수정");
         DiscordDTO.UpdateUserRequest requestOne = DiscordDTO.UpdateUserRequest.builder()
                 .id(userOne.getId())
-                .nickname(userOne.getNickname())
+                .username(userOne.getNickname())
                 .email(userOne.getEmail())
                 .currentPassword(strongPassword)
                 .newPassword(strongPassword + "k")
@@ -87,13 +87,13 @@ public class JavaApplication {
         //유저 등록
         System.out.println("유저 등록");
         User userOne = new User.Builder()
-                .nickname("Kim")
+                .username("Kim")
                 .email("kimjaewon@gmail.com")
                 .password(strongPassword)
                 .description("Hi")
                 .build();
         User userTwo = new User.Builder()
-                .nickname("Kim2")
+                .username("Kim2")
                 .email("kimjaewon2@gmail.com")
                 .password(strongPassword)
                 .description("Hi")
@@ -115,7 +115,7 @@ public class JavaApplication {
         System.out.println("유저 수정");
         DiscordDTO.UpdateUserRequest requestOne = DiscordDTO.UpdateUserRequest.builder()
                 .id(userOne.getId())
-                .nickname(userOne.getNickname())
+                .username(userOne.getNickname())
                 .email(userOne.getEmail())
                 .currentPassword(strongPassword)
                 .newPassword(strongPassword + "k")
@@ -153,13 +153,13 @@ public class JavaApplication {
         //유저 등록
         System.out.println("유저 등록");
         User userOne = new User.Builder()
-                .nickname("Kim")
+                .username("Kim")
                 .email("kimjaewon@gmail.com")
                 .password(strongPassword)
                 .description("Hi")
                 .build();
         User userTwo = new User.Builder()
-                .nickname("Kim2")
+                .username("Kim2")
                 .email("kimjaewon2@gmail.com")
                 .password(strongPassword)
                 .description("Hi")
@@ -181,7 +181,7 @@ public class JavaApplication {
         System.out.println("유저 수정");
         DiscordDTO.UpdateUserRequest requestOne = DiscordDTO.UpdateUserRequest.builder()
                 .id(userOne.getId())
-                .nickname(userOne.getNickname())
+                .username(userOne.getNickname())
                 .email(userOne.getEmail())
                 .currentPassword(strongPassword)
                 .newPassword(strongPassword + "k")
@@ -222,13 +222,13 @@ public class JavaApplication {
         //Channel channelOne = new Channel("channelOne", ChannelType.TEXT, false);
         //Channel channelTwo = new Channel("channelTwo", ChannelType.VOICE, true);
         Channel channelOne = new Channel.Builder()
-                .channelName("channelOne")
-                .category(ChannelType.TEXT)
+                .name("channelOne")
+                .type(ChannelType.TEXT)
                 .isVoiceChannel(false)
                 .build();
         Channel channelTwo = new Channel.Builder()
-                .channelName("channelTwo")
-                .category(ChannelType.VOICE)
+                .name("channelTwo")
+                .type(ChannelType.VOICE)
                 .isVoiceChannel(true)
                 .build();
         jcfChannelCrudService.createChannel(channelOne);
@@ -252,8 +252,8 @@ public class JavaApplication {
         System.out.println("채널 수정");
         DiscordDTO.UpdateChannelRequest requestTwo = DiscordDTO.UpdateChannelRequest.builder()
                 .id(channelTwo.getId())
-                .channelName(channelTwo.getChannelName())
-                .category(ChannelType.DM)
+                .name(channelTwo.getChannelName())
+                .type(ChannelType.DM)
                 .isVoiceChannel(false)
                 .build();
         jcfChannelCrudService.updateChannel(requestTwo);
@@ -289,13 +289,13 @@ public class JavaApplication {
         User user = new User("test", "test@test.com", strongPassword, "test");
         Message message = new Message(user.getId(), null, "message", false, null);
         Channel channelOne = new Channel.Builder()
-                .channelName("channelOne")
-                .category(ChannelType.TEXT)
+                .name("channelOne")
+                .type(ChannelType.TEXT)
                 .isVoiceChannel(false)
                 .build();
         Channel channelTwo = new Channel.Builder()
-                .channelName("channelTwo")
-                .category(ChannelType.VOICE)
+                .name("channelTwo")
+                .type(ChannelType.VOICE)
                 .isVoiceChannel(true)
                 .build();
         fileChannelCrudService.createChannel(channelOne);
@@ -319,8 +319,8 @@ public class JavaApplication {
         System.out.println("채널 수정");
         DiscordDTO.UpdateChannelRequest requestTwo = DiscordDTO.UpdateChannelRequest.builder()
                 .id(channelTwo.getId())
-                .channelName(channelTwo.getChannelName())
-                .category(ChannelType.DM)
+                .name(channelTwo.getChannelName())
+                .type(ChannelType.DM)
                 .isVoiceChannel(false)
                 .build();
         fileChannelCrudService.updateChannel(requestTwo);
@@ -366,13 +366,13 @@ public class JavaApplication {
         User user = new User("test", "test@test.com", strongPassword, "test");
         Message message = new Message(user.getId(), null, "message", false, null);
         Channel channelOne = new Channel.Builder()
-                .channelName("channelOne")
-                .category(ChannelType.TEXT)
+                .name("channelOne")
+                .type(ChannelType.TEXT)
                 .isVoiceChannel(false)
                 .build();
         Channel channelTwo = new Channel.Builder()
-                .channelName("channelTwo")
-                .category(ChannelType.VOICE)
+                .name("channelTwo")
+                .type(ChannelType.VOICE)
                 .isVoiceChannel(true)
                 .build();
         basicChannelCrudService.createChannel(channelOne);
@@ -396,8 +396,8 @@ public class JavaApplication {
         System.out.println("채널 수정");
         DiscordDTO.UpdateChannelRequest requestTwo = DiscordDTO.UpdateChannelRequest.builder()
                 .id(channelTwo.getId())
-                .channelName(channelTwo.getChannelName())
-                .category(ChannelType.DM)
+                .name(channelTwo.getChannelName())
+                .type(ChannelType.DM)
                 .isVoiceChannel(false)
                 .build();
         basicChannelCrudService.updateChannel(requestTwo);
@@ -451,14 +451,14 @@ public class JavaApplication {
         //Message messageOne = new Message(userOne.getId(), channelOne.getId(),"messageOne", false, null);
         //Message messageTwo = new Message(userOne.getId(), channelOne.getId(), "messageTwo", true, messageOne.getId());
         Message messageOne = new Message.Builder()
-                .userId(userOne.getId())
+                .authorId(userOne.getId())
                 .channelId(channelOne.getId())
                 .content("messageOne")
                 .isReply(false)
                 .parentMessageId(null)
                 .build();
         Message messageTwo = new Message.Builder()
-                .userId(userTwo.getId())
+                .authorId(userTwo.getId())
                 .channelId(channelTwo.getId())
                 .content("messageTwo")
                 .isReply(true)
@@ -525,14 +525,14 @@ public class JavaApplication {
         Channel channelTwo = new Channel("channelTwo", ChannelType.DM, true);
         fileChannelCrudService.createChannel(channelTwo);
         Message messageOne = new Message.Builder()
-                .userId(userOne.getId())
+                .authorId(userOne.getId())
                 .channelId(channelOne.getId())
                 .content("messageOne")
                 .isReply(false)
                 .parentMessageId(null)
                 .build();
         Message messageTwo = new Message.Builder()
-                .userId(userTwo.getId())
+                .authorId(userTwo.getId())
                 .channelId(channelTwo.getId())
                 .content("messageTwo")
                 .isReply(true)
@@ -606,14 +606,14 @@ public class JavaApplication {
         Channel channelTwo = new Channel("channelTwo", ChannelType.VOICE, true);
         basicChannelCrudService.createChannel(channelTwo);
         Message messageOne = new Message.Builder()
-                .userId(userOne.getId())
+                .authorId(userOne.getId())
                 .channelId(channelOne.getId())
                 .content("messageOne")
                 .isReply(false)
                 .parentMessageId(null)
                 .build();
         Message messageTwo = new Message.Builder()
-                .userId(userTwo.getId())
+                .authorId(userTwo.getId())
                 .channelId(channelTwo.getId())
                 .content("messageTwo")
                 .isReply(true)

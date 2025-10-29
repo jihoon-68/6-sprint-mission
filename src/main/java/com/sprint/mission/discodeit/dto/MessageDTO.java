@@ -1,59 +1,43 @@
 package com.sprint.mission.discodeit.dto;
 
-import lombok.Builder;
-
+import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContentCreateCommand;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class MessageDTO {
 
-    @Builder
-    public record CreateMessageCommand(String content, boolean isReply, UUID parentMessageId, UUID channelId, UUID userId, List<BinaryContentDTO.CreateBinaryContentCommand> binaryContentList) {
+  @Builder
+  public record CreateMessageCommand(String content, UUID channelId, UUID userId,
+                                     List<BinaryContentCreateCommand> binaryContentList) {
 
-        public CreateMessageCommand {
+  }
 
-            if (isReply && parentMessageId == null) {
-                throw new IllegalArgumentException("Parent message id is required.");
-            }
+  @Getter
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Message {
 
-            if (!isReply && parentMessageId != null) {
-                throw new IllegalArgumentException("Parent message id is not required.");
-            }
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private UUID channelId;
+    private UserDTO.User author;
+    private String content;
+    private List<BinaryContentDTO.BinaryContent> attachments = new ArrayList<>();
 
-        }
+  }
 
-    }
+  //message update를 위한 Request DTO
+  @Builder
+  public record UpdateMessageCommand(UUID id, String content) {
 
-    @Builder
-    public record FindMessageResult(
-            UUID id,
-            String content,
-            boolean isReply,
-            UUID parentMessageId,
-            UUID channelId,
-            UUID userId,
-            List<UUID> binaryContentList,
-            Long createdAt,
-            Long updatedAt) {
-
-    }
-
-    //message update를 위한 Request DTO
-    @Builder
-    public record UpdateMessageCommand(UUID id, String content, boolean isReply, UUID parentMessageId) {
-
-        public UpdateMessageCommand {
-
-            if (isReply && parentMessageId == null) {
-                throw new IllegalArgumentException("Parent message id is required.");
-            }
-
-            if (!isReply && parentMessageId != null) {
-                throw new IllegalArgumentException("Parent message id is not required.");
-            }
-
-        }
-
-    }
+  }
 
 }

@@ -1,31 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.UserStatusDTO;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface UserStatusService {
 
-    void createUserStatus(UserStatusDTO.CreateUserStatusCommand request);
+  UserStatusDTO.UserStatus createUserStatus(UserStatusDTO.CreateUserStatusCommand request);
 
-    boolean existUserStatusById(UUID id);
+  boolean existUserStatusById(UUID id);
 
-    boolean existUserStatusByUserId(UUID userId);
+  boolean existUserStatusByUserId(UUID userId);
 
-    Optional<UserStatusDTO.FindUserStatusResult> findUserStatusById(UUID id);
+  Optional<UserStatusDTO.UserStatus> findUserStatusById(UUID id);
 
-    Optional<UserStatusDTO.FindUserStatusResult> findUserStatusByUserId(UUID userId);
+  Optional<UserStatusDTO.UserStatus> findUserStatusByUserId(UUID userId);
 
-    List<UserStatusDTO.FindUserStatusResult> findAllUserStatus();
+  List<UserStatusDTO.UserStatus> findAllUserStatus();
 
-    void updateUserStatus(UserStatusDTO.UpdateUserStatusCommand request);
+  UserStatusDTO.UserStatus updateUserStatus(UserStatusDTO.UpdateUserStatusCommand request);
 
-    void deleteUserStatusById(UUID id);
+  void deleteUserStatusById(UUID id);
 
-    void deleteUserStatusByUserId(UUID userId);
+  void deleteUserStatusByUserId(UUID userId);
 
-    void deleteAllUserStatusByIdIn(List<UUID> idList);
+  void deleteAllUserStatusByIdIn(List<UUID> idList);
 
 }

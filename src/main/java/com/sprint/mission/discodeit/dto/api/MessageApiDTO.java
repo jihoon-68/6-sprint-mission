@@ -1,49 +1,42 @@
 package com.sprint.mission.discodeit.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotBlank;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
 
 public class MessageApiDTO {
 
-    @Builder
-    public record MessageCreateRequest(
-            String content,
-            boolean isReply,
-            UUID parentMessageId,
-            UUID channelId,
-            @JsonProperty("authorId")
-            UUID userId) {
+  @Builder
+  public record MessageCreateRequest(
+      @NotBlank(message = "메시지는 공백을 허용하지 않습니다.") String content,
+      @NotBlank(message = "올바르지 않은 이용자입니다.") UUID authorId,
+      @NotBlank(message = "올바르지 않은 채널입니다.") UUID channelId) {
 
-    }
+  }
 
-    @Builder
-    public record MessageUpdateRequest(
-        @JsonProperty("newContent")
-        String content,
-        boolean isReply,
-        UUID parentMessageId) {
+  @Builder
+  public record MessageUpdateRequest(
+      UUID id,
+      @JsonProperty("newContent")
+      String content) {
 
-    }
+  }
 
-    @Builder
-    public record FindMessageResponse(
-            UUID id,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt,
-            String content,
-            UUID channelId,
-            @JsonProperty("authorId")
-            UUID userId,
-            boolean isReply,
-            UUID parentMessageId,
-            @JsonProperty("attachmentIds")
-            List<UUID> binaryContentList
-    ) {
+  @Builder
+  public record FindMessageResponse(
+      UUID id,
+      Instant createdAt,
+      Instant updatedAt,
+      String content,
+      UUID channelId,
+      UserApiDTO.FindUserResponse author,
+      @JsonProperty("attachments")
+      List<BinaryContentApiDTO.ReadBinaryContentResponse> attachments
+  ) {
 
-    }
+  }
 
 }

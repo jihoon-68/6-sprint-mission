@@ -1,33 +1,31 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.User;
-
-import java.util.List;
+import com.sprint.mission.discodeit.entity.UserEntity;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
-    void save(User user);
+  boolean existsById(UUID id);
 
-    void saveAll(Iterable<User> users);
+  boolean existsByEmail(String email);
 
-    boolean existById(UUID id);
+  boolean existsByUsername(String username);
 
-    boolean existByEmail(String email);
+  boolean existsByEmailOrUsername(String email, String username);
 
-    boolean existByNickname(String nickname);
+  @Query("SELECT u FROM UserEntity u LEFT JOIN FETCH u.profileId LEFT JOIN FETCH u.userStatus WHERE u.id = :id")
+  Optional<UserEntity> findById(@Param("id") UUID id);
 
-    boolean existByEmailOrNickname(String email, String nickname);
+  @Query("SELECT u FROM UserEntity u LEFT JOIN FETCH u.profileId LEFT JOIN FETCH u.userStatus WHERE u.email = :email")
+  Optional<UserEntity> findByEmail(@Param("email") String email);
 
-    Optional<User> findById(UUID id);
+  @Query("SELECT u FROM UserEntity u LEFT JOIN FETCH u.profileId LEFT JOIN FETCH u.userStatus WHERE u.username = :username")
+  Optional<UserEntity> findByUsername(@Param("username") String username);
 
-    Optional<User> findByEmail(String email);
-
-    Optional<User> findByNickname(String nickname);
-
-    List<User> findAll();
-
-    void deleteById(UUID id);
+  void deleteById(UUID id);
 
 }
