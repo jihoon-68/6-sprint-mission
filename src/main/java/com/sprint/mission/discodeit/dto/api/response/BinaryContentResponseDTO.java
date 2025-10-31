@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.api;
+package com.sprint.mission.discodeit.dto.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprint.mission.discodeit.enums.ContentType;
@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BinaryContentApiDTO {
+public class BinaryContentResponseDTO {
 
   @Builder
   public record ReadBinaryContentResponse(
@@ -20,5 +20,4 @@ public class BinaryContentApiDTO {
   ) {
 
   }
-
 }

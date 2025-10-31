@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.api;
+package com.sprint.mission.discodeit.dto.api.request;
 
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReadStatusApiDTO {
+public class ReadStatusRequestDTO {
 
   @Builder
   public record ReadStatusCreateRequest(
@@ -22,15 +22,4 @@ public class ReadStatusApiDTO {
   public record ReadStatusUpdateRequest(Instant newLastReadAt) {
 
   }
-
-  @Builder
-  public record FindReadStatusResponse(
-      UUID id,
-      UUID userId,
-      UUID channelId,
-      Instant lastReadAt
-  ) {
-
-  }
-
 }

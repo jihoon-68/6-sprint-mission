@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.api.BinaryContentApiDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
+import com.sprint.mission.discodeit.dto.api.response.BinaryContentResponseDTO.ReadBinaryContentResponse;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.BinaryContentApiMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -57,7 +57,7 @@ public class BinaryContentController {
               description = "바이너리 콘텐츠 조회 성공",
               content = @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(implementation = BinaryContentApiDTO.ReadBinaryContentResponse.class)
+                  schema = @Schema(implementation = ReadBinaryContentResponse.class)
               )
           ),
           @ApiResponse(
@@ -68,7 +68,7 @@ public class BinaryContentController {
       }
   )
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentApiDTO.ReadBinaryContentResponse> readBinaryContent(
+  public ResponseEntity<ReadBinaryContentResponse> readBinaryContent(
       @Parameter(description = "바이너리 콘텐츠 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable("binaryContentId") UUID id) {
 
@@ -93,13 +93,13 @@ public class BinaryContentController {
               description = "바이너리 콘텐츠 목록 조회 성공",
               content = @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  array = @ArraySchema(schema = @Schema(implementation = BinaryContentApiDTO.ReadBinaryContentResponse.class))
+                  array = @ArraySchema(schema = @Schema(implementation = ReadBinaryContentResponse.class))
               )
           )
       }
   )
   @GetMapping()
-  public ResponseEntity<List<BinaryContentApiDTO.ReadBinaryContentResponse>> readBinaryContentsByIdIn(
+  public ResponseEntity<List<ReadBinaryContentResponse>> readBinaryContentsByIdIn(
       @Parameter(
           description = "바이너리 콘텐츠 ID 목록",
           required = true,

@@ -1,16 +1,14 @@
-package com.sprint.mission.discodeit.dto.api;
+package com.sprint.mission.discodeit.dto.api.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MessageApiDTO {
+public class MessageRequestDTO {
 
   @Builder
   public record MessageCreateRequest(
@@ -27,19 +25,4 @@ public class MessageApiDTO {
       String content) {
 
   }
-
-  @Builder
-  public record FindMessageResponse(
-      UUID id,
-      Instant createdAt,
-      Instant updatedAt,
-      String content,
-      UUID channelId,
-      UserApiDTO.FindUserResponse author,
-      @JsonProperty("attachments")
-      List<BinaryContentApiDTO.ReadBinaryContentResponse> attachments
-  ) {
-
-  }
-
 }

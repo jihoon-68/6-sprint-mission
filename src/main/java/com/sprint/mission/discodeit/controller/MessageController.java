@@ -4,11 +4,16 @@ import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContentCreateComm
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.dto.PagingDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.dto.api.MessageApiDTO;
-import com.sprint.mission.discodeit.dto.api.MessageApiDTO.FindMessageResponse;
-import com.sprint.mission.discodeit.dto.api.MessageApiDTO.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.api.PagingApiDTO;
-import com.sprint.mission.discodeit.dto.api.PagingApiDTO.OffsetPageResponse;
+import com.sprint.mission.discodeit.dto.api.request.PagingRequestDTO.CursorRequest;
+import com.sprint.mission.discodeit.dto.api.request.PagingRequestDTO.OffsetRequest;
+import com.sprint.mission.discodeit.dto.api.response.MessageResponseDTO.FindMessageResponse;
+import com.sprint.mission.discodeit.dto.api.request.MessageRequestDTO.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO.CursorPageResponse;
+import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO.OffsetPageResponse;
+import com.sprint.mission.discodeit.dto.api.request.MessageRequestDTO;
+import com.sprint.mission.discodeit.dto.api.request.MessageRequestDTO.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.api.response.MessageResponseDTO;
+import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO;
 import com.sprint.mission.discodeit.enums.ContentType;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.BinaryContentApiMapper;
@@ -74,7 +79,7 @@ public class MessageController {
           @ApiResponse(
               responseCode = "201",
               description = "메시지 전송 성공",
-              content = @Content(schema = @Schema(implementation = MessageApiDTO.FindMessageResponse.class))
+              content = @Content(schema = @Schema(implementation = FindMessageResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -84,11 +89,11 @@ public class MessageController {
       }
   )
   @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<MessageApiDTO.FindMessageResponse> sendMessage(
+  public ResponseEntity<FindMessageResponse> sendMessage(
       @Parameter(description = "메시지 생성 요청 정보", required = true,
           content = @Content(mediaType = "application/json",
-              schema = @Schema(implementation = MessageApiDTO.MessageCreateRequest.class)))
-      @RequestPart @Valid MessageApiDTO.MessageCreateRequest messageCreateRequest,
+              schema = @Schema(implementation = MessageCreateRequest.class)))
+      @RequestPart @Valid MessageRequestDTO.MessageCreateRequest messageCreateRequest,
       @Parameter(description = "첨부 파일 목록")
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
@@ -132,7 +137,7 @@ public class MessageController {
           @ApiResponse(
               responseCode = "200",
               description = "메시지 수정 성공",
-              content = @Content(schema = @Schema(implementation = MessageApiDTO.FindMessageResponse.class))
+              content = @Content(schema = @Schema(implementation = FindMessageResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -147,7 +152,7 @@ public class MessageController {
       }
   )
   @PatchMapping(value = "/{messageId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<MessageApiDTO.FindMessageResponse> updateMessage(
+  public ResponseEntity<FindMessageResponse> updateMessage(
       @Parameter(description = "메시지 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable UUID messageId,
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -213,25 +218,25 @@ public class MessageController {
           @ApiResponse(
               responseCode = "200",
               description = "메시지 목록 조회 성공",
-              content = @Content(array = @ArraySchema(schema = @Schema(implementation = MessageApiDTO.FindMessageResponse.class)))
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindMessageResponse.class)))
           )
       }
   )
   @GetMapping("/offset")
-  public ResponseEntity<PagingApiDTO.OffsetPageResponse<FindMessageResponse>> findAllByChannelId(
+  public ResponseEntity<OffsetPageResponse<FindMessageResponse>> findAllByChannelId(
       @Parameter(description = "채널 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @RequestParam UUID channelId,
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "페이징 요청 정보",
           required = true,
-          content = @Content(schema = @Schema(implementation = PagingApiDTO.OffsetRequest.class))
+          content = @Content(schema = @Schema(implementation = OffsetRequest.class))
       )
-      @ModelAttribute PagingApiDTO.OffsetRequest pageable) {
+      @ModelAttribute OffsetRequest pageable) {
 
     PagingDTO.OffsetPage<MessageDTO.Message> messagePage = messageService.findMessagesByChannelId(
         channelId, PagingDTO.OffsetRequest.of(pageable.page(), pageable.size()));
 
-    PagingApiDTO.OffsetPageResponse<FindMessageResponse> response = OffsetPageResponse.<MessageApiDTO.FindMessageResponse>builder()
+    OffsetPageResponse<FindMessageResponse> response = PagingResponseDTO.OffsetPageResponse.<FindMessageResponse>builder()
         .number(messagePage.getNumber())
         .size(messagePage.getSize())
         .hasNext(messagePage.isHasNext())
@@ -246,7 +251,7 @@ public class MessageController {
   }
 
   @GetMapping("")
-  public ResponseEntity<PagingApiDTO.CursorPageResponse<FindMessageResponse>> findAllByChannelIdAndCreatedAt(
+  public ResponseEntity<CursorPageResponse<FindMessageResponse>> findAllByChannelIdAndCreatedAt(
       @Parameter(description = "채널 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @RequestParam UUID channelId,
       @Parameter(description = "기준 생성 시간(ISO 8601 형식)", example = "2023-10-01T12:00:00Z")
@@ -254,14 +259,14 @@ public class MessageController {
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "페이징 요청 정보",
           required = true,
-          content = @Content(schema = @Schema(implementation = PagingApiDTO.CursorRequest.class))
+          content = @Content(schema = @Schema(implementation = CursorRequest.class))
       )
-      @ModelAttribute PagingApiDTO.CursorRequest pageable) {
+      @ModelAttribute CursorRequest pageable) {
 
     PagingDTO.CursorPage<MessageDTO.Message> messagePage = messageService.findMessagesByChannelIdAndCreatedAt(channelId, cursor, PagingDTO.CursorRequest.of(pageable.size()));
 
-    PagingApiDTO.CursorPageResponse<MessageApiDTO.FindMessageResponse> response = PagingApiDTO.CursorPageResponse.<MessageApiDTO.FindMessageResponse>builder()
-        .nextCursor(messagePage.getNextCursor() != null ? MessageApiDTO.FindMessageResponse.builder()
+    CursorPageResponse<FindMessageResponse> response = PagingResponseDTO.CursorPageResponse.<FindMessageResponse>builder()
+        .nextCursor(messagePage.getNextCursor() != null ? MessageResponseDTO.FindMessageResponse.builder()
             .id(messagePage.getNextCursor().getId())
             .createdAt(messagePage.getNextCursor().getCreatedAt())
             .updatedAt(messagePage.getNextCursor().getUpdatedAt())

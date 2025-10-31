@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.api.AuthApiDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.dto.api.UserApiDTO;
+import com.sprint.mission.discodeit.dto.api.request.AuthRequestDTO;
+import com.sprint.mission.discodeit.dto.api.request.AuthRequestDTO.LoginRequest;
+import com.sprint.mission.discodeit.dto.api.response.UserResponseDTO.FindUserResponse;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.AuthApiMapper;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -51,7 +52,7 @@ public class AuthController {
           @ApiResponse(
               responseCode = "200",
               description = "로그인 성공",
-              content = @Content(schema = @Schema(implementation = UserApiDTO.FindUserResponse.class))
+              content = @Content(schema = @Schema(implementation = FindUserResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -66,13 +67,13 @@ public class AuthController {
       }
   )
   @PostMapping(value = "/login")
-  public ResponseEntity<UserApiDTO.FindUserResponse> login(
+  public ResponseEntity<FindUserResponse> login(
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "로그인 요청 정보",
           required = true,
-          content = @Content(schema = @Schema(implementation = AuthApiDTO.LoginRequest.class))
+          content = @Content(schema = @Schema(implementation = LoginRequest.class))
       )
-      @RequestBody @Valid AuthApiDTO.LoginRequest loginRequest) {
+      @RequestBody @Valid AuthRequestDTO.LoginRequest loginRequest) {
 
     UserDTO.User user = authService.login(UserDTO.toLoginCommand(
         loginRequest.username(),

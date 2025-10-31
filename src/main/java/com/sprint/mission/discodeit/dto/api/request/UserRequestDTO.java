@@ -1,15 +1,14 @@
-package com.sprint.mission.discodeit.dto.api;
+package com.sprint.mission.discodeit.dto.api.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserApiDTO {
+public class UserRequestDTO {
 
   @Builder
   public record UserCreateRequest(
@@ -38,30 +37,4 @@ public class UserApiDTO {
   public record UserStatusUpdateRequest(Instant newLastActiveAt) {
 
   }
-
-  @Builder
-  public record FindUserResponse(
-      UUID id,
-      String username,
-      String email,
-      @JsonProperty("profile")
-      BinaryContentApiDTO.ReadBinaryContentResponse profile,
-      @JsonProperty("online")
-      boolean isOnline
-  ) {
-
-  }
-
-  @Builder
-  public record CheckUserOnlineResponse(
-      UUID id,
-      UUID userId,
-      @JsonProperty("lastActiveAt")
-      Instant lastOnlineAt,
-      boolean isOnline
-  ) {
-
-  }
-
-
 }

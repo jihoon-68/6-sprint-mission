@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ReadStatusDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.dto.api.ReadStatusApiDTO;
-import com.sprint.mission.discodeit.dto.api.ReadStatusApiDTO.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.api.request.ReadStatusRequestDTO.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.api.request.ReadStatusRequestDTO;
+import com.sprint.mission.discodeit.dto.api.request.ReadStatusRequestDTO.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.api.response.ReadStatusResponseDTO.FindReadStatusResponse;
 import com.sprint.mission.discodeit.exception.AllReadyExistDataBaseRecordException;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.ReadStatusApiMapper;
@@ -59,7 +61,7 @@ public class ReadStatusController {
           @ApiResponse(
               responseCode = "201",
               description = "읽음 상태 생성 성공",
-              content = @Content(schema = @Schema(implementation = ReadStatusApiDTO.FindReadStatusResponse.class))
+              content = @Content(schema = @Schema(implementation = FindReadStatusResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -69,13 +71,13 @@ public class ReadStatusController {
       }
   )
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ReadStatusApiDTO.FindReadStatusResponse> createReadStatus(
+  public ResponseEntity<FindReadStatusResponse> createReadStatus(
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "읽음 상태 생성 요청 정보",
           required = true,
-          content = @Content(schema = @Schema(implementation = ReadStatusApiDTO.ReadStatusCreateRequest.class))
+          content = @Content(schema = @Schema(implementation = ReadStatusCreateRequest.class))
       )
-      @RequestBody @Valid ReadStatusApiDTO.ReadStatusCreateRequest readStatusCreateRequest) {
+      @RequestBody @Valid ReadStatusRequestDTO.ReadStatusCreateRequest readStatusCreateRequest) {
 
     ReadStatusDTO.ReadStatus readStatus = readStatusService.createReadStatus(ReadStatusDTO.CreateReadStatusCommand.builder()
         .channelId(readStatusCreateRequest.channelId())
@@ -101,7 +103,7 @@ public class ReadStatusController {
           @ApiResponse(
               responseCode = "200",
               description = "읽음 상태 수정 성공",
-              content = @Content(schema = @Schema(implementation = ReadStatusApiDTO.FindReadStatusResponse.class))
+              content = @Content(schema = @Schema(implementation = FindReadStatusResponse.class))
           ),
           @ApiResponse(
               responseCode = "404",
@@ -111,7 +113,7 @@ public class ReadStatusController {
       }
   )
   @PatchMapping(value = "/{readStatusId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ReadStatusApiDTO.FindReadStatusResponse> updateReadStatus(
+  public ResponseEntity<FindReadStatusResponse> updateReadStatus(
       @Parameter(description = "읽음 상태 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable UUID readStatusId,
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -144,16 +146,16 @@ public class ReadStatusController {
           @ApiResponse(
               responseCode = "200",
               description = "읽음 상태 목록 조회 성공",
-              content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReadStatusApiDTO.FindReadStatusResponse.class)))
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindReadStatusResponse.class)))
           )
       }
   )
   @GetMapping()
-  public ResponseEntity<List<ReadStatusApiDTO.FindReadStatusResponse>> findAllReadStatusByUserId(
+  public ResponseEntity<List<FindReadStatusResponse>> findAllReadStatusByUserId(
       @Parameter(description = "사용자 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @RequestParam UUID userId) {
 
-    List<ReadStatusApiDTO.FindReadStatusResponse> readStatusList = readStatusService.findAllReadStatusByUserId(
+    List<FindReadStatusResponse> readStatusList = readStatusService.findAllReadStatusByUserId(
             userId).stream()
         .map(readStatusApiMapper::toReadStatusResponse)
         .toList();
