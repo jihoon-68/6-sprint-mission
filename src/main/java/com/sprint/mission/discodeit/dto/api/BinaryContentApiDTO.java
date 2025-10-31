@@ -3,8 +3,11 @@ package com.sprint.mission.discodeit.dto.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprint.mission.discodeit.enums.ContentType;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContentApiDTO {
 
   @Builder

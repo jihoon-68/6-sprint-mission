@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.dto;
 
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatusDTO {
 
   @Builder

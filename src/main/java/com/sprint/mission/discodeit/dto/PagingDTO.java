@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.dto;
 
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PagingDTO {
 
     @Getter
