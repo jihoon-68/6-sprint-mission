@@ -13,7 +13,7 @@ public interface ChannelService {
 
   boolean existChannelById(UUID id);
 
-  Optional<ChannelDTO.Channel> findChannelById(UUID id);
+  ChannelDTO.Channel findChannelById(UUID id);
 
   List<ChannelDTO.Channel> findChannelsByUserId(UUID userId);
 

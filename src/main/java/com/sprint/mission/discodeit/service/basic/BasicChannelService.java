@@ -90,14 +90,14 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public Optional<ChannelDTO.Channel> findChannelById(UUID id) {
+  public ChannelDTO.Channel findChannelById(UUID id) {
 
     ChannelEntity channelEntity = channelRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such channel."));
 
     ChannelDTO.Channel channel = channelWithParticipants.addParticipantsToChannel(channelEntity);
 
-    return Optional.ofNullable(channel);
+    return channel;
 
   }
 
