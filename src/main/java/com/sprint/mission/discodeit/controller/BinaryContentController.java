@@ -72,8 +72,7 @@ public class BinaryContentController {
       @Parameter(description = "바이너리 콘텐츠 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable("binaryContentId") UUID id) {
 
-    BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("BinaryContent not found"));
+    BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id);
 
     return ResponseEntity.ok(binaryContentApiMapper.binaryContentToReadBinaryContentResponse(readBinaryContentResult));
 
@@ -141,8 +140,7 @@ public class BinaryContentController {
       @Parameter(description = "바이너리 콘텐츠 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable("binaryContentId") UUID id) {
 
-    BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such BinaryContent"));
+    BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id);
 
     return binaryContentStorage.download(readBinaryContentResult);
 

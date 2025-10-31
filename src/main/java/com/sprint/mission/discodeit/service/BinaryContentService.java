@@ -12,7 +12,7 @@ public interface BinaryContentService {
 
   boolean existBinaryContentById(UUID id);
 
-  Optional<BinaryContentDTO.BinaryContent> findBinaryContentById(UUID id);
+  BinaryContentDTO.BinaryContent findBinaryContentById(UUID id);
 
   List<BinaryContentDTO.BinaryContent> findAllBinaryContentByIdIn(List<UUID> uuidList);
 

@@ -49,7 +49,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
-  public Optional<BinaryContentDTO.BinaryContent> findBinaryContentById(UUID id) {
+  public BinaryContentDTO.BinaryContent findBinaryContentById(UUID id) {
 
     BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such binary content"));
@@ -62,14 +62,14 @@ public class BasicBinaryContentService implements BinaryContentService {
       throw new RuntimeException(e);
     }
 
-    return Optional.ofNullable(BinaryContentDTO.BinaryContent.builder()
+    return BinaryContentDTO.BinaryContent.builder()
         .id(binaryContentEntity.getId())
         .fileName(binaryContentEntity.getFileName())
         .size(binaryContentEntity.getSize())
         .createdAt(binaryContentEntity.getCreatedAt())
         .contentType(binaryContentEntity.getContentType())
         .bytes(bytes)
-        .build());
+        .build();
   }
 
   @Override
