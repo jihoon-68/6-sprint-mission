@@ -25,7 +25,7 @@ public class BasicAuthService implements AuthService {
         .orElseThrow(() -> new NoSuchDataBaseRecordException("사용자를 찾을 수 없음"));
 
     if (userEntity.getPassword().equals(securityUtil.hashPassword(loginCommand.password()))) {
-      return userEntityMapper.entityToUser(userEntity);
+      return userEntityMapper.toUser(userEntity);
     } else {
       throw new IllegalArgumentException("비밀번호가 일치하지 않음");
     }

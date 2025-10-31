@@ -79,7 +79,7 @@ public class AuthController {
         loginRequest.password()
     ));
 
-    return ResponseEntity.ok(authApiMapper.userToFindUserResponse(user));
+    return ResponseEntity.ok(authApiMapper.toFindUserResponse(user));
 
   }
 

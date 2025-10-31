@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,7 +40,7 @@ public class BasicUserStatusService implements UserStatusService {
         .user(userEntity)
         .build();
 
-    return userStatusEntityMapper.entityToUserStatus(userStatusRepository.save(userStatusEntity));
+    return userStatusEntityMapper.toUserStatus(userStatusRepository.save(userStatusEntity));
 
   }
 
@@ -61,7 +60,7 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatusEntity userStatusEntity = userStatusRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
 
-    return userStatusEntityMapper.entityToUserStatus(userStatusEntity);
+    return userStatusEntityMapper.toUserStatus(userStatusEntity);
 
   }
 
@@ -76,14 +75,14 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatusEntity userStatusEntity = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
 
-    return userStatusEntityMapper.entityToUserStatus(userStatusEntity);
+    return userStatusEntityMapper.toUserStatus(userStatusEntity);
 
   }
 
   @Override
   public List<UserStatusDTO.UserStatus> findAllUserStatus() {
     return userStatusRepository.findAll().stream()
-        .map(userStatusEntityMapper::entityToUserStatus)
+        .map(userStatusEntityMapper::toUserStatus)
         .toList();
 
   }
@@ -97,7 +96,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     userStatusEntity.updateLastActiveAt(request.lastActiveAt());
 
-    return userStatusEntityMapper.entityToUserStatus(userStatusRepository.save(userStatusEntity));
+    return userStatusEntityMapper.toUserStatus(userStatusRepository.save(userStatusEntity));
 
   }
 

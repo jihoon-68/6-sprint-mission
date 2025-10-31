@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChannelApiMapper {
 
-  public ChannelApiDTO.FindChannelResponse channelToFindChannelResponse(ChannelDTO.Channel channel) {
+  public ChannelApiDTO.FindChannelResponse toFindChannelResponse(ChannelDTO.Channel channel) {
     return ChannelApiDTO.FindChannelResponse.builder()
         .id(channel.getId())
         .type(channel.getType())

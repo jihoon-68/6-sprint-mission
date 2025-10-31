@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageApiMapper {
 
-  public MessageApiDTO.FindMessageResponse messageToFindMessageResponse(MessageDTO.Message message) {
+  public MessageApiDTO.FindMessageResponse toFindMessageResponse(MessageDTO.Message message) {
 
     return MessageApiDTO.FindMessageResponse.builder()
         .id(message.getId())

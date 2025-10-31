@@ -3,14 +3,12 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.dto.PagingDTO;
-import com.sprint.mission.discodeit.dto.api.BinaryContentApiDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
 import com.sprint.mission.discodeit.dto.api.MessageApiDTO;
 import com.sprint.mission.discodeit.dto.api.MessageApiDTO.FindMessageResponse;
 import com.sprint.mission.discodeit.dto.api.MessageApiDTO.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.api.PagingApiDTO;
 import com.sprint.mission.discodeit.dto.api.PagingApiDTO.OffsetPageResponse;
-import com.sprint.mission.discodeit.dto.api.UserApiDTO;
 import com.sprint.mission.discodeit.enums.ContentType;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.BinaryContentApiMapper;
@@ -116,7 +114,7 @@ public class MessageController {
 
     MessageDTO.Message message = messageService.createMessage(createMessageCommand);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(messageApiMapper.messageToFindMessageResponse(message));
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageApiMapper.toFindMessageResponse(message));
 
   }
 
@@ -166,7 +164,7 @@ public class MessageController {
 
     MessageDTO.Message message = messageService.updateMessage(updateMessageCommand);
 
-    return ResponseEntity.ok(messageApiMapper.messageToFindMessageResponse(message));
+    return ResponseEntity.ok(messageApiMapper.toFindMessageResponse(message));
 
   }
 
@@ -239,7 +237,7 @@ public class MessageController {
         .hasNext(messagePage.isHasNext())
         .totalElements(messagePage.getTotalElement())
         .content(messagePage.getContent().stream()
-            .map(messageApiMapper::messageToFindMessageResponse)
+            .map(messageApiMapper::toFindMessageResponse)
             .toList())
         .build();
 
@@ -269,14 +267,14 @@ public class MessageController {
             .updatedAt(messagePage.getNextCursor().getUpdatedAt())
             .content(messagePage.getNextCursor().getContent())
             .channelId(messagePage.getNextCursor().getChannelId())
-            .author(userApiMapper.userToFindUserResponse(messagePage.getNextCursor().getAuthor()))
+            .author(userApiMapper.toFindUserResponse(messagePage.getNextCursor().getAuthor()))
             .attachments(messagePage.getNextCursor().getAttachments().stream()
-                .map(binaryContentApiMapper::binaryContentToReadBinaryContentResponse).toList())
+                .map(binaryContentApiMapper::toReadBinaryContentResponse).toList())
             .build() : null)
         .size(messagePage.getSize())
         .hasNext(messagePage.isHasNext())
         .content(messagePage.getContent().stream()
-            .map(messageApiMapper::messageToFindMessageResponse)
+            .map(messageApiMapper::toFindMessageResponse)
             .toList())
         .build();
 

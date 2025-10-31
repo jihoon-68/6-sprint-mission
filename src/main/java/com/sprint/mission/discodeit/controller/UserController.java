@@ -105,7 +105,7 @@ public class UserController {
 
     UserDTO.User user = userService.createUser(createUserCommand);
 
-    return ResponseEntity.status(201).body(userApiMapper.userToFindUserResponse(user));
+    return ResponseEntity.status(201).body(userApiMapper.toFindUserResponse(user));
 
   }
 
@@ -170,7 +170,7 @@ public class UserController {
 
     UserDTO.User user = userService.updateUser(updateUserCommand);
 
-    return ResponseEntity.status(204).body(userApiMapper.userToFindUserResponse(user));
+    return ResponseEntity.status(204).body(userApiMapper.toFindUserResponse(user));
 
   }
 
@@ -226,7 +226,7 @@ public class UserController {
   public ResponseEntity<List<UserApiDTO.FindUserResponse>> findAll() {
 
     List<UserApiDTO.FindUserResponse> userList = userService.findAllUsers().stream()
-        .map(userApiMapper::userToFindUserResponse)
+        .map(userApiMapper::toFindUserResponse)
         .toList();
 
     return ResponseEntity.status(201).body(userList);

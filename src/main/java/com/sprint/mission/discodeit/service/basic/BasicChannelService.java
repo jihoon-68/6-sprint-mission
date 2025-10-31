@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.entity.ChannelEntity;
 import com.sprint.mission.discodeit.entity.ReadStatusEntity;
-import com.sprint.mission.discodeit.entity.UserEntity;
 import com.sprint.mission.discodeit.enums.ChannelType;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.ChannelEntityMapper;
@@ -15,11 +14,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -48,7 +44,7 @@ public class BasicChannelService implements ChannelService {
         .description(request.description())
         .build();
 
-    return channelEntityMapper.entityToChannel(channelRepository.save(channelEntity));
+    return channelEntityMapper.toChannel(channelRepository.save(channelEntity));
 
   }
 
@@ -61,7 +57,7 @@ public class BasicChannelService implements ChannelService {
         .description(request.description())
         .build();
 
-    ChannelDTO.Channel channel = channelEntityMapper.entityToChannel(channelRepository.save(channelEntity));
+    ChannelDTO.Channel channel = channelEntityMapper.toChannel(channelRepository.save(channelEntity));
 
     List<ReadStatusEntity> readStatusEntityList = request.participants().stream()
         .map(userId -> ReadStatusEntity.builder()
@@ -77,7 +73,7 @@ public class BasicChannelService implements ChannelService {
     channel.addParticipants(readStatusEntityList.stream()
         .map(ReadStatusEntity::getUser)
         .filter(Objects::nonNull)
-        .map(userEntityMapper::entityToUser)
+        .map(userEntityMapper::toUser)
         .toList());
 
     return channel;
@@ -112,7 +108,7 @@ public class BasicChannelService implements ChannelService {
         .toList());
 
     channelList.addAll(channelRepository.findByType(ChannelType.PUBLIC).stream()
-        .map(channelEntityMapper::entityToChannel)
+        .map(channelEntityMapper::toChannel)
         .toList());
 
     return channelList;
@@ -147,7 +143,7 @@ public class BasicChannelService implements ChannelService {
 
     updatedChannelEntity.update(request.name(), request.description());
 
-    return channelEntityMapper.entityToChannel(channelRepository.save(updatedChannelEntity));
+    return channelEntityMapper.toChannel(channelRepository.save(updatedChannelEntity));
 
   }
 
@@ -175,7 +171,7 @@ public class BasicChannelService implements ChannelService {
 
     private ChannelDTO.Channel addParticipantsToChannel(ChannelEntity channelEntity) {
 
-      ChannelDTO.Channel channel = channelEntityMapper.entityToChannel(channelEntity);
+      ChannelDTO.Channel channel = channelEntityMapper.toChannel(channelEntity);
 
       if (channelEntity.getType() == ChannelType.PUBLIC) {
         return channel;
@@ -186,7 +182,7 @@ public class BasicChannelService implements ChannelService {
       channel.addParticipants(readStatusEntityList.stream()
           .map(ReadStatusEntity::getUser)
           .filter(Objects::nonNull)
-          .map(userEntityMapper::entityToUser)
+          .map(userEntityMapper::toUser)
           .toList());
 
       return channel;

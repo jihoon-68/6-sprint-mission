@@ -13,12 +13,12 @@ public interface ReadStatusEntityMapper {
       @Mapping(target = "userId", source = "user.id"),
       @Mapping(target = "channelId", source = "channel.id")
   })
-  ReadStatusDTO.ReadStatus entityToReadStatus(ReadStatusEntity readStatusEntity);
+  ReadStatusDTO.ReadStatus toReadStatus(ReadStatusEntity readStatusEntity);
 
   @Mappings({
       //@Mapping(target = "user.id", source = "userId"),
       //@Mapping(target = "channel.id", source = "channelId")
   })
-  ReadStatusEntity readStatusToEntity(ReadStatusDTO.ReadStatus readStatusDTO);
+  ReadStatusEntity toEntity(ReadStatusDTO.ReadStatus readStatusDTO);
 
 }

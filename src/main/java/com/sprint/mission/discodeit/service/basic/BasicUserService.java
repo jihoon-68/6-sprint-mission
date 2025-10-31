@@ -15,7 +15,6 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.utils.SecurityUtil;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,7 +62,7 @@ public class BasicUserService implements UserService {
 
     }
 
-    UserDTO.User user = userEntityMapper.entityToUser(userRepository.save(userEntity));
+    UserDTO.User user = userEntityMapper.toUser(userRepository.save(userEntity));
 
     if (request.profileImage() != null) {
       binaryContentStorage.put(user.getProfileId().getId(), request.profileImage().data());
@@ -98,7 +97,7 @@ public class BasicUserService implements UserService {
     UserStatusEntity userStatusEntity = userStatusRepository.findByUserId(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
 
-    UserDTO.User user = userEntityMapper.entityToUser(userEntity);
+    UserDTO.User user = userEntityMapper.toUser(userEntity);
     user.updateStatus(userStatusEntity.isOnline());
 
     return user;
@@ -114,7 +113,7 @@ public class BasicUserService implements UserService {
     UserStatusEntity userStatusEntity = userStatusRepository.findByUserId(userEntity.getId())
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
 
-    UserDTO.User user = userEntityMapper.entityToUser(userEntity);
+    UserDTO.User user = userEntityMapper.toUser(userEntity);
     user.updateStatus(userStatusEntity.isOnline());
 
     return user;
@@ -130,7 +129,7 @@ public class BasicUserService implements UserService {
     UserStatusEntity userStatusEntity = userStatusRepository.findByUserId(userEntity.getId())
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
 
-    UserDTO.User user = userEntityMapper.entityToUser(userEntity);
+    UserDTO.User user = userEntityMapper.toUser(userEntity);
     user.updateStatus(userStatusEntity.isOnline());
 
     return user;
@@ -142,7 +141,7 @@ public class BasicUserService implements UserService {
   public List<UserDTO.User> findAllUsers() {
 
     return userRepository.findAll().stream()
-        .map(userEntityMapper::entityToUser)
+        .map(userEntityMapper::toUser)
         .peek(user -> {
           UserStatusEntity userStatusEntity = userStatusRepository.findByUserId(user.getId())
               .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
@@ -189,7 +188,7 @@ public class BasicUserService implements UserService {
 
     }
 
-    return userEntityMapper.entityToUser(userRepository.save(updatedUserEntity));
+    return userEntityMapper.toUser(userRepository.save(updatedUserEntity));
 
   }
 

@@ -7,8 +7,8 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface BinaryContentEntityMapper {
 
-  BinaryContentDTO.BinaryContent entityToBinaryContent(BinaryContentEntity binaryContentEntity);
+  BinaryContentDTO.BinaryContent toBinaryContent(BinaryContentEntity binaryContentEntity);
 
-  BinaryContentEntity binaryContentToEntity(BinaryContentDTO.BinaryContent binaryContentDTO);
+  BinaryContentEntity toEntity(BinaryContentDTO.BinaryContent binaryContentDTO);
 
 }

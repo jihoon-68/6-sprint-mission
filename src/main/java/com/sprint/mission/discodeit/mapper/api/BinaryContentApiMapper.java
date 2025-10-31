@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.mapper.api;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContent;
 import com.sprint.mission.discodeit.dto.api.BinaryContentApiDTO;
 import org.springframework.stereotype.Component;
@@ -8,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BinaryContentApiMapper {
 
-  public BinaryContentApiDTO.ReadBinaryContentResponse binaryContentToReadBinaryContentResponse(BinaryContent binaryContent){
+  public BinaryContentApiDTO.ReadBinaryContentResponse toReadBinaryContentResponse(BinaryContent binaryContent){
 
     return BinaryContentApiDTO.ReadBinaryContentResponse.builder()
         .id(binaryContent.getId())

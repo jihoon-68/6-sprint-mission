@@ -74,7 +74,7 @@ public class BinaryContentController {
 
     BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id);
 
-    return ResponseEntity.ok(binaryContentApiMapper.binaryContentToReadBinaryContentResponse(readBinaryContentResult));
+    return ResponseEntity.ok(binaryContentApiMapper.toReadBinaryContentResponse(readBinaryContentResult));
 
   }
 
@@ -108,7 +108,7 @@ public class BinaryContentController {
       @RequestParam("binaryContentIds") List<UUID> idList) {
 
     return ResponseEntity.ok(binaryContentService.findAllBinaryContentByIdIn(idList).stream()
-        .map(binaryContentApiMapper::binaryContentToReadBinaryContentResponse)
+        .map(binaryContentApiMapper::toReadBinaryContentResponse)
         .toList());
 
   }

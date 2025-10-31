@@ -16,13 +16,13 @@ public interface MessageEntityMapper {
       @Mapping(target = "author.isOnline", expression = "java(userEntity.isOnline())"),
       @Mapping(target = "attachments", source = "attachments", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_DEFAULT)
   })
-  MessageDTO.Message entityToMessage(MessageEntity messageEntity);
+  MessageDTO.Message toMessage(MessageEntity messageEntity);
 
   @Mappings({
       //@Mapping(target = "channel", source = "channelId"),
       @Mapping(target = "author", source = "author"),
       //@Mapping(target = "attachments", source = "attachments")
   })
-  MessageEntity messageToEntity(MessageDTO.Message messageDTO);
+  MessageEntity toEntity(MessageDTO.Message messageDTO);
 
 }

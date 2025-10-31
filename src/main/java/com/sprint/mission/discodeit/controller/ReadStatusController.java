@@ -83,7 +83,7 @@ public class ReadStatusController {
         .lastReadTimeAt(readStatusCreateRequest.lastReadAt())
         .build());
 
-    return ResponseEntity.status(201).body(readStatusApiMapper.readStatusApiToReadStatusResponse(readStatus));
+    return ResponseEntity.status(201).body(readStatusApiMapper.toReadStatusResponse(readStatus));
 
   }
 
@@ -127,7 +127,7 @@ public class ReadStatusController {
         .lastReadAt(readStatusUpdateRequest.newLastReadAt())
         .build());
 
-    return ResponseEntity.ok(readStatusApiMapper.readStatusApiToReadStatusResponse(readStatus));
+    return ResponseEntity.ok(readStatusApiMapper.toReadStatusResponse(readStatus));
 
   }
 
@@ -155,7 +155,7 @@ public class ReadStatusController {
 
     List<ReadStatusApiDTO.FindReadStatusResponse> readStatusList = readStatusService.findAllReadStatusByUserId(
             userId).stream()
-        .map(readStatusApiMapper::readStatusApiToReadStatusResponse)
+        .map(readStatusApiMapper::toReadStatusResponse)
         .toList();
 
     return ResponseEntity.ok(readStatusList);

@@ -3,9 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.dto.MessageDTO.Message;
 import com.sprint.mission.discodeit.dto.PagingDTO;
-import com.sprint.mission.discodeit.dto.PagingDTO.CursorPage;
 import com.sprint.mission.discodeit.dto.PagingDTO.OffsetPage;
-import com.sprint.mission.discodeit.dto.PagingDTO.OffsetRequest;
 import com.sprint.mission.discodeit.entity.BinaryContentEntity;
 import com.sprint.mission.discodeit.entity.MessageEntity;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
@@ -18,7 +16,6 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -78,7 +75,7 @@ public class BasicMessageService implements MessageService {
 
     }
 
-    return messageEntityMapper.entityToMessage(messageRepository.save(messageEntity));
+    return messageEntityMapper.toMessage(messageRepository.save(messageEntity));
 
   }
 
@@ -93,7 +90,7 @@ public class BasicMessageService implements MessageService {
     MessageEntity messageEntity = messageRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message."));
 
-    return messageEntityMapper.entityToMessage(messageEntity);
+    return messageEntityMapper.toMessage(messageEntity);
   }
 
   @Transactional(readOnly = true)
@@ -108,7 +105,7 @@ public class BasicMessageService implements MessageService {
 
     return OffsetPage.<MessageDTO.Message>builder()
         .content(paging.getContent().stream()
-            .map(messageEntityMapper::entityToMessage)
+            .map(messageEntityMapper::toMessage)
             .toList())
         .number(paging.getNumber())
         .size(paging.getSize())
@@ -132,7 +129,7 @@ public class BasicMessageService implements MessageService {
 
     return PagingDTO.OffsetPage.<MessageDTO.Message>builder()
         .content(paging.getContent().stream()
-            .map(messageEntityMapper::entityToMessage)
+            .map(messageEntityMapper::toMessage)
             .toList())
         .number(paging.getNumber())
         .size(paging.getSize())
@@ -156,9 +153,9 @@ public class BasicMessageService implements MessageService {
 
     return PagingDTO.CursorPage.<Message>builder()
         .content(slice.getContent().stream()
-            .map(messageEntityMapper::entityToMessage)
+            .map(messageEntityMapper::toMessage)
             .toList())
-        .nextCursor(slice.hasNext() ? messageEntityMapper.entityToMessage(slice.getContent().get(slice.getContent().size() - 1)) : null)
+        .nextCursor(slice.hasNext() ? messageEntityMapper.toMessage(slice.getContent().get(slice.getContent().size() - 1)) : null)
         .size(slice.getSize())
         .hasNext(slice.hasNext())
         .build();
@@ -172,7 +169,7 @@ public class BasicMessageService implements MessageService {
 
     return OffsetPage.<MessageDTO.Message>builder()
         .content(paging.getContent().stream()
-            .map(messageEntityMapper::entityToMessage)
+            .map(messageEntityMapper::toMessage)
             .toList())
         .number(paging.getNumber())
         .size(paging.getSize())
@@ -194,7 +191,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message."));
     updatedMessageEntity.updateMessage(request.content());
 
-    return messageEntityMapper.entityToMessage(messageRepository.save(updatedMessageEntity));
+    return messageEntityMapper.toMessage(messageRepository.save(updatedMessageEntity));
 
   }
 

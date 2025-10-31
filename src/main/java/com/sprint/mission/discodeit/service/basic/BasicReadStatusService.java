@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class BasicReadStatusService implements ReadStatusService {
         .lastReadAt(request.lastReadTimeAt())
         .build();
 
-    return readStatusEntityMapper.entityToReadStatus(readStatusRepository.save(readStatusEntity));
+    return readStatusEntityMapper.toReadStatus(readStatusRepository.save(readStatusEntity));
 
   }
 
@@ -67,7 +66,7 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatusEntity readStatusEntity = readStatusRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such read status."));
 
-    return readStatusEntityMapper.entityToReadStatus(readStatusEntity);
+    return readStatusEntityMapper.toReadStatus(readStatusEntity);
   }
 
   @Transactional(readOnly = true)
@@ -87,7 +86,7 @@ public class BasicReadStatusService implements ReadStatusService {
             channelId)
         .orElseThrow(() -> new IllegalArgumentException("No such read status."));
 
-    return readStatusEntityMapper.entityToReadStatus(readStatusEntity);
+    return readStatusEntityMapper.toReadStatus(readStatusEntity);
 
   }
 
@@ -100,7 +99,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     return readStatusRepository.findByUserId(userId)
         .stream()
-        .map(readStatusEntityMapper::entityToReadStatus)
+        .map(readStatusEntityMapper::toReadStatus)
         .toList();
   }
 
@@ -114,14 +113,14 @@ public class BasicReadStatusService implements ReadStatusService {
 
     return readStatusRepository.findByChannelId(channelId)
         .stream()
-        .map(readStatusEntityMapper::entityToReadStatus)
+        .map(readStatusEntityMapper::toReadStatus)
         .toList();
   }
 
   @Override
   public List<ReadStatusDTO.ReadStatus> findAllReadStatus() {
     return readStatusRepository.findAll().stream()
-        .map(readStatusEntityMapper::entityToReadStatus)
+        .map(readStatusEntityMapper::toReadStatus)
         .toList();
   }
 
@@ -134,7 +133,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     readStatusEntity.updateLastReadAt(request.lastReadAt());
 
-    return readStatusEntityMapper.entityToReadStatus(readStatusRepository.save(readStatusEntity));
+    return readStatusEntityMapper.toReadStatus(readStatusRepository.save(readStatusEntity));
 
   }
 

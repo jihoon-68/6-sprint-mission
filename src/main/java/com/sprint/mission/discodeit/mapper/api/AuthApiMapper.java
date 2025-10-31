@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthApiMapper {
 
-  public UserApiDTO.FindUserResponse userToFindUserResponse(UserDTO.User user) {
+  public UserApiDTO.FindUserResponse toFindUserResponse(UserDTO.User user) {
 
     return UserApiDTO.FindUserResponse.builder()
         .id(user.getId())

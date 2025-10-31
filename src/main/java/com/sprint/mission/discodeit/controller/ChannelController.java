@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ChannelDTO;
-import com.sprint.mission.discodeit.dto.api.BinaryContentApiDTO;
 import com.sprint.mission.discodeit.dto.api.ChannelApiDTO;
 import com.sprint.mission.discodeit.dto.api.ChannelApiDTO.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.api.ChannelApiDTO.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.dto.api.UserApiDTO;
 import com.sprint.mission.discodeit.enums.ChannelType;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.ChannelApiMapper;
@@ -138,7 +136,7 @@ public class ChannelController {
 
     ChannelDTO.Channel channel = channelService.createPrivateChannel(createPrivateChannelCommand);
 
-    return ResponseEntity.status(201).body(channelApiMapper.channelToFindChannelResponse(channel));
+    return ResponseEntity.status(201).body(channelApiMapper.toFindChannelResponse(channel));
 
   }
 
@@ -189,7 +187,7 @@ public class ChannelController {
 
     ChannelDTO.Channel channel = channelService.updateChannel(updateChannelCommand);
 
-    return ResponseEntity.status(200).body(channelApiMapper.channelToFindChannelResponse(channel));
+    return ResponseEntity.status(200).body(channelApiMapper.toFindChannelResponse(channel));
 
   }
 
@@ -248,7 +246,7 @@ public class ChannelController {
       @RequestParam UUID userId) {
 
     return channelService.findChannelsByUserId(userId).stream()
-        .map(channelApiMapper::channelToFindChannelResponse)
+        .map(channelApiMapper::toFindChannelResponse)
         .toList();
 
   }

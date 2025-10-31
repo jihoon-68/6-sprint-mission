@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReadStatusApiMapper {
 
-  public ReadStatusApiDTO.FindReadStatusResponse readStatusApiToReadStatusResponse(ReadStatusDTO.ReadStatus readStatus) {
+  public ReadStatusApiDTO.FindReadStatusResponse toReadStatusResponse(ReadStatusDTO.ReadStatus readStatus) {
     return ReadStatusApiDTO.FindReadStatusResponse.builder()
         .id(readStatus.getId())
         .channelId(readStatus.getChannelId())
