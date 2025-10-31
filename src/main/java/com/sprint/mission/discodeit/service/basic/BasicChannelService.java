@@ -18,10 +18,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -43,6 +45,8 @@ public class BasicChannelService implements ChannelService {
         .name(request.name())
         .description(request.description())
         .build();
+
+    log.debug("Creating channel with name {}, description {}", channelEntity.getName(), channelEntity.getDescription());
 
     return channelEntityMapper.toChannel(channelRepository.save(channelEntity));
 
@@ -76,6 +80,9 @@ public class BasicChannelService implements ChannelService {
         .map(userEntityMapper::toUser)
         .toList());
 
+    log.debug("Creating private channel with id {}, description {}, participants {}",
+        channel.getId(), channel.getDescription(), channel.getParticipants().size());
+
     return channel;
 
   }
@@ -89,11 +96,12 @@ public class BasicChannelService implements ChannelService {
   public ChannelDTO.Channel findChannelById(UUID id) {
 
     ChannelEntity channelEntity = channelRepository.findById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such channel."));
+        .orElseThrow(() -> {
+          log.warn("No such channel with id {}", id);
+          throw new NoSuchDataBaseRecordException("No such channel.");
+        });
 
-    ChannelDTO.Channel channel = channelWithParticipants.addParticipantsToChannel(channelEntity);
-
-    return channel;
+    return channelWithParticipants.addParticipantsToChannel(channelEntity);
 
   }
 
@@ -127,10 +135,12 @@ public class BasicChannelService implements ChannelService {
   public ChannelDTO.Channel updateChannel(ChannelDTO.UpdateChannelCommand request) {
 
     if (!channelRepository.existsById(request.id())) {
+      log.warn("No such channel with id {}", request.id());
       throw new NoSuchDataBaseRecordException("No such channel.");
     }
 
     if (request.name().isBlank() || request.type() == null) {
+      log.warn("Missing required fields for updateChannel");
       throw new IllegalArgumentException("Invalid channel data.");
     }
 
@@ -142,6 +152,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     updatedChannelEntity.update(request.name(), request.description());
+
+    log.debug("Updating channel with id {}, name {}, description {}",
+        updatedChannelEntity.getId(), updatedChannelEntity.getName(), updatedChannelEntity.getDescription());
 
     return channelEntityMapper.toChannel(channelRepository.save(updatedChannelEntity));
 
@@ -158,6 +171,8 @@ public class BasicChannelService implements ChannelService {
     messageRepository.deleteByChannelId(id);
     readStatusRepository.deleteByChannelId(id);
     channelRepository.deleteById(id);
+
+    log.debug("Deleted channel with id {}", id);
 
   }
 

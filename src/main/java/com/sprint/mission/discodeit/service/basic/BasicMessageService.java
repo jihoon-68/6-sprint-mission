@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -42,10 +44,12 @@ public class BasicMessageService implements MessageService {
   public MessageDTO.Message createMessage(MessageDTO.CreateMessageCommand request) {
 
     if (!userRepository.existsById(request.userId())) {
+      log.warn("User with id {} does not exist", request.userId());
       throw new NoSuchDataBaseRecordException("No such user.");
     }
 
     if (!channelRepository.existsById(request.channelId())) {
+      log.warn("Channel with id {} does not exist", request.channelId());
       throw new NoSuchDataBaseRecordException("No such channel.");
     }
 
@@ -75,6 +79,8 @@ public class BasicMessageService implements MessageService {
 
     }
 
+    log.debug("Creating message with id {}", messageEntity.getId());
+
     return messageEntityMapper.toMessage(messageRepository.save(messageEntity));
 
   }
@@ -88,7 +94,10 @@ public class BasicMessageService implements MessageService {
   public MessageDTO.Message findMessageById(UUID id) {
 
     MessageEntity messageEntity = messageRepository.findById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message."));
+        .orElseThrow(() -> {
+          log.warn("Message with id {} does not exist", id);
+          throw new NoSuchDataBaseRecordException("No such message.");
+        });
 
     return messageEntityMapper.toMessage(messageEntity);
   }
@@ -98,6 +107,7 @@ public class BasicMessageService implements MessageService {
   public OffsetPage<MessageDTO.Message> findMessagesByAuthorId(UUID authorId, PagingDTO.OffsetRequest pageable) {
 
     if (!userRepository.existsById(authorId)) {
+      log.warn("User with id {} does not exist", authorId);
       throw new NoSuchDataBaseRecordException("No such user.");
     }
 
@@ -120,6 +130,7 @@ public class BasicMessageService implements MessageService {
   public PagingDTO.OffsetPage<MessageDTO.Message> findMessagesByChannelId(UUID channelId, PagingDTO.OffsetRequest pageable) {
 
     if (!channelRepository.existsById(channelId)) {
+      log.warn("Channel with id {} does not exist", channelId);
       throw new NoSuchDataBaseRecordException("No such channel.");
     }
 
@@ -144,6 +155,7 @@ public class BasicMessageService implements MessageService {
   public PagingDTO.CursorPage<Message> findMessagesByChannelIdAndCreatedAt(UUID channelId, String createdAt, PagingDTO.CursorRequest pageable) {
 
     if (!channelRepository.existsById(channelId)) {
+      log.warn("Channel with id {} does not exist", channelId);
       throw new NoSuchDataBaseRecordException("No such channel.");
     }
 
@@ -184,12 +196,15 @@ public class BasicMessageService implements MessageService {
   public MessageDTO.Message updateMessage(MessageDTO.UpdateMessageCommand request) {
 
     if (!messageRepository.existsById(request.id())) {
+      log.warn("Message with id {} does not exist", request.id());
       throw new NoSuchDataBaseRecordException("No such message.");
     }
 
     MessageEntity updatedMessageEntity = messageRepository.findById(request.id())
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message."));
     updatedMessageEntity.updateMessage(request.content());
+
+    log.debug("Updating message with id {}", updatedMessageEntity.getId());
 
     return messageEntityMapper.toMessage(messageRepository.save(updatedMessageEntity));
 
@@ -206,6 +221,8 @@ public class BasicMessageService implements MessageService {
         .toList());
 
     messageRepository.deleteById(id);
+
+    log.debug("Deleted message with id {}", id);
 
   }
 }
