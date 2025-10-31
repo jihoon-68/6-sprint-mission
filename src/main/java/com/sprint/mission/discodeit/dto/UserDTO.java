@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.dto;
 import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContentCreateCommand;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,14 +49,17 @@ public class UserDTO {
       String description,
       BinaryContentCreateCommand profileImage) {
 
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile(
+          "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$");
+
     public boolean isEmailValid(String email) {
-      return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+      return EMAIL_PATTERN.matcher(email).matches();
     }
 
     public boolean isPasswordValid(String password) {
       //길이는 8자리 이상, 영어 대소문자, 숫자, 특수문자 포함
-      return password.matches(
-          "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$");
+      return PASSWORD_PATTERN.matcher(password).matches();
     }
 
     public CreateUserCommand {
