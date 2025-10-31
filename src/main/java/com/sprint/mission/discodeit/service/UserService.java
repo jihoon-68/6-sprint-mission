@@ -15,11 +15,11 @@ public interface UserService {
 
   boolean existUserByUsername(String nickname);
 
-  Optional<UserDTO.User> findUserById(UUID id);
+  UserDTO.User findUserById(UUID id);
 
-  Optional<UserDTO.User> findUserByEmail(String email);
+  UserDTO.User findUserByEmail(String email);
 
-  Optional<UserDTO.User> findUserByUsername(String username);
+  UserDTO.User findUserByUsername(String username);
 
   List<UserDTO.User> findAllUsers();
 

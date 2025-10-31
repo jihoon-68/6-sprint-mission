@@ -90,7 +90,7 @@ public class BasicUserService implements UserService {
 
   @Transactional(readOnly = true)
   @Override
-  public Optional<UserDTO.User> findUserById(UUID id) {
+  public UserDTO.User findUserById(UUID id) {
 
     UserEntity userEntity = userRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user."));
@@ -101,12 +101,12 @@ public class BasicUserService implements UserService {
     UserDTO.User user = userEntityMapper.entityToUser(userEntity);
     user.updateStatus(userStatusEntity.isOnline());
 
-    return Optional.ofNullable(user);
+    return user;
 
   }
 
   @Override
-  public Optional<UserDTO.User> findUserByEmail(String email) {
+  public UserDTO.User findUserByEmail(String email) {
 
     UserEntity userEntity = userRepository.findByEmail(email)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user."));
@@ -117,12 +117,12 @@ public class BasicUserService implements UserService {
     UserDTO.User user = userEntityMapper.entityToUser(userEntity);
     user.updateStatus(userStatusEntity.isOnline());
 
-    return Optional.ofNullable(user);
+    return user;
 
   }
 
   @Override
-  public Optional<UserDTO.User> findUserByUsername(String username) {
+  public UserDTO.User findUserByUsername(String username) {
 
     UserEntity userEntity = userRepository.findByUsername(username)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user."));
@@ -133,7 +133,7 @@ public class BasicUserService implements UserService {
     UserDTO.User user = userEntityMapper.entityToUser(userEntity);
     user.updateStatus(userStatusEntity.isOnline());
 
-    return Optional.ofNullable(user);
+    return user;
 
   }
 
