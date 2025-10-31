@@ -8,12 +8,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class UserDTO {
 
   //login request DTO
-  @Builder
   public record LoginCommand(String username, String password) {
+  }
 
+  public static LoginCommand toLoginCommand(String username, String password) {
+    return new LoginCommand(username, password);
   }
 
   @Getter

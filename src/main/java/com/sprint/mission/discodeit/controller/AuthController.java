@@ -74,10 +74,10 @@ public class AuthController {
       )
       @RequestBody @Valid AuthApiDTO.LoginRequest loginRequest) {
 
-    UserDTO.User user = authService.login(UserDTO.LoginCommand.builder()
-        .username(loginRequest.username())
-        .password(loginRequest.password())
-        .build());
+    UserDTO.User user = authService.login(UserDTO.toLoginCommand(
+        loginRequest.username(),
+        loginRequest.password()
+    ));
 
     return ResponseEntity.ok(authApiMapper.userToFindUserResponse(user));
 
