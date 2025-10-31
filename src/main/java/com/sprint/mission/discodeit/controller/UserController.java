@@ -260,8 +260,7 @@ public class UserController {
       @Parameter(description = "사용자 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable UUID userId) {
 
-    UserStatusDTO.UserStatus userStatus = userStatusService.findUserStatusByUserId(userId)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+    UserStatusDTO.UserStatus userStatus = userStatusService.findUserStatusByUserId(userId);
 
     return ResponseEntity.ok(userApiMapper.userStatusToCheckUserOnlineResponse(userStatus));
 
@@ -306,8 +305,7 @@ public class UserController {
       )
       @RequestBody @Valid UserApiDTO.UserStatusUpdateRequest userStatusUpdateRequest) {
 
-    UserStatusDTO.UserStatus userStatus = userStatusService.findUserStatusByUserId(userId)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+    UserStatusDTO.UserStatus userStatus = userStatusService.findUserStatusByUserId(userId);
 
     userStatus = userStatusService.updateUserStatus(UserStatusDTO.UpdateUserStatusCommand.builder()
         .id(userStatus.getId())
