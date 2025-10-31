@@ -62,17 +62,17 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public Optional<ReadStatusDTO.ReadStatus> findReadStatusById(UUID id) {
+  public ReadStatusDTO.ReadStatus findReadStatusById(UUID id) {
 
     ReadStatusEntity readStatusEntity = readStatusRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such read status."));
 
-    return Optional.ofNullable(readStatusEntityMapper.entityToReadStatus(readStatusEntity));
+    return readStatusEntityMapper.entityToReadStatus(readStatusEntity);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Optional<ReadStatusDTO.ReadStatus> findReadStatusByUserIdAndChannelId(UUID userId,
+  public ReadStatusDTO.ReadStatus findReadStatusByUserIdAndChannelId(UUID userId,
       UUID channelId) {
 
     if (!userRepository.existsById(userId)) {
@@ -87,7 +87,7 @@ public class BasicReadStatusService implements ReadStatusService {
             channelId)
         .orElseThrow(() -> new IllegalArgumentException("No such read status."));
 
-    return Optional.ofNullable(readStatusEntityMapper.entityToReadStatus(readStatusEntity));
+    return readStatusEntityMapper.entityToReadStatus(readStatusEntity);
 
   }
 
