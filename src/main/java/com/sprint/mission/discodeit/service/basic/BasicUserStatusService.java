@@ -56,18 +56,18 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public Optional<UserStatusDTO.UserStatus> findUserStatusById(UUID id) {
+  public UserStatusDTO.UserStatus findUserStatusById(UUID id) {
 
     UserStatusEntity userStatusEntity = userStatusRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
 
-    return Optional.ofNullable(userStatusEntityMapper.entityToUserStatus(userStatusEntity));
+    return userStatusEntityMapper.entityToUserStatus(userStatusEntity);
 
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Optional<UserStatusDTO.UserStatus> findUserStatusByUserId(UUID userId) {
+  public UserStatusDTO.UserStatus findUserStatusByUserId(UUID userId) {
 
     if (!userRepository.existsById(userId)) {
       throw new NoSuchDataBaseRecordException("No such user.");
@@ -76,7 +76,7 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatusEntity userStatusEntity = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
 
-    return Optional.ofNullable(userStatusEntityMapper.entityToUserStatus(userStatusEntity));
+    return userStatusEntityMapper.entityToUserStatus(userStatusEntity);
 
   }
 

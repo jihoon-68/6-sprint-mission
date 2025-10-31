@@ -13,9 +13,9 @@ public interface UserStatusService {
 
   boolean existUserStatusByUserId(UUID userId);
 
-  Optional<UserStatusDTO.UserStatus> findUserStatusById(UUID id);
+  UserStatusDTO.UserStatus findUserStatusById(UUID id);
 
-  Optional<UserStatusDTO.UserStatus> findUserStatusByUserId(UUID userId);
+  UserStatusDTO.UserStatus findUserStatusByUserId(UUID userId);
 
   List<UserStatusDTO.UserStatus> findAllUserStatus();
 
