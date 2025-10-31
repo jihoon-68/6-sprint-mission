@@ -24,6 +24,9 @@ code:
   repository:
     type: file
 
+logging:
+    level:
+        root: INFO
 
 server:
   port: 8080

@@ -24,6 +24,10 @@ code:
   repository:
     type: file
 
+logging:
+    level:
+        root: DEBUG
+
 
 server:
   port: 8081
