@@ -88,12 +88,12 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Optional<MessageDTO.Message> findMessageById(UUID id) {
+  public MessageDTO.Message findMessageById(UUID id) {
 
     MessageEntity messageEntity = messageRepository.findById(id)
         .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message."));
 
-    return Optional.ofNullable(messageEntityMapper.entityToMessage(messageEntity));
+    return messageEntityMapper.entityToMessage(messageEntity);
   }
 
   @Transactional(readOnly = true)

@@ -13,7 +13,7 @@ public interface MessageService {
 
   boolean existMessageById(UUID id);
 
-  Optional<MessageDTO.Message> findMessageById(UUID id);
+  MessageDTO.Message findMessageById(UUID id);
 
   PagingDTO.OffsetPage<MessageDTO.Message> findMessagesByAuthorId(UUID authorId, PagingDTO.OffsetRequest pageable);
 
