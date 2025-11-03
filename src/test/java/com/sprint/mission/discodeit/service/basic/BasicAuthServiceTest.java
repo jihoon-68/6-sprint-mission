@@ -63,7 +63,7 @@ class BasicAuthServiceTest {
   @DisplayName("로그인 성공 테스트")
   void login_success() {
 
-    // given
+    //given
     when(userRepository.findByUsername(testUsername))
         .thenReturn(Optional.of(testUserEntity));
     when(securityUtil.hashPassword(testPassword))
@@ -71,10 +71,10 @@ class BasicAuthServiceTest {
     when(userEntityMapper.toUser(testUserEntity))
         .thenReturn(expectedUserDto);
 
-    // when
+    //when
     UserDTO.User result = basicAuthService.login(loginCommand);
 
-    // then
+    //then
     assertNotNull(result);
     assertEquals(expectedUserDto, result);
 
@@ -84,11 +84,11 @@ class BasicAuthServiceTest {
   @DisplayName("로그인 실패 테스트 - 사용자 없음")
   void login_fail_no_such_user() {
 
-    // given
+    //given
     when(userRepository.findByUsername(testUsername))
         .thenReturn(Optional.empty());
 
-    // when & then
+    //when & then
     assertThrows(NoSuchUserException.class, () -> {
       basicAuthService.login(loginCommand);
     });
@@ -99,13 +99,13 @@ class BasicAuthServiceTest {
   @DisplayName("로그인 실패 테스트 - 비밀번호 일치하지 않음")
   void login_fail_password_mismatch() {
 
-    // given
+    //given
     when(userRepository.findByUsername(testUsername))
         .thenReturn(Optional.of(testUserEntity));
     when(securityUtil.hashPassword(testPassword))
         .thenReturn("wrongHashedPassword");
 
-    // when & then
+    //when & then
     assertThrows(PasswordMismatchException.class, () -> {
       basicAuthService.login(loginCommand);
     });
