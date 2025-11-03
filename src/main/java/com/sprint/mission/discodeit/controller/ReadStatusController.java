@@ -6,8 +6,6 @@ import com.sprint.mission.discodeit.dto.api.request.ReadStatusRequestDTO.ReadSta
 import com.sprint.mission.discodeit.dto.api.request.ReadStatusRequestDTO;
 import com.sprint.mission.discodeit.dto.api.request.ReadStatusRequestDTO.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.api.response.ReadStatusResponseDTO.FindReadStatusResponse;
-import com.sprint.mission.discodeit.exception.AllReadyExistDataBaseRecordException;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.ReadStatusApiMapper;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -161,46 +159,6 @@ public class ReadStatusController {
         .toList();
 
     return ResponseEntity.ok(readStatusList);
-
-  }
-
-  /**
-   * 데이터 없음 예외 처리
-   *
-   * @param e 발생한 예외
-   * @return 에러 응답
-   */
-  @io.swagger.v3.oas.annotations.Hidden
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleNoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(404).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-
-  }
-
-  /**
-   * 이미 존재하는 데이터 예외 처리
-   *
-   * @param e 발생한 예외
-   * @return 에러 응답
-   */
-  @io.swagger.v3.oas.annotations.Hidden
-  @ExceptionHandler(AllReadyExistDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleAllReadyExistDataException(
-      AllReadyExistDataBaseRecordException e) {
-
-    log.error("AllReadyExistDataException occurred", e);
-
-    return ResponseEntity.status(400).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
 
   }
 

@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
 import com.sprint.mission.discodeit.dto.api.response.BinaryContentResponseDTO.ReadBinaryContentResponse;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.BinaryContentApiMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -143,39 +142,6 @@ public class BinaryContentController {
     BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id);
 
     return binaryContentStorage.download(readBinaryContentResult);
-
-  }
-
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleNoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(404).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-
-  }
-
-  /**
-   * 잘못된 인자 예외 처리
-   *
-   * @param e 발생한 예외
-   * @return 에러 응답
-   */
-  @io.swagger.v3.oas.annotations.Hidden
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleIllegalArgumentException(
-      IllegalArgumentException e) {
-
-    log.error("IllegalArgumentException occurred", e);
-
-    return ResponseEntity.status(400).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
 
   }
 

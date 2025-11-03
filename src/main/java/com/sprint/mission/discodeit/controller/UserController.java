@@ -11,8 +11,6 @@ import com.sprint.mission.discodeit.dto.api.request.UserRequestDTO;
 import com.sprint.mission.discodeit.dto.api.request.UserRequestDTO.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.api.response.UserResponseDTO.FindUserResponse;
 import com.sprint.mission.discodeit.enums.ContentType;
-import com.sprint.mission.discodeit.exception.AllReadyExistDataBaseRecordException;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.UserApiMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -316,32 +314,6 @@ public class UserController {
         .build());
 
     return ResponseEntity.ok(userApiMapper.userStatusToCheckUserOnlineResponse(userStatus));
-
-  }
-
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> NoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(404).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-
-  }
-
-  @ExceptionHandler(AllReadyExistDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> AllReadyExistDataException(
-      AllReadyExistDataBaseRecordException e) {
-
-    log.error("AllReadyExistDataException occurred", e);
-
-    return ResponseEntity.status(400).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
 
   }
 

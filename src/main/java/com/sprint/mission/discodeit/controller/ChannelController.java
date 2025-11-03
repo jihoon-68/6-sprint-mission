@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.PublicChan
 import com.sprint.mission.discodeit.dto.api.response.ChannelResponseDTO;
 import com.sprint.mission.discodeit.dto.api.response.ChannelResponseDTO.FindChannelResponse;
 import com.sprint.mission.discodeit.enums.ChannelType;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.ChannelApiMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -251,32 +250,6 @@ public class ChannelController {
     return channelService.findChannelsByUserId(userId).stream()
         .map(channelApiMapper::toFindChannelResponse)
         .toList();
-
-  }
-
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleNoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(404).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-
-  }
-
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleIllegalArgumentException(
-      IllegalArgumentException e) {
-
-    log.error("IllegalArgumentException occurred", e);
-
-    return ResponseEntity.status(400).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
 
   }
 

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto.api;
 
+import java.time.Instant;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -9,8 +11,12 @@ public class ErrorApiDTO {
 
   @Builder
   public record ErrorApiResponse(
-      Integer code,
-      String message
+      Instant timestamp,
+      String code,
+      String message,
+      Map<String, Object> details,
+      String exceptionType,
+      int status
   ) {
 
   }

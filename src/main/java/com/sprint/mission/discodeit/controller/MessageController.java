@@ -15,7 +15,6 @@ import com.sprint.mission.discodeit.dto.api.request.MessageRequestDTO.MessageCre
 import com.sprint.mission.discodeit.dto.api.response.MessageResponseDTO;
 import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO;
 import com.sprint.mission.discodeit.enums.ContentType;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.BinaryContentApiMapper;
 import com.sprint.mission.discodeit.mapper.api.MessageApiMapper;
 import com.sprint.mission.discodeit.mapper.api.UserApiMapper;
@@ -284,32 +283,6 @@ public class MessageController {
         .build();
 
     return ResponseEntity.ok(response);
-
-  }
-
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleNoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(404).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-
-  }
-
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleIllegalArgumentException(
-      IllegalArgumentException e) {
-
-    log.error("IllegalArgumentException occurred", e);
-
-    return ResponseEntity.status(400).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
 
   }
 

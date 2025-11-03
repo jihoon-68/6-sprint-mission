@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.PagingDTO;
 import com.sprint.mission.discodeit.dto.PagingDTO.OffsetPage;
 import com.sprint.mission.discodeit.entity.BinaryContentEntity;
 import com.sprint.mission.discodeit.entity.MessageEntity;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.exception.channel.NoSuchChannelException;
 import com.sprint.mission.discodeit.exception.message.NoSuchMessageException;
 import com.sprint.mission.discodeit.exception.user.NoSuchUserException;
