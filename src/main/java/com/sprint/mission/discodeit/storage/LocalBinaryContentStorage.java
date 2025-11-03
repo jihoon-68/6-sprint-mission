@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContent;
+import com.sprint.mission.discodeit.exception.binarycontent.NoSuchBinaryContentException;
 import jakarta.annotation.PostConstruct;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -73,7 +75,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       return Files.newInputStream(resolvePath(id));
     } catch (IOException e) {
-      throw new NoSuchDataBaseRecordException("No such file.");
+      throw new NoSuchBinaryContentException(Map.of("id", id));
     }
 
   }
