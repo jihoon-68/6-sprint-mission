@@ -17,7 +17,7 @@ public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final UserEntityMapper userEntityMapper;
-  private final SecurityUtil securityUtil = new SecurityUtil();
+  private final SecurityUtil securityUtil;
 
   @Override
   public UserDTO.User login(UserDTO.LoginCommand loginCommand) {
