@@ -19,15 +19,11 @@ public enum ErrorCode {
     MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "메시지를 찾을 수 없음"),
 
     USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "유저 상태를 찾을 수 없음"),
-    USER_STATUS_DUPLICATE(HttpStatus.CONFLICT, "유저 상태 중복"),
 
     READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "읽음 상태를 찾을 수 없음"),
-    READ_STATUS_DUPLICATE(HttpStatus.CONFLICT, "읽음 상태 중복"),
 
-    BINARY_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND,"파일 정보 없음"),
-
-    FILE_IN_PUT_FAIL(HttpStatus.BAD_REQUEST, "파일 읽어오기 실패"),
-    FILE_OUT_PUT_FAIL(HttpStatus.BAD_REQUEST, "파일 저장 실패"),
+    FILE_IN_PUT_FAIL(HttpStatus.BAD_REQUEST, "파일 저장 실패"),
+    FILE_OUT_PUT_FAIL(HttpStatus.BAD_REQUEST, "파일 읽어오기 실패"),
     FILE_DOWNLOAD_FAIL(HttpStatus.BAD_REQUEST, "파일 다운로드 실패");
 
     private final HttpStatus status;
