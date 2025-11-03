@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.exception.message;
 
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.MessageException;
-import org.hibernate.mapping.Map;
+import java.util.Map;
 
 public class NoSuchMessageException extends MessageException {
 
