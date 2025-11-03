@@ -6,6 +6,10 @@ import java.util.Map;
 
 public class NoSuchUserException extends UserException {
 
+  public NoSuchUserException() {
+    super(ErrorCode.NO_SUCH_USER, Map.of());
+  }
+
   public NoSuchUserException(Map<String, Object> details) {
     super(ErrorCode.NO_SUCH_USER, details);
   }

@@ -7,6 +7,9 @@ import com.sprint.mission.discodeit.dto.PagingDTO.OffsetPage;
 import com.sprint.mission.discodeit.entity.BinaryContentEntity;
 import com.sprint.mission.discodeit.entity.MessageEntity;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.exception.channel.NoSuchChannelException;
+import com.sprint.mission.discodeit.exception.message.NoSuchMessageException;
+import com.sprint.mission.discodeit.exception.user.NoSuchUserException;
 import com.sprint.mission.discodeit.mapper.MessageEntityMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -45,19 +48,19 @@ public class BasicMessageService implements MessageService {
 
     if (!userRepository.existsById(request.userId())) {
       log.warn("User with id {} does not exist", request.userId());
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     if (!channelRepository.existsById(request.channelId())) {
       log.warn("Channel with id {} does not exist", request.channelId());
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
     MessageEntity messageEntity = MessageEntity.builder()
         .author(userRepository.findById(request.userId())
-            .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user.")))
+            .orElseThrow(NoSuchUserException::new))
         .channel(channelRepository.findById(request.channelId())
-            .orElseThrow(() -> new NoSuchDataBaseRecordException("No such channel.")))
+            .orElseThrow(NoSuchChannelException::new))
         .content(request.content())
         .build();
 
@@ -96,7 +99,7 @@ public class BasicMessageService implements MessageService {
     MessageEntity messageEntity = messageRepository.findById(id)
         .orElseThrow(() -> {
           log.warn("Message with id {} does not exist", id);
-          throw new NoSuchDataBaseRecordException("No such message.");
+          throw new NoSuchMessageException();
         });
 
     return messageEntityMapper.toMessage(messageEntity);
@@ -108,7 +111,7 @@ public class BasicMessageService implements MessageService {
 
     if (!userRepository.existsById(authorId)) {
       log.warn("User with id {} does not exist", authorId);
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     Page<MessageEntity> paging = messageRepository.findByAuthorId(authorId, PageRequest.of(pageable.getPage(), pageable.getSize()));
@@ -131,7 +134,7 @@ public class BasicMessageService implements MessageService {
 
     if (!channelRepository.existsById(channelId)) {
       log.warn("Channel with id {} does not exist", channelId);
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
     Sort.Direction direction = pageable.getSort().split(",")[1].equalsIgnoreCase("DESC") ? Direction.DESC : Direction.ASC;
@@ -156,10 +159,8 @@ public class BasicMessageService implements MessageService {
 
     if (!channelRepository.existsById(channelId)) {
       log.warn("Channel with id {} does not exist", channelId);
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
-
-    //Sort.Direction direction = pageable.getSort().split(",")[1].equalsIgnoreCase("DESC") ? Direction.DESC : Direction.ASC;
 
     Slice<MessageEntity> slice = messageRepository.findByChannelIdAndCreatedAt(channelId, Instant.parse(createdAt), pageable.getSize());
 
@@ -197,11 +198,11 @@ public class BasicMessageService implements MessageService {
 
     if (!messageRepository.existsById(request.id())) {
       log.warn("Message with id {} does not exist", request.id());
-      throw new NoSuchDataBaseRecordException("No such message.");
+      throw new NoSuchMessageException();
     }
 
     MessageEntity updatedMessageEntity = messageRepository.findById(request.id())
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message."));
+        .orElseThrow(NoSuchMessageException::new);
     updatedMessageEntity.updateMessage(request.content());
 
     log.debug("Updating message with id {}", updatedMessageEntity.getId());
@@ -215,7 +216,7 @@ public class BasicMessageService implements MessageService {
   public void deleteMessageById(UUID id) {
 
     binaryContentRepository.deleteAllByIdIn(messageRepository.findById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message.")).getAttachments()
+        .orElseThrow(NoSuchMessageException::new).getAttachments()
         .stream()
         .map(BinaryContentEntity::getId)
         .toList());

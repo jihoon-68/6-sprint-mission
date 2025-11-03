@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.ChannelEntity;
 import com.sprint.mission.discodeit.entity.ReadStatusEntity;
 import com.sprint.mission.discodeit.enums.ChannelType;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.exception.channel.InvalidChannelDataException;
+import com.sprint.mission.discodeit.exception.channel.NoSuchChannelException;
 import com.sprint.mission.discodeit.mapper.ChannelEntityMapper;
 import com.sprint.mission.discodeit.mapper.UserEntityMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -15,6 +17,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +69,7 @@ public class BasicChannelService implements ChannelService {
     List<ReadStatusEntity> readStatusEntityList = request.participants().stream()
         .map(userId -> ReadStatusEntity.builder()
             .user(userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user.")))
+                .orElseThrow(NoSuchChannelException::new))
             .channel(channelEntity)
             .lastReadAt(Instant.now())
             .build())
@@ -98,7 +101,7 @@ public class BasicChannelService implements ChannelService {
     ChannelEntity channelEntity = channelRepository.findById(id)
         .orElseThrow(() -> {
           log.warn("No such channel with id {}", id);
-          throw new NoSuchDataBaseRecordException("No such channel.");
+          throw new NoSuchChannelException();
         });
 
     return channelWithParticipants.addParticipantsToChannel(channelEntity);
@@ -136,19 +139,24 @@ public class BasicChannelService implements ChannelService {
 
     if (!channelRepository.existsById(request.id())) {
       log.warn("No such channel with id {}", request.id());
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
-    if (request.name().isBlank() || request.type() == null) {
-      log.warn("Missing required fields for updateChannel");
-      throw new IllegalArgumentException("Invalid channel data.");
+    if (request.name().isBlank()) {
+      log.warn("Invalid channel name for updateChannel with id {}", request.id());
+      throw new InvalidChannelDataException(Map.of("name", "Channel name cannot be blank."));
+    }
+
+    if (request.type() == null) {
+      log.warn("Missing channel type for updateChannel with id {}", request.id());
+      throw new InvalidChannelDataException(Map.of("type", "Channel type is required."));
     }
 
     ChannelEntity updatedChannelEntity = channelRepository.findById(request.id())
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such channel."));
+        .orElseThrow(NoSuchChannelException::new);
 
     if (updatedChannelEntity.isPrivate()) {
-      throw new IllegalArgumentException("Private channel cannot be updated.");
+      throw new InvalidChannelDataException(Map.of("private", "Channel is private."));
     }
 
     updatedChannelEntity.update(request.name(), request.description());
@@ -165,7 +173,7 @@ public class BasicChannelService implements ChannelService {
   public void deleteChannelById(UUID id) {
 
     if (!channelRepository.existsById(id)) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
     messageRepository.deleteByChannelId(id);

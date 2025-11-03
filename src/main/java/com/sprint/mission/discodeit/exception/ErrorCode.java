@@ -11,7 +11,11 @@ public enum ErrorCode {
   NO_SUCH_USER_STATUS("No such user status."),
   ALREADY_EXISTING_USER("User already exists."),
   ALREADY_EXISTING_CHANNEL("Channel already exists."),
-  ALREADY_EXISTING_MESSAGE("Message already exists.");
+  ALREADY_EXISTING_MESSAGE("Message already exists."),
+  ALREADY_EXISTING_READ_STATUS("Read status already exists."),
+  ALREADY_EXISTING_USER_STATUS("User status already exists."),
+  PASSWORD_MISMATCH("Password mismatch."),
+  INVALID_CHANNEL_DATA("Invalid channel data.");
 
   private String message;
 

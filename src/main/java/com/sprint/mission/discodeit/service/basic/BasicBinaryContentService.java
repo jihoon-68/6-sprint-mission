@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.entity.BinaryContentEntity;
 import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.exception.binarycontent.NoSuchBinaryContentException;
 import com.sprint.mission.discodeit.mapper.BinaryContentEntityMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -56,7 +57,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     BinaryContentEntity binaryContentEntity = binaryContentRepository.findById(id)
         .orElseThrow(() -> {
           log.warn("Could not find binary content with id {}", id);
-          throw new NoSuchDataBaseRecordException("No such binary content");
+          throw new NoSuchBinaryContentException();
         });
 
     byte[] bytes = null;
@@ -92,7 +93,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .build();
           } catch (IOException e) {
             log.warn("Could not find binary content with id {}", binaryContent.getId());
-            throw new NoSuchDataBaseRecordException("No such binary content");
+            throw new NoSuchBinaryContentException();
           }
         })
         .toList();
@@ -113,7 +114,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .build();
           } catch (IOException e) {
             log.warn("Could not find binary content with id {}", binaryContent.getId());
-            throw new NoSuchDataBaseRecordException("No such binary content");
+            throw new NoSuchBinaryContentException();
           }
         })
         .toList();
@@ -125,7 +126,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     if (!binaryContentRepository.existsById(id)) {
       log.warn("Could not find binary content with id {}", id);
-      throw new NoSuchDataBaseRecordException("No such binary content");
+      throw new NoSuchBinaryContentException();
     }
 
     binaryContentRepository.deleteById(id);

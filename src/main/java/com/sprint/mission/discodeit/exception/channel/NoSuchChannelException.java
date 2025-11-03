@@ -6,6 +6,10 @@ import java.util.Map;
 
 public class NoSuchChannelException extends ChannelException {
 
+  public NoSuchChannelException() {
+    super(ErrorCode.NO_SUCH_CHANNEL, Map.of());
+  }
+
   public NoSuchChannelException(Map<String, Object> details) {
     super(ErrorCode.NO_SUCH_CHANNEL, details);
   }
