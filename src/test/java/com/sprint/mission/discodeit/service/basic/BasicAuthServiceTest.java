@@ -97,7 +97,7 @@ class BasicAuthServiceTest {
 
   @Test
   @DisplayName("로그인 실패 테스트 - 비밀번호 일치하지 않음")
-  void login_fail_password_mismatch() {
+  void login_fail_passwordMismatch() {
 
     //given
     when(userRepository.findByUsername(testUsername))

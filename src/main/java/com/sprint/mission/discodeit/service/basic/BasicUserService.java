@@ -34,7 +34,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final UserEntityMapper userEntityMapper;
-  private final SecurityUtil securityUtil = new SecurityUtil();
+  private final SecurityUtil securityUtil;
 
   @Transactional
   @Override
