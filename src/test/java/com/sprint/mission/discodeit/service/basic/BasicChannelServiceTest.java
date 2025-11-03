@@ -57,6 +57,7 @@ class BasicChannelServiceTest {
 
   @BeforeEach
   void setUp() {
+
     testChannelEntity = ChannelEntity.builder()
         .name(testChannelName)
         .description(testDescription)
@@ -117,7 +118,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 ID로 조회 실패 테스트 - 존재하지 않는 채널")
-  void findChannelById_fail_notFound() {
+  void findChannelById_fail_noSuchChannel() {
 
     //given
     when(channelRepository.findById(testChannelId))
@@ -158,6 +159,26 @@ class BasicChannelServiceTest {
   }
 
   @Test
+  @DisplayName("채널 업데이트 실패 테스트 - 존재하지 않는 채널")
+  void updateChannel_fail_noSuchChannel() {
+
+    //given
+    String updatedName = "updated-name";
+    String updatedDescription = "Updated Description";
+    ChannelDTO.UpdateChannelCommand command = new ChannelDTO.UpdateChannelCommand(
+        testChannelId, updatedName, ChannelType.PUBLIC, null, updatedDescription);
+
+    when(channelRepository.existsById(testChannelId))
+        .thenReturn(false);
+
+    //when & then
+    assertThrows(NoSuchChannelException.class, () -> {
+      basicChannelService.updateChannel(command);
+    });
+
+  }
+
+  @Test
   @DisplayName("채널 삭제 성공 테스트")
   void deleteChannelById_success() {
 
@@ -172,7 +193,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 삭제 실패 테스트 - 존재하지 않는 채널")
-  void deleteChannelById_fail_notFound() {
+  void deleteChannelById_fail_noSuchChannel() {
 
     //given
     when(channelRepository.existsById(testChannelId))
@@ -204,8 +225,10 @@ class BasicChannelServiceTest {
   @Test
   @DisplayName("사용자 ID로 채널 목록 조회 테스트")
   void findChannelsByUserId() {
+
     //given
     UUID userId = UUID.randomUUID();
+
     when(readStatusRepository.findByUserId(userId))
         .thenReturn(List.of());
     when(channelRepository.findByType(ChannelType.PUBLIC))
