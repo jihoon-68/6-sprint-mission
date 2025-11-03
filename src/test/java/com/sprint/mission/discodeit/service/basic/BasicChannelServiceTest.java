@@ -96,6 +96,28 @@ class BasicChannelServiceTest {
   }
 
   @Test
+  @DisplayName("채널 비공개 생성 성공 테스트")
+  void createPrivateChannel_success() {
+
+    //given
+    ChannelDTO.CreatePrivateChannelCommand command = new ChannelDTO.CreatePrivateChannelCommand(
+        ChannelType.PRIVATE, List.of(), testDescription);
+
+    when(channelRepository.save(any(ChannelEntity.class)))
+        .thenReturn(testChannelEntity);
+    when(channelEntityMapper.toChannel(any(ChannelEntity.class)))
+        .thenReturn(testChannelDto);
+
+    //when
+    ChannelDTO.Channel result = basicChannelService.createPrivateChannel(command);
+
+    //then
+    assertNotNull(result);
+    assertEquals(testDescription, result.getDescription());
+
+  }
+
+  @Test
   @DisplayName("채널 ID로 조회 성공 테스트")
   void findChannelById_success() {
 
