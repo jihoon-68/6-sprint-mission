@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.dto.api.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,9 +14,15 @@ public class UserRequestDTO {
 
   @Builder
   public record UserCreateRequest(
-      @NotBlank(message = "계정명을 입력하세요.") String username,
-      @NotBlank(message = "이메일을 입력하세요.") String email,
-      @NotBlank(message = "비밀번호를 입력하세요.") String password,
+      @NotBlank(message = "계정명을 입력하세요.")
+      String username,
+      @NotBlank(message = "이메일을 입력하세요.")
+      @Email
+      String email,
+      @NotBlank(message = "비밀번호를 입력하세요.")
+      @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$"
+          , message = "비밀번호는 최소 8자, 하나 이상의 대문자, 소문자, 숫자 및 특수 문자를 포함해야 합니다.")
+      String password,
       String description) {
 
   }
@@ -26,9 +34,14 @@ public class UserRequestDTO {
       String username,
       @JsonProperty("newEmail")
       @NotBlank(message = "이메일을 입력하세요.")
+      @Email
       String email,
-      @NotBlank(message = "기존 비밀번호를 입력하세요.")String currentPassword,
-      @NotBlank(message = "새 비밀번호를 입력하세요.")String newPassword
+      @NotBlank(message = "기존 비밀번호를 입력하세요.")
+      String currentPassword,
+      @NotBlank(message = "새 비밀번호를 입력하세요.")
+      @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$"
+          , message = "비밀번호는 최소 8자, 하나 이상의 대문자, 소문자, 숫자 및 특수 문자를 포함해야 합니다.")
+      String newPassword
   ) {
 
   }

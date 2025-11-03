@@ -19,6 +19,7 @@ import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -53,6 +54,23 @@ public class GlobalExceptionHandler {
         .timestamp(Instant.now())
         .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
         .message(e.getMessage())
+        .exceptionType(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+        .status(HttpStatus.BAD_REQUEST.value())
+        .build());
+
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> MethodArgumentNotValidException(
+      MethodArgumentNotValidException e) {
+
+    log.error("MethodArgumentNotValidException occurred", e);
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorApiDTO.ErrorApiResponse.builder()
+        .timestamp(Instant.now())
+        .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+        .message(e.getBindingResult().getAllErrors().get(0).getDefaultMessage())
         .exceptionType(String.valueOf(HttpStatus.BAD_REQUEST.value()))
         .status(HttpStatus.BAD_REQUEST.value())
         .build());
