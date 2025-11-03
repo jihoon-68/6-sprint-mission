@@ -21,18 +21,15 @@ public class AuthService {
 
     public UserDto login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.username())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElse(null);
 
-        if (!user.getPassword().equals(loginRequest.password())) {
-            throw new IllegalArgumentException("Wrong password");
+        if (user == null || !user.getPassword().equals(loginRequest.password())) {
+            throw new IllegalArgumentException("아이디 또는 비밀번호가 틀렸습니다.");
         }
 
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
-
         //로그인시 오프라인 -> 온라인으로
-        userStatus.update(Instant.now());
-        userStatusRepository.save(userStatus);
+        user.getStatus().update(Instant.now());
+        userStatusRepository.save(user.getStatus());
         return UserMapper.INSTANCE.toDto(user);
     }
 }
