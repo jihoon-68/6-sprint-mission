@@ -16,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
 
     @Id
@@ -26,7 +27,8 @@ public class UserStatus extends BaseUpdatableEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Instant lastActiveAt; // NULL 허용, 수정 가능.
+    // NULL 허용, 수정 가능.
+    private Instant lastActiveAt;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

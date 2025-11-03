@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.enums.BinaryContentType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,7 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BinaryContent extends BaseEntity implements Serializable{
+@Table(name = "binary_contents")
+public class BinaryContent extends BaseEntity {
 
     @Id
     @Builder.Default
@@ -41,9 +43,6 @@ public class BinaryContent extends BaseEntity implements Serializable{
 
     @Column(nullable = false, updatable = false)
     private Long size;
-
-//    @Column(nullable = false, updatable = false)
-//    private byte[] data;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.binarycontent;
 
-import com.sprint.mission.discodeit.entity.BinaryContentType;
+import com.sprint.mission.discodeit.enums.BinaryContentType;
 
 public record BinaryContentCreateRequestDto(
 

@@ -6,7 +6,11 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusListNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -35,16 +39,16 @@ public class ReadStatusService {
     public ReadStatusResponseDto create(ReadStatusCreateRequestDto dto){
 
         User user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
         Channel channel = channelRepository.findById(dto.channelId())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
 
         // 중복 체크
         List<ReadStatus> userReadStatuses = readStatusRepository.findAllByUserId(dto.userId());
         boolean exists = userReadStatuses.stream()
                 .anyMatch(readStatus -> readStatus.getChannel().getId().equals(dto.channelId()));
         if (exists) {
-            throw new IllegalArgumentException("해당 유저와 채널에 대해 이미 ReadStatus가 존재합니다.");
+            throw new ReadStatusAlreadyExistsException(channel.getId(), user.getId());
         }
 
         ReadStatus readStatus = ReadStatus.builder()
@@ -61,13 +65,18 @@ public class ReadStatusService {
     @Transactional(readOnly = true)
     public ReadStatusResponseDto findById(UUID id){
         ReadStatus readStatus = readStatusRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다"));
+                .orElseThrow(() -> new ReadStatusNotFoundException(id));
         return readStatusMapper.toDto(readStatus);
     }
 
     @Transactional(readOnly = true)
     public List<ReadStatusResponseDto> findAllByUserId(UUID id){
         List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(id);
+
+        if (readStatuses.isEmpty()) {
+            throw new ReadStatusListNotFoundException(id);
+        }
+
         return readStatuses.stream()
                 .map(readStatusMapper::toDto)
                 .toList();
@@ -76,14 +85,16 @@ public class ReadStatusService {
     @Transactional
     public ReadStatusResponseDto update(UUID id, ReadStatusUpdateRequestDto dto){
         ReadStatus readStatus = readStatusRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
+                .orElseThrow(() -> new ReadStatusNotFoundException(id));
         readStatus.setLastReadAt(dto.newLastReadAt());
-        readStatusRepository.save(readStatus); // 명시적 저장
+        readStatusRepository.save(readStatus);
         return readStatusMapper.toDto(readStatus);
     }
 
     @Transactional
     public void deleteById(UUID id){
+        ReadStatus readStatus = readStatusRepository.findById(id)
+                        .orElseThrow(() -> new ReadStatusNotFoundException(id));
         readStatusRepository.deleteById(id);
         log.info("ReadStatus 삭제 완료: " + id);
     }

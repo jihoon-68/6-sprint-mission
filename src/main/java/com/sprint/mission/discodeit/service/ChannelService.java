@@ -7,13 +7,13 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.enums.ChannelType;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.*;
-import lombok.Locked;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class ChannelService {
 
         List<UserResponseDto> userResponseDtos = users.stream()
                 .map(user -> {
-                    BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
+                    BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
                     return userMapper.toDto(user, statusMap.get(user.getId()), profileImage);
                 })
                 .toList();
@@ -101,15 +101,15 @@ public class ChannelService {
     @Transactional(readOnly = true)
     public ChannelResponseDto findById(UUID id) {
         Channel channel = channelRepository.findByIdWithUsers(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(id));
 
-        Instant lastMessageAt = lastMessageAt(channel.getId());
+        Instant lastMessageSentAt = lastMessageSentAt(channel.getId());
 
         if (channel.getType() == ChannelType.PRIVATE) {
             return ChannelResponseDto.privateChannel(
                     channel.getId(),
                     getUserResponseDtos(channel),
-                    lastMessageAt
+                    lastMessageSentAt
                     );
         }
 
@@ -117,7 +117,7 @@ public class ChannelService {
                 channel.getId(),
                 channel.getName(),
                 channel.getDescription(),
-                lastMessageAt
+                lastMessageSentAt
                 );
     }
 
@@ -140,14 +140,14 @@ public class ChannelService {
                         return ChannelResponseDto.privateChannel(
                                 channel.getId(),
                                 getUserResponseDtos(channel.getId()),
-                                lastMessageAt(channel.getId())
+                                lastMessageSentAt(channel.getId())
                         );
                     } else {
                         return ChannelResponseDto.publicChannel(
                                 channel.getId(),
                                 channel.getName(),
                                 channel.getDescription(),
-                                lastMessageAt(channel.getId())
+                                lastMessageSentAt(channel.getId())
                         );
                     }
                 })
@@ -158,9 +158,9 @@ public class ChannelService {
     public ChannelResponseDto update(UUID id, PublicChannelUpdateRequestDto dto) {
         // validateCreator(user, channel);
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(id));
 
-        if (channel.getType() == ChannelType.PRIVATE) throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
+        if (channel.getType() == ChannelType.PRIVATE) throw new PrivateChannelUpdateException(id);
 
         if (dto.newName() != null) channel.setName(dto.newName());
         if (dto.newDescription() != null) channel.setDescription(dto.newDescription());
@@ -171,7 +171,7 @@ public class ChannelService {
             return ChannelResponseDto.privateChannel(
                     channel.getId(),
                     getUserResponseDtos(channel.getId()),
-                    lastMessageAt(channel.getId())
+                    lastMessageSentAt(channel.getId())
             );
         }
         else {
@@ -179,7 +179,7 @@ public class ChannelService {
                     channel.getId(),
                     channel.getName(),
                     channel.getDescription(),
-                    lastMessageAt(channel.getId())
+                    lastMessageSentAt(channel.getId())
             );
         }
     }
@@ -189,7 +189,7 @@ public class ChannelService {
     public void deleteById(UUID id) {
 
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(id));
 
         List<Message> messages = messageRepository.findByChannelId(id);
         if (messages != null) {
@@ -212,9 +212,9 @@ public class ChannelService {
 //        channelRepository.clear();
 //    }
 
-    public Instant lastMessageAt(UUID id) {
+    public Instant lastMessageSentAt(UUID id) {
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(id));
 
         List<UUID> messageIds = channel.getMessages().stream()
                 .map(Message::getId).toList();
@@ -233,9 +233,9 @@ public class ChannelService {
                 .orElse(null);
     }
 
-//    public ChannelResponseDto getChannelDto(Channel channel, List<UserResponseDto> participants, Instant lastMessageAt) {
+//    public ChannelResponseDto getChannelDto(Channel channel, List<UserResponseDto> participants, Instant lastMessageSentAt) {
 //        // MapStruct가 생성한 ChannelMapperImpl 클래스의 toDto 메서드를 사용
-//        return channelMapper.toDto(channel, participants, lastMessageAt);
+//        return channelMapper.toDto(channel, participants, lastMessageSentAt);
 //    }
 
     // 다건 조회 시 사용
@@ -248,7 +248,7 @@ public class ChannelService {
                     .distinct()
                     .map(user -> {
                         UserStatus userStatus = user.getUserStatus();
-                        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
+                        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
                         return userMapper.toDto(user, userStatus, profileImage);
                     })
                     .toList();
@@ -292,7 +292,7 @@ public class ChannelService {
                 .map(user -> userMapper.toDto(
                         user,
                         user.getUserStatus(),
-                        binaryContentMapper.toDto(user.getProfile())
+                        binaryContentMapper.toDto(user.getProfileImage())
                 ))
                 .toList();
     }

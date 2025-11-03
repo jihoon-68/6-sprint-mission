@@ -36,10 +36,10 @@ public class ChannelController {
                 .body(channel);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<List<ChannelResponseDto>> findAll(@PathVariable UUID id) {
-//        return ResponseEntity.ok(channelService.findAllByUserId(id));
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<List<ChannelResponseDto>> findAll(@PathVariable UUID id) {
+        return ResponseEntity.ok(channelService.findAllByUserId(id));
+    }
 
 
     @PatchMapping("/{id}")

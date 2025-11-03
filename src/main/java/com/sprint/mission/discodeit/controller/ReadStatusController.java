@@ -27,12 +27,12 @@ public class ReadStatusController {
                 .body(readStatus);
     }
 
-//    @GetMapping("/{readStatusId}")
-//    public ResponseEntity<List<ReadStatusResponseDto>> findAllByUserId(@PathVariable UUID readStatusId) {
-//        return ResponseEntity.ok(readStatusService.findAllByUserId(readStatusId));
-//    }
+    @GetMapping("/{readStatusId}")
+    public ResponseEntity<List<ReadStatusResponseDto>> findAllByUserId(@PathVariable UUID readStatusId) {
+        return ResponseEntity.ok(readStatusService.findAllByUserId(readStatusId));
+    }
 
-    @PatchMapping("/{userId}")
+    @PatchMapping("/users/{userId}")
     public ResponseEntity<ReadStatusResponseDto> update(@PathVariable UUID userId,
                                                         @RequestBody ReadStatusUpdateRequestDto request) {
         ReadStatusResponseDto readStatus = readStatusService.update(userId, request);

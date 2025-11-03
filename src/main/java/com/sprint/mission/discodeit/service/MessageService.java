@@ -2,19 +2,19 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.enums.BinaryContentType;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageListNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,13 +38,14 @@ public class MessageService {
 
     // 메시지 생성
     @Transactional
-    public MessageResponseDto create(MessageCreateRequestDto dto,
+    public MessageResponseDto create(/* UUID userId,*/
+                                     MessageCreateRequestDto dto,
                                      List<BinaryContentCreateRequestDto> binaryContentCreateRequests) {
 
         User user = userRepository.findById(dto.userId())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다: " + dto.userId()));
+                .orElseThrow(() -> new UserNotFoundException(dto.userId()));
         Channel channel = channelRepository.findById(dto.channelId())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다: " + dto.channelId()));
+                .orElseThrow(() -> new ChannelNotFoundException(dto.channelId()));
 
         Message message = Message.builder()
                 .author(user)
@@ -71,7 +71,7 @@ public class MessageService {
 
         user.getMessages().add(message);
         channel.getMessages().add(message);
-        messageRepository.save(message); // 명시적 저장
+        messageRepository.save(message);
 
         log.info("메시지 추가 완료: " + message.getContent());
         return messageMapper.toDto(message);
@@ -80,16 +80,21 @@ public class MessageService {
     @Transactional(readOnly = true)
     public MessageResponseDto findById(UUID id) {
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
+                .orElseThrow(() -> new MessageNotFoundException(id));
 
         return messageMapper.toDto(message);
     }
 
     @Transactional(readOnly = true)
-    public List<MessageResponseDto> findByChannelId(UUID id) {
-        List<Message> messages= messageRepository.findByChannelId(id);
+    public List<MessageResponseDto> findByChannelId(UUID channelId) {
+
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
+
+        List<Message> messages = messageRepository.findByChannelId(channelId);
+
         if (messages.isEmpty()) {
-            throw new NotFoundException("채널이 존재하지 않거나, 메세지가 하나도 없습니다.");
+            throw new MessageListNotFoundException(channelId);
         }
 
 //        // 해당채널에 메시지 남긴 모든 유저ID 조회
@@ -111,11 +116,18 @@ public class MessageService {
 
     @Transactional(readOnly = true)
     public PageResponse<MessageResponseDto> findByChannelId(UUID channelId, Instant cursor, int size) {
-        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
+
+        Pageable pageable = PageRequest.of(
+                0, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
         List<Message> messages = messageRepository.findByChannelIdAndCursor(channelId, cursor, pageable);
 
+
         if (messages.isEmpty()) {
-            throw new NotFoundException("채널이 존재하지 않거나, 메세지가 하나도 없습니다.");
+            throw new MessageListNotFoundException(channelId);
         }
 
         Instant nextCursor = messages.size() < size ? null : messages.get(messages.size() - 1).getCreatedAt();
@@ -136,7 +148,7 @@ public class MessageService {
     public MessageResponseDto update(UUID id, MessageUpdateRequestDto dto) {
         // validateWriter(user, message);
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
+                .orElseThrow(() -> new MessageNotFoundException(id));
 
         message.setContent(dto.newContent());
         messageRepository.save(message);
@@ -150,7 +162,7 @@ public class MessageService {
     public void delete(UUID id) {
         // validateWriter(user, message);
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
+                .orElseThrow(() -> new MessageNotFoundException(id));
 
         List<UUID> binaryContentIds = message.getAttachments().stream().map(BinaryContent::getId).toList();
         if (message.getAttachments() != null) {
@@ -162,9 +174,4 @@ public class MessageService {
         messageRepository.delete(message);
         log.info("메시지 삭제 완료: " + id);
     }
-
-//    @Transactional
-//    public void clear() {
-//        messageRepository.clear();
-//    }
 }

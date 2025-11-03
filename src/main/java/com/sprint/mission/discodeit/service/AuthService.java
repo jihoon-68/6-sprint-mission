@@ -3,15 +3,12 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +31,7 @@ public class AuthService {
 
         // FETCH JOIN으로 UserStatus도 한번에 가져옴
         User user = userRepository.findByUsernameWithStatusAndProfile(request.username())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new UserNotFoundException(request.username()));
 
         if (!user.getPassword().equals(request.password())){
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
@@ -53,7 +50,7 @@ public class AuthService {
         }
 
         log.info("로그인 되었습니다: " +  user.getId());
-        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
+        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
         return userMapper.toDto(user, user.getUserStatus(), profileImage);
     }
 }

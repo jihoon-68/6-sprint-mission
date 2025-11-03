@@ -11,20 +11,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
-    ReadStatus save(ReadStatus readStatus);
-    Optional<ReadStatus> findById(UUID id);
-    List<ReadStatus> findAllByUserId(UUID id);
-    List<ReadStatus> findAllByChannelId(UUID id);
+    List<ReadStatus> findAllByUserId(UUID userId);
+    List<ReadStatus> findAllByChannelId(UUID channelId);
 
     @Query("""
     SELECT DISTINCT rs FROM ReadStatus rs
     LEFT JOIN FETCH rs.user u
     LEFT JOIN FETCH u.userStatus
-    LEFT JOIN FETCH u.profile
+    LEFT JOIN FETCH u.profileImage
     WHERE rs.channel.id = :channelId
 """)
     List<ReadStatus> findAllByChannelIdWithUser(@Param("channelId") UUID channelId);
 
-    void deleteById(UUID id);
-    // void clear();
 }

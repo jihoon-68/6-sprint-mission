@@ -3,7 +3,8 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentListNotFoundException;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -43,7 +44,7 @@ public class BinaryContentService {
     @Transactional(readOnly = true)
     public BinaryContentResponseDto findById(UUID id){
         BinaryContent binaryContent = binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 BinaryContent입니다."));
+                .orElseThrow(() -> new BinaryContentNotFoundException(id));
 
         return binaryContentMapper.toDto(binaryContent);
     }
@@ -52,7 +53,7 @@ public class BinaryContentService {
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> ids){
         List<BinaryContent> contents = binaryContentRepository.findAllByIdIn(ids);
         if (contents.isEmpty()) {
-            throw new NotFoundException("해당하는 BinaryContent가 존재하지 않습니다.");
+            throw new BinaryContentListNotFoundException(ids);
         }
         return contents.stream()
                 .map(binaryContentMapper::toDto)
@@ -61,12 +62,9 @@ public class BinaryContentService {
 
     @Transactional
     public void deleteById(UUID id){
+        binaryContentRepository.findById(id)
+                .orElseThrow(() -> new BinaryContentNotFoundException(id));
         binaryContentRepository.deleteById(id);
         log.info("BinaryContent 삭제 완료: " + id);
     }
-
-//    @Transactional
-//    public void clear(){
-//        binaryContentRepository.clear();
-//    }
 }

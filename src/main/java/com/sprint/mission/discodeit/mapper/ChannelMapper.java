@@ -14,19 +14,19 @@ import java.util.List;
 public interface ChannelMapper {
 
     @Mapping(target = "participants", source = "participants")
-    @Mapping(target = "lastMessageAt", source = "lastMessageAt")
+    @Mapping(target = "lastMessageSentAt", source = "lastMessageSentAt")
     ChannelResponseDto toDto(Channel channel,
                              List<UserResponseDto> participants,
-                             Instant lastMessageAt);
+                             Instant lastMessageSentAt);
 
-//    public static ChannelResponseDto toDto(Channel channel, List<UserResponseDto> participants, Instant lastMessageAt) {
+//    public static ChannelResponseDto toDto(Channel channel, List<UserResponseDto> participants, Instant lastMessageSentAt) {
 //        return ChannelResponseDto.builder()
 //                .id(channel.getId())
 //                .type(channel.getType())
 //                .name(channel.getName())
 //                .description(channel.getDescription())
 //                .participants(participants)
-//                .lastMessageAt(lastMessageAt)
+//                .lastMessageSentAt(lastMessageSentAt)
 //                .build();
 //    }
 }

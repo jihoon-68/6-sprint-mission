@@ -6,10 +6,11 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryContentType;
+import com.sprint.mission.discodeit.enums.BinaryContentType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -24,7 +25,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -43,11 +43,11 @@ public class UserService {
                                   Optional<BinaryContentCreateRequestDto> profileImageCreateDto) {
 
         if (userRepository.findByUsername(dto.username()).isPresent()){
-            throw new IllegalStateException("이미 사용중인 닉네임입니다.");
+            throw UserAlreadyExistsException.byUsername(dto.username());
         }
 
         if (userRepository.findByEmail(dto.email()).isPresent()) {
-            throw new IllegalStateException("이미 사용중인 이메일입니다.");
+            throw new UserAlreadyExistsException(dto.email());
         }
 
         User user = User.builder()
@@ -77,7 +77,7 @@ public class UserService {
                             .build();
 
                     binaryContentRepository.save(binaryContent);
-                    user.setProfile(binaryContent);
+                    user.setProfileImage(binaryContent);
                 });
 
         userRepository.save(user);
@@ -93,34 +93,34 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponseDto findByUsername(String name) {
-        User user = userRepository.findByUsername(name)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+    public UserResponseDto findByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
 
 //        boolean isUserOnline = isUserOnline(user.getId());
-        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
+        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
 
         return userMapper.toDto(user, user.getUserStatus(), profileImage);
     }
 
-    @Transactional(readOnly = true)
-    public UserResponseDto findByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
-
+//    @Transactional(readOnly = true)
+//    public UserResponseDto findByEmail(String email) {
+//        User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new UserNotFoundException(email));
+//
 //        boolean isUserOnline = isUserOnline(user.getId());
-        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
-
-        return userMapper.toDto(user, user.getUserStatus(), profileImage);
-    }
+//        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
+//
+//        return userMapper.toDto(user, user.getUserStatus(), profileImage);
+//    }
 
     @Transactional(readOnly = true)
     public UserResponseDto findById(UUID id){
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
 //        boolean isUserOnline = isUserOnline(user.getId());
-        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
+        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
 
         return userMapper.toDto(user, user.getUserStatus(), profileImage);
     }
@@ -132,7 +132,7 @@ public class UserService {
         return users.stream()
                 .map(user -> {
 //                    boolean isUserOnline = isUserOnline(user.getId());
-                    BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
+                    BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
 
                     return userMapper.toDto(user, user.getUserStatus(), profileImage);
                 })
@@ -145,7 +145,7 @@ public class UserService {
                                   Optional<BinaryContentCreateRequestDto> optionalProfileCreateRequest) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         if (dto.newUsername() != null){
             userRepository.findByUsername(dto.newUsername())
@@ -180,32 +180,25 @@ public class UserService {
                             .size((long) profileRequest.bytes().length)
                             .build();
                     binaryContentRepository.save(binaryContent);
-                    user.setProfile(binaryContent);
+                    user.setProfileImage(binaryContent);
                 });
 
         userRepository.save(user); // 명시적 저장
         log.info("수정 및 저장 완료 : " + user.getUsername());
 
-        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfile());
+        BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
         return userMapper.toDto(user, user.getUserStatus(), profileImage);
     }
 
     // 유저 삭제
     @Transactional
     public void delete(UUID id) {
-
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         userRepository.delete(user);
         log.info("유저 삭제 완료: " + id);
     }
-
-//    // 유저 모두 삭제
-//    @Transactional
-//    public void clear(){
-//        userRepository.clear();
-//    }
 
 //    /**
 //     * 특정 유저의 온라인 상태를 확인합니다.

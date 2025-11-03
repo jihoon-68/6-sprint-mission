@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.BinaryContentType;
+import com.sprint.mission.discodeit.enums.BinaryContentType;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +36,9 @@ public class UserController {
         Optional<BinaryContentCreateRequestDto> profileRequest = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);
         UserResponseDto user = userService.create(dto, profileRequest);
-        return ResponseEntity.
-                status(HttpStatus.CREATED).
-                body(user);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(user);
     }
 
     @GetMapping
@@ -61,7 +61,7 @@ public class UserController {
 
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusResponseDto> updateUserStatusByUserId(@PathVariable UUID userId,
-                                                                          @RequestPart UserStatusUpdateRequestDto dto) {
+                                                                          @RequestBody UserStatusUpdateRequestDto dto) {
         return ResponseEntity.ok(userStatusService.updateByUserId(userId, dto));
     }
 

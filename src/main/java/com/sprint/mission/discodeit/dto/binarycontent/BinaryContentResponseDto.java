@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.dto.binarycontent;
 
-import com.sprint.mission.discodeit.entity.BinaryContentType;
 import lombok.Builder;
+import lombok.Getter;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Builder

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,7 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReadStatus extends BaseUpdatableEntity implements Serializable {
+@Table(name = "read_statuses")
+public class ReadStatus extends BaseUpdatableEntity {
 
     @Id
     @Builder.Default
@@ -30,7 +32,8 @@ public class ReadStatus extends BaseUpdatableEntity implements Serializable {
     @JoinColumn(name = "channel_id")
     private Channel channel;
 
-    private Instant lastReadAt; // NULL 허용, 수정 가능.
+    // NULL 허용, 수정 가능.
+    private Instant lastReadAt;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

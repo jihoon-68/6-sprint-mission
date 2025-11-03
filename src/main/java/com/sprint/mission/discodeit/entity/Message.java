@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -18,10 +19,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Message extends BaseUpdatableEntity implements Serializable {
-
-//    @Serial
-//    private static final long serialVersionUID = 3L;
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
     @Id
     @Builder.Default
@@ -38,8 +37,9 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     @OneToMany(mappedBy = "message")
     private List<BinaryContent> attachments;
 
+    @NotBlank
     @Column(nullable = false)
-    private String content; // 내용. 수정 가능.
+    private String content;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -48,15 +48,7 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     @LastModifiedDate
     private Instant updatedAt;
 
-
-//    public Message(UUID userId, UUID channelId, String content){
-//        this.id = UUID.randomUUID();
-//        this.userId = userId;
-//        this.channelId = channelId;
-//        this.content = content;
-//    }
-
-//    public void setBinaryContents(List<UUID> binaryContents) { // 메시지 첨부파일 수정
-//        this.binaryContents = (binaryContents != null ? binaryContents : new ArrayList<>());
-//    }
+    public void setBinaryContents(List<BinaryContent> attachments) {
+        this.attachments = (attachments != null ? attachments : new ArrayList<>());
+    }
 }

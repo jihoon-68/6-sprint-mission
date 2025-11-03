@@ -1,27 +1,24 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.enums.ChannelType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.io.Serial;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.io.Serializable;
 
 @Entity
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Channel extends BaseUpdatableEntity implements Serializable {
-
-//    @Serial
-//    private static final long serialVersionUID = 2L;
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
 
     @Id
     @Builder.Default
@@ -37,10 +34,10 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
     @OneToMany(mappedBy = "channel")
     private List<ReadStatus> readStatuses;
 
+    @NotBlank
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private String description;
 
     @CreatedDate
