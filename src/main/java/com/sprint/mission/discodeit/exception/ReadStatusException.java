@@ -1,7 +1,5 @@
-package com.sprint.mission.discodeit.exception.domain;
+package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.exception.DiscodeitException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.Map;
 
 public class ReadStatusException extends DiscodeitException {

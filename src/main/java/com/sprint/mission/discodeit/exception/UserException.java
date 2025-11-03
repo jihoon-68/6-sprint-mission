@@ -1,7 +1,4 @@
-package com.sprint.mission.discodeit.exception.domain;
-
-import com.sprint.mission.discodeit.exception.DiscodeitException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
+package com.sprint.mission.discodeit.exception;
 
 public class UserException extends DiscodeitException {
 
