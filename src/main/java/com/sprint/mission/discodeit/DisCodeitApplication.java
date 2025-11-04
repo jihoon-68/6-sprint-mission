@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @RequiredArgsConstructor
-@EnableJpaAuditing
 public class DisCodeitApplication {
 
   static final String strongPassword = "fe5A3sad@lks^";
