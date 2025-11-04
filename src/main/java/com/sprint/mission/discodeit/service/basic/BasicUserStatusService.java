@@ -28,7 +28,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
-    private final UserStatusMapper userStatusMapper;
     private final UserRepository userRepository;
 
     @Override
@@ -43,14 +42,14 @@ public class BasicUserStatusService implements UserStatusService {
         }
         UserStatus userStatus = new UserStatus(user);
         log.info("유저 상태 생성 요청 수신: userStatus={}", userStatus.getId());
-        return userStatusMapper.toDto(userStatusRepository.save(userStatus));
+        return UserStatusMapper.INSTANCE.toDto(userStatusRepository.save(userStatus));
     }
 
     @Override
     public List<UserStatusDto> findAll() {
         log.info("유저 상태 목록 조회 요청 수신");
         return userStatusRepository.findAll().stream()
-                .map(userStatusMapper::toDto)
+                .map(UserStatusMapper.INSTANCE::toDto)
                 .toList();
     }
 
@@ -73,7 +72,7 @@ public class BasicUserStatusService implements UserStatusService {
         userStatus.isConnecting(userStatusUpdateRequest.newLastActiveAt());
         userStatusRepository.save(userStatus);
         log.info("유저 접속 상태 수정 완료: userId={}",userId);
-        return userStatusMapper.toDto(userStatusRepository.save(userStatus));
+        return UserStatusMapper.INSTANCE.toDto(userStatusRepository.save(userStatus));
     }
 
     @Override

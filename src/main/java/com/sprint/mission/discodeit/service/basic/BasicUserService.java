@@ -72,14 +72,14 @@ public class BasicUserService implements UserService {
         userRepository.save(user);
         userStatusRepository.save(userStatus);
         log.info("유저 생성 완료: userId={}", user.getId());
-        return userMapper.toDto(user);
+        return UserMapper.INSTANCE.toDto(user);
     }
 
     @Override
     public List<UserDto> findAll() {
         log.info("유저 목록 조회 요청 수신");
         List<User> users = userRepository.findAll();
-        return userMapper.toDtoList(users);
+        return UserMapper.INSTANCE.toDtoList(users);
     }
 
     @Override
@@ -111,9 +111,8 @@ public class BasicUserService implements UserService {
         }
         userRepository.save(user);
         log.info("사용자 수정 완료: userId={}", userId);
-
-        return userMapper.toDto(user);
-}
+        return UserMapper.INSTANCE.toDto(user);
+    }
 
     @Override
     public void delete(UUID id) {

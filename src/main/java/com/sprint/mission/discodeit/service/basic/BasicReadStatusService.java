@@ -31,7 +31,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
-    private final ReadStatusMapper readStatusMapper;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
@@ -55,7 +54,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         ReadStatus readStatus = readStatusRepository.save(new ReadStatus(channel, user));
         log.info("읽음 상태 생성 완료: readStatusId={}", readStatus.getId());
-        return readStatusMapper.toDto(readStatus);
+        return ReadStatusMapper.INSTANCE.toDto(readStatus);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class BasicReadStatusService implements ReadStatusService {
         log.info("사용자 읽음 상태 목록 조회 요청 수신:  userId={}", userId);
         return readStatusRepository.findAll().stream()
                 .filter(sr -> sr.getUser().getId().equals(userId))
-                .map(readStatusMapper::toDto)
+                .map(ReadStatusMapper.INSTANCE::toDto)
                 .toList();
     }
 
@@ -76,7 +75,7 @@ public class BasicReadStatusService implements ReadStatusService {
         readStatus.update(newLastReadAt);
         readStatusRepository.save(readStatus);
         log.info("읽음 상태 수정 완료:  readStatusId={}", readStatusId);
-        return readStatusMapper.toDto(readStatus);
+        return ReadStatusMapper.INSTANCE.toDto(readStatus);
     }
 
     @Override
