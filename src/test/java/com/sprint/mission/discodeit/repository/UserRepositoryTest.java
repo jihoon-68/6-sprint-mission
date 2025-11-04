@@ -32,23 +32,16 @@ class UserRepositoryTest {
   private final String testPassword = "Testpass123@";
   private final String testHashedPassword = "hashedPassword123@";
   private UserEntity testUserEntity;
-  private UserDTO.User testUserDto;
 
   @BeforeEach
   void setUp() {
 
     userRepository.deleteAll();
 
-    testUserDto = UserDTO.User.builder()
+    testUserEntity = UserEntity.builder()
         .username(testUsername)
         .email(testEmail)
         .password(testHashedPassword)
-        .build();
-
-    testUserEntity = UserEntity.builder()
-        .username(testUserDto.getUsername())
-        .email(testUserDto.getEmail())
-        .password(testUserDto.getPassword())
         .build();
 
   }
