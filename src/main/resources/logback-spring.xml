@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!--    <include resource="org/springframework/boot/logging/logback/base.xml"/>-->
+    <include resource ="org/springframework/boot/logging/logback/base.xml"/>
 
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{requestId}] %msg%n"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{requestId}] %msg%n" />
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -12,10 +12,11 @@
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/spring-reliability.log</file>
+
         <rollingPolicy class ="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>logs/archive/spring-reliability.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
-            <maxHistory>30000</maxHistory>
+            <maxHistory>300000</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
@@ -24,15 +25,8 @@
     </appender>
 
     <springProfile name="dev">
-        <root level="INFO" >
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="CONSOLE"/>
-        </root>
-    </springProfile>
-
-    <springProfile name="test">
-        <root level="INFO" >
-            <appender-ref ref="CONSOLE"/>
+        <root level="DEBUG" >
+            <appender-ref ref="CONDOLE"/>
         </root>
     </springProfile>
 
