@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
 import com.sprint.mission.discodeit.enums.BinaryContentType;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,7 +33,7 @@ public class MessageController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageResponseDto> create(/* @RequestParam UUID userId,*/
-                                                     @RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
+                                                     @Valid @RequestPart("messageCreateRequest") MessageCreateRequestDto dto,
                                                      @RequestPart(value = "attachments", required = false)  List<MultipartFile> attachments) {
 
         List<BinaryContentCreateRequestDto> attachmentRequests = Optional.ofNullable(attachments)
@@ -75,7 +76,7 @@ public class MessageController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<MessageResponseDto> update(@PathVariable UUID id,
-                                                     @RequestBody MessageUpdateRequestDto dto) {
+                                                     @Valid @RequestBody MessageUpdateRequestDto dto) {
         MessageResponseDto message = messageService.update(id, dto);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

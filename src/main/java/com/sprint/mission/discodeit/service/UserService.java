@@ -82,7 +82,7 @@ public class UserService {
 
         userRepository.save(user);
         userStatusRepository.save(userStatus);
-        log.info("유저 추가 완료: " + user.getUsername());
+        log.info("회원가입이 완료되었습니다. id=" + user.getId());
         return UserResponseDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -151,7 +151,7 @@ public class UserService {
             userRepository.findByUsername(dto.newUsername())
                     .filter(existingUser -> !existingUser.getId().equals(user.getId()))
                     .ifPresent(existingUser -> {
-                        throw new IllegalStateException("이미 사용중인 닉네임입니다.");
+                        throw UserAlreadyExistsException.byUsername(dto.newUsername());
                     });
             user.setUsername(dto.newUsername());
         }
@@ -160,7 +160,7 @@ public class UserService {
             userRepository.findByEmail(dto.newEmail())
                     .filter(existingUser -> !existingUser.getEmail().equals(user.getEmail()))
                     .ifPresent(existingUser -> {
-                        throw new IllegalStateException("이미 사용중인 이메일입니다.");
+                        throw new UserAlreadyExistsException(dto.newEmail());
                     });
             user.setEmail(dto.newEmail());
         }
@@ -184,7 +184,7 @@ public class UserService {
                 });
 
         userRepository.save(user); // 명시적 저장
-        log.info("수정 및 저장 완료 : " + user.getUsername());
+        log.info("사용자 수정이 완료되었습니다. id=" + user.getId());
 
         BinaryContentResponseDto profileImage = binaryContentMapper.toDto(user.getProfileImage());
         return userMapper.toDto(user, user.getUserStatus(), profileImage);
@@ -197,7 +197,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
 
         userRepository.delete(user);
-        log.info("유저 삭제 완료: " + id);
+        log.info("사용자 삭제가 완료되었습니다. id=" + id);
     }
 
 //    /**

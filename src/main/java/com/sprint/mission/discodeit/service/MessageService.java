@@ -33,7 +33,6 @@ public class MessageService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusRepository userStatusRepository;
     private final MessageMapper messageMapper; // 유저 온라인 여부 확인시 리포지토리 필요, 스태틱으로 사용 불가해 별도로 선언.
 
     // 메시지 생성
@@ -73,7 +72,7 @@ public class MessageService {
         channel.getMessages().add(message);
         messageRepository.save(message);
 
-        log.info("메시지 추가 완료: " + message.getContent());
+        log.info("메시지 생성이 완료되었습니다. id=" + message.getId());
         return messageMapper.toDto(message);
     }
 
@@ -152,7 +151,7 @@ public class MessageService {
 
         message.setContent(dto.newContent());
         messageRepository.save(message);
-        log.info("내용 수정 완료 : " + dto.newContent());
+        log.info("메시지 수정이 완료되었습니다. id=" + message.getId());
 
         return messageMapper.toDto(message);
     }
@@ -172,6 +171,6 @@ public class MessageService {
         }
 
         messageRepository.delete(message);
-        log.info("메시지 삭제 완료: " + id);
+        log.info("메시지 삭제가 완료되었습니다. id=" + id);
     }
 }

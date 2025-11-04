@@ -66,7 +66,7 @@ public class ChannelService {
                 .toList();
         readStatusRepository.saveAll(readStatuses);
 
-        log.info("채널 추가 완료: " + channel.getName());
+        log.info("비공개 채널 생성이 완료되었습니다. id=" + channel.getId());
         return ChannelResponseDto.privateChannel( // private 채널은 name, description이 없음.
                 channel.getId(),
                 userResponseDtos,
@@ -89,7 +89,7 @@ public class ChannelService {
         }
 
         channelRepository.save(channel);
-        log.info("채널 추가 완료: " + channel.getName());
+        log.info("공개 채널 생성이 완료되었습니다. id=" + channel.getId());
         return ChannelResponseDto.publicChannel( // public 채널은 participants가 없음.
                 channel.getId(),
                 channel.getName(),
@@ -165,7 +165,7 @@ public class ChannelService {
         if (dto.newName() != null) channel.setName(dto.newName());
         if (dto.newDescription() != null) channel.setDescription(dto.newDescription());
         channelRepository.save(channel);
-        log.info("수정 및 저장 완료");
+        log.info("채널 수정이 완료되었습니다. id=" + channel.getId());
 
         if (channel.getType() == ChannelType.PRIVATE) {
             return ChannelResponseDto.privateChannel(
@@ -204,13 +204,8 @@ public class ChannelService {
         }
 
         channelRepository.delete(channel);
-        log.info("채널 삭제 완료: " + id);
+        log.info("채널 삭제가 완료되었습니다. id=" + id);
     }
-
-//    @Transactional
-//    public void clear() {
-//        channelRepository.clear();
-//    }
 
     public Instant lastMessageSentAt(UUID id) {
         Channel channel = channelRepository.findById(id)

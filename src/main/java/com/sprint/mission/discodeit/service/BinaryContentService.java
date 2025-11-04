@@ -37,7 +37,7 @@ public class BinaryContentService {
                 .build();
         binaryContentRepository.save(binaryContent);
         binaryContentStorage.put(binaryContent.getId(), bytes);
-
+        log.info("파일이 업로드되었습니다. id=" + binaryContent.getId());
         return binaryContentMapper.toDto(binaryContent);
     }
 
@@ -65,6 +65,6 @@ public class BinaryContentService {
         binaryContentRepository.findById(id)
                 .orElseThrow(() -> new BinaryContentNotFoundException(id));
         binaryContentRepository.deleteById(id);
-        log.info("BinaryContent 삭제 완료: " + id);
+        log.info("BinaryContent 삭제가 완료되었습니다. id=" + id);
     }
 }

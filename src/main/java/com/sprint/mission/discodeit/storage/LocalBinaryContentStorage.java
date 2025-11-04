@@ -71,10 +71,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
             InputStream inputStream = get(dto.id()); // InputStream: 바이트 데이터를 읽기 위한 표준 통로
             Resource resource = new InputStreamResource(inputStream); // Resource: 추상화된 '자원'. 파일, URL 등..
 
-            return ResponseEntity.ok()
+            ResponseEntity<Resource> response = ResponseEntity.ok()
                     // .contentType(MediaType.parseMediaType(dto.getMimeType()))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + dto.fileName() + "\"")
                     .body(resource);
+            log.info("다운로드가 완료되었습니다. id=" + dto.id());
+            return response;
         } catch (Exception e) {
             log.error("다운로드 실패 - id: {}, 원인: {}", dto.id(), e.getMessage(), e);
             throw new RuntimeException("다운로드에 실패했습니다.");

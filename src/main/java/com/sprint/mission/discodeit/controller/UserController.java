@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.enums.BinaryContentType;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +32,7 @@ public class UserController {
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserResponseDto> register(@RequestPart("userCreateRequest") UserCreateRequestDto dto,
-                                                    @RequestPart(value = "profile", required = false) MultipartFile profile) {
+                                                    @RequestPart(value = "profile_image", required = false) MultipartFile profile) {
 
         Optional<BinaryContentCreateRequestDto> profileRequest = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);
@@ -46,10 +47,13 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @PatchMapping(path = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(
+            path = "/{id}",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE
+            })
     public ResponseEntity<UserResponseDto> update(@PathVariable UUID id,
                                                   @RequestPart("userUpdateRequest") UserUpdateRequestDto dto,
-                                                  @RequestPart(value = "profile", required = false) MultipartFile profile
+                                                  @RequestPart(value = "profile_image", required = false) MultipartFile profile
     ) {
         Optional<BinaryContentCreateRequestDto> profileRequest = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);
@@ -61,7 +65,7 @@ public class UserController {
 
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusResponseDto> updateUserStatusByUserId(@PathVariable UUID userId,
-                                                                          @RequestBody UserStatusUpdateRequestDto dto) {
+                                                                          @Valid @RequestBody UserStatusUpdateRequestDto dto) {
         return ResponseEntity.ok(userStatusService.updateByUserId(userId, dto));
     }
 

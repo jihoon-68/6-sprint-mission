@@ -26,3 +26,9 @@ logging:
 discodeit:
   repository:
     file-directory: ./uploads
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
