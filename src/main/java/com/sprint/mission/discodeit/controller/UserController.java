@@ -97,7 +97,7 @@ public class UserController {
         .email(userCreateRequest.email())
         .password(userCreateRequest.password())
         .description(userCreateRequest.description())
-        .profileImage(profile == null ? null : BinaryContentCreateCommand.builder()
+        .profileImage(profile != null && !profile.isEmpty() ? null : BinaryContentCreateCommand.builder()
             .fileName(profile.getName())
             .data(profile.getBytes())
             .contentType(ContentType.IMAGE)
@@ -159,8 +159,8 @@ public class UserController {
         .email(userUpdateRequest.email())
         .currentPassword(userUpdateRequest.currentPassword())
         .newPassword(userUpdateRequest.newPassword())
-        .isProfileImageUpdated(!profile.isEmpty())
-        .profileImage(profile != null ?
+        .isProfileImageUpdated(profile != null && !profile.isEmpty())
+        .profileImage(profile != null && !profile.isEmpty() ?
             BinaryContentCreateCommand.builder()
                 .fileName(profile.getName())
                 .data(profile.getBytes())
