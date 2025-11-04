@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.api.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,16 +14,16 @@ public class MessageRequestDTO {
   @Builder
   public record MessageCreateRequest(
       @NotBlank(message = "메시지는 공백을 허용하지 않습니다.") String content,
-      @NotBlank(message = "올바르지 않은 이용자입니다.") UUID authorId,
-      @NotBlank(message = "올바르지 않은 채널입니다.") UUID channelId) {
+      @NotNull UUID authorId,
+      @NotNull UUID channelId) {
 
   }
 
   @Builder
   public record MessageUpdateRequest(
-      UUID id,
+      @NotNull UUID id,
       @JsonProperty("newContent")
-      String content) {
+      @NotBlank(message = "메시지는 공백을 허용하지 않습니다.") String content) {
 
   }
 }
