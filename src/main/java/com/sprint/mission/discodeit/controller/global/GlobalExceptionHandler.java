@@ -311,7 +311,7 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(ErrorApiDTO.ErrorApiResponse.builder()
             .timestamp(e.getTimestamp())
-            .code(e.getErrorCode().toString())
+            .code(e.getErrorCode().name())
             .message(e.getMessage())
             .details(e.getDetails())
             .exceptionType(String.valueOf(HttpStatus.NOT_FOUND.value()))
