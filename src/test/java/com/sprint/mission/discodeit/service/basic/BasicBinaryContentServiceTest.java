@@ -73,7 +73,7 @@ class BasicBinaryContentServiceTest {
 
   @Test
   @DisplayName("BinaryContent 생성 테스트")
-  void createBinaryContent_success() {
+  void createBinaryContent_Success() {
 
     //given
     BinaryContentCreateCommand command = new BinaryContentCreateCommand(
@@ -95,7 +95,7 @@ class BasicBinaryContentServiceTest {
 
   @Test
   @DisplayName("BinaryContent 조회 성공 테스트")
-  void findBinaryContentById_success() {
+  void findBinaryContentById_Success() {
 
     //given
     when(binaryContentRepository.findById(testId))
@@ -114,7 +114,7 @@ class BasicBinaryContentServiceTest {
 
   @Test
   @DisplayName("BinaryContent 조회 실패 테스트")
-  void findBinaryContentById_fail() {
+  void findBinaryContentById_Fail() {
 
     //given
     when(binaryContentRepository.findById(testId))
@@ -129,7 +129,7 @@ class BasicBinaryContentServiceTest {
 
   @Test
   @DisplayName("BinaryContent 다중 조회 실패 테스트")
-  void findAllBinaryContentByIdIn_fail() throws IOException {
+  void findAllBinaryContentByIdIn_Fail() throws IOException {
 
     //given
     List<UUID> testIds = List.of(testId);

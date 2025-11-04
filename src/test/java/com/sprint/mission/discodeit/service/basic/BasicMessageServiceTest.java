@@ -100,7 +100,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 생성 성공 테스트")
-  void createMessage_success() {
+  void createMessage_Success() {
 
     //given
     byte[] testData = "test data".getBytes();
@@ -133,7 +133,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 생성 실패 테스트 - 존재하지 않는 유저")
-  void createMessage_fail_noSuchUser() {
+  void createMessage_Fail_noSuchUser() {
 
     //given
     MessageDTO.CreateMessageCommand command = new MessageDTO.CreateMessageCommand(
@@ -152,7 +152,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 ID로 조회 성공 테스트")
-  void findMessageById_success() {
+  void findMessageById_Success() {
 
     //given
     when(messageRepository.findById(testMessageId))
@@ -171,7 +171,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 ID로 조회 실패 테스트 - 존재하지 않는 메시지")
-  void findMessageById_fail_noSuchMessage() {
+  void findMessageById_Fail_noSuchMessage() {
 
     //given
     when(messageRepository.findById(testMessageId))
@@ -186,7 +186,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("사용자 ID로 메시지 조회 성공 테스트")
-  void findMessagesByAuthorId_success() {
+  void findMessagesByAuthorId_Success() {
 
     //given
     PagingDTO.OffsetRequest pageable = PagingDTO.OffsetRequest.of(0, 10);
@@ -210,7 +210,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("채널 ID로 메시지 조회 성공 테스트")
-  void findMessagesByChannelId_success() {
+  void findMessagesByChannelId_Success() {
 
     //given
     PagingDTO.OffsetRequest pageable = new PagingDTO.OffsetRequest(0, 10, "createdAt,DESC");
@@ -233,7 +233,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 업데이트 성공 테스트")
-  void updateMessage_success() {
+  void updateMessage_Success() {
 
     //given
     String updatedContent = "Updated content";
@@ -259,7 +259,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 업데이트 실패 테스트 - 존재하지 않는 메시지")
-  void updateMessage_fail_noSuchMessage() {
+  void updateMessage_Fail_noSuchMessage() {
 
     //given
     String updatedContent = "Updated content";
@@ -278,7 +278,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 삭제 성공 테스트")
-  void deleteMessageById_success() {
+  void deleteMessageById_Success() {
 
     //given
     when(messageRepository.findById(testMessageId))
@@ -291,7 +291,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 삭제 실패 테스트 - 존재하지 않는 메시지")
-  void deleteMessageById_fail_noSuchMessage() {
+  void deleteMessageById_Fail_noSuchMessage() {
 
     //given
     when(messageRepository.findById(testMessageId))

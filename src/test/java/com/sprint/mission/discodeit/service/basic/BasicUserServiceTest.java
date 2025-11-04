@@ -87,7 +87,7 @@ class BasicUserServiceTest {
 
   @Test
   @DisplayName("사용자 생성 성공 테스트")
-  void createUser_success() {
+  void createUser_Success() {
 
     // given
     UserDTO.CreateUserCommand command = new UserDTO.CreateUserCommand(
@@ -117,7 +117,7 @@ class BasicUserServiceTest {
 
   @Test
   @DisplayName("사용자 생성 실패 테스트 - 이미 존재하는 이메일")
-  void createUser_fail_emailAlreadyExists() {
+  void createUser_Fail_emailAlreadyExists() {
 
     // given
     UserDTO.CreateUserCommand command = new UserDTO.CreateUserCommand(
@@ -139,7 +139,7 @@ class BasicUserServiceTest {
 
   @Test
   @DisplayName("사용자 정보 업데이트 성공 테스트")
-  void updateUser_success() {
+  void updateUser_Success() {
 
     // given
     String updatedUsername = "updateduser";
@@ -179,7 +179,7 @@ class BasicUserServiceTest {
 
   @Test
   @DisplayName("사용자 정보 업데이트 실패 테스트 - 잘못된 비밀번호")
-  void updateUser_fail_invalidPassword() {
+  void updateUser_Fail_invalidPassword() {
     // given
     UserDTO.UpdateUserCommand command = new UserDTO.UpdateUserCommand(
         testUserId,
@@ -203,7 +203,7 @@ class BasicUserServiceTest {
 
   @Test
   @DisplayName("사용자 삭제 성공 테스트")
-  void deleteUserById_success() {
+  void deleteUserById_Success() {
 
     // given
     BinaryContentEntity profileImage = BinaryContentEntity.builder()
@@ -221,7 +221,7 @@ class BasicUserServiceTest {
 
   @Test
   @DisplayName("사용자 삭제 실패 테스트 - 존재하지 않는 사용자")
-  void deleteUserById_fail_userNotFound() {
+  void deleteUserById_Fail_userNotFound() {
 
     // given
     when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
@@ -235,7 +235,7 @@ class BasicUserServiceTest {
 
   @Test
   @DisplayName("사용자 ID로 조회 성공 테스트")
-  void findUserById_success() {
+  void findUserById_Success() {
 
     // given
     when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUserEntity));
@@ -253,7 +253,7 @@ class BasicUserServiceTest {
 
   @Test
   @DisplayName("사용자 ID로 조회 실패 테스트 - 존재하지 않는 사용자")
-  void findUserById_fail_userNotFound() {
+  void findUserById_Fail_userNotFound() {
 
     // given
     when(userRepository.findById(testUserId)).thenReturn(Optional.empty());

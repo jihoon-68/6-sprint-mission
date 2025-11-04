@@ -77,7 +77,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 생성 성공 테스트")
-  void createChannel_success() {
+  void createChannel_Success() {
 
     //given
     ChannelDTO.CreatePublicChannelCommand command = new ChannelDTO.CreatePublicChannelCommand(
@@ -99,7 +99,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 비공개 생성 성공 테스트")
-  void createPrivateChannel_success() {
+  void createPrivateChannel_Success() {
 
     //given
     ChannelDTO.CreatePrivateChannelCommand command = new ChannelDTO.CreatePrivateChannelCommand(
@@ -121,7 +121,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 ID로 조회 성공 테스트")
-  void findChannelById_success() {
+  void findChannelById_Success() {
 
     //given
     when(channelRepository.findById(testChannelId))
@@ -142,7 +142,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 ID로 조회 실패 테스트 - 존재하지 않는 채널")
-  void findChannelById_fail_noSuchChannel() {
+  void findChannelById_Fail_noSuchChannel() {
 
     //given
     when(channelRepository.findById(testChannelId))
@@ -157,7 +157,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 업데이트 성공 테스트")
-  void updateChannel_success() {
+  void updateChannel_Success() {
 
     //given
     String updatedName = "updated-name";
@@ -184,7 +184,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 업데이트 실패 테스트 - 존재하지 않는 채널")
-  void updateChannel_fail_noSuchChannel() {
+  void updateChannel_Fail_noSuchChannel() {
 
     //given
     String updatedName = "updated-name";
@@ -204,7 +204,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 삭제 성공 테스트")
-  void deleteChannelById_success() {
+  void deleteChannelById_Success() {
 
     //given
     when(channelRepository.existsById(testChannelId))
@@ -217,7 +217,7 @@ class BasicChannelServiceTest {
 
   @Test
   @DisplayName("채널 삭제 실패 테스트 - 존재하지 않는 채널")
-  void deleteChannelById_fail_noSuchChannel() {
+  void deleteChannelById_Fail_noSuchChannel() {
 
     //given
     when(channelRepository.existsById(testChannelId))

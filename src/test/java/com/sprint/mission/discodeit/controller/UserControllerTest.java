@@ -101,7 +101,7 @@ class UserControllerTest {
 
   @Test
   @DisplayName("사용자 생성 - 실패 (중복된 이메일 또는 사용자 이름)")
-  void createUser_fail_DuplicateEmailOrUsername() throws Exception {
+  void createUser_Fail_DuplicateEmailOrUsername() throws Exception {
 
     //given
     UserRequestDTO.UserCreateRequest createUserRequest = new UserRequestDTO.UserCreateRequest(
@@ -271,7 +271,7 @@ class UserControllerTest {
 
   @Test
   @DisplayName("사용자 온라인 상태 확인 - 실패 (존재하지 않는 사용자)")
-  void checkUserOnlineStatus_fail_UserNotFound() throws Exception {
+  void checkUserOnlineStatus_Fail_UserNotFound() throws Exception {
 
     //given
     when(userStatusService.findUserStatusByUserId(testUserId))
