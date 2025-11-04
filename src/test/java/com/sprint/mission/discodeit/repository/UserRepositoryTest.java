@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sprint.mission.discodeit.config.JpaConfig;
-import com.sprint.mission.discodeit.dto.UserDTO;
 import com.sprint.mission.discodeit.entity.UserEntity;
 import java.util.Optional;
 import java.util.UUID;
