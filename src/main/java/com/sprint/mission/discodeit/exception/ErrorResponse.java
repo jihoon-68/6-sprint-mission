@@ -12,4 +12,13 @@ public record ErrorResponse(
         int status
 ) {
 
+    public static ErrorResponse of(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
+        return new ErrorResponse(
+                timestamp,
+                errorCode.getStatus().toString(),
+                errorCode.getMessage(),
+                details,
+                errorCode.getStatus().getReasonPhrase(),
+                errorCode.getStatus().value());
+    }
 }
