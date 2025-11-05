@@ -19,6 +19,10 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
 code:
   repository:
     type: file
