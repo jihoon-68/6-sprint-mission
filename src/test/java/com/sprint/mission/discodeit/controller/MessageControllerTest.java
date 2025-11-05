@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.dto.api.request.MessageRequestDTO;
-import com.sprint.mission.discodeit.dto.api.request.MessageRequestDTO.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.api.response.MessageResponseDTO;
 import com.sprint.mission.discodeit.exception.message.NoSuchMessageException;
 import com.sprint.mission.discodeit.mapper.api.BinaryContentApiMapper;
