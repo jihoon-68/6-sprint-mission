@@ -146,10 +146,10 @@ public class BasicChannelService implements ChannelService {
       throw new InvalidChannelDataException(Map.of("name", "Channel name cannot be blank."));
     }
 
-    if (request.type() == null) {
+    /*if (request.type() == null) {
       log.warn("Missing channel type for updateChannel with id {}", request.id());
       throw new InvalidChannelDataException(Map.of("type", "Channel type is required."));
-    }
+    }*/
 
     ChannelEntity updatedChannelEntity = channelRepository.findById(request.id())
         .orElseThrow(NoSuchChannelException::new);
