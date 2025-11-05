@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +70,9 @@ public class BinaryContentController {
   @GetMapping("/{binaryContentId}")
   public ResponseEntity<ReadBinaryContentResponse> readBinaryContent(
       @Parameter(description = "바이너리 콘텐츠 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable("binaryContentId") UUID id) {
+      @PathVariable("binaryContentId") @NotNull UUID id) {
+
+    log.info("Reading binary content with ID: {}", id);
 
     BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id);
 
@@ -137,7 +140,9 @@ public class BinaryContentController {
   @GetMapping("{binaryContentId}/download")
   public ResponseEntity<?> downloadBinaryContent(
       @Parameter(description = "바이너리 콘텐츠 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable("binaryContentId") UUID id) {
+      @PathVariable("binaryContentId") @NotNull UUID id) {
+
+    log.info("Downloading binary content with ID: {}", id);
 
     BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id);
 

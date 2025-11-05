@@ -46,9 +46,6 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-test {
     finalizedBy jacocoTestReport
 }
 
@@ -57,10 +54,8 @@ jacocoTestReport {
     reports {
         xml.required = true
         html.required = true
+        xml.destination file(project.layout.buildDirectory.dir("jacoco/index.xml")) as File
+        html.destination file(project.layout.buildDirectory.dir("jacoco/index.html")) as File
     }
 }
 
-jacoco {
-    toolVersion = "0.8.13"
-    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
-}

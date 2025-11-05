@@ -198,6 +198,8 @@ public class MessageController {
       @Parameter(description = "메시지 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable UUID messageId) {
 
+    log.info("Deleting message with ID: {}", messageId);
+
     messageService.deleteMessageById(messageId);
 
     return ResponseEntity.status(204).build();

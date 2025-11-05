@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -92,6 +93,8 @@ public class UserController {
       @RequestPart(value = "profile", required = false) MultipartFile profile)
       throws IOException {
 
+    log.info("Received signup request email: {}", userCreateRequest.email());
+
     UserDTO.CreateUserCommand createUserCommand = UserDTO.CreateUserCommand.builder()
         .username(userCreateRequest.username())
         .email(userCreateRequest.email())
@@ -153,6 +156,8 @@ public class UserController {
       @RequestPart(value = "profile", required = false) MultipartFile profile)
       throws IOException {
 
+    log.info("Received profile update request for userId: {}", userId);
+
     UserDTO.UpdateUserCommand updateUserCommand = UserDTO.UpdateUserCommand.builder()
         .id(userId)
         .username(userUpdateRequest.username())
@@ -199,7 +204,9 @@ public class UserController {
   @DeleteMapping("/{userId}")
   public ResponseEntity<String> deleteUser(
       @Parameter(description = "사용자 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable UUID userId) {
+      @PathVariable @NotNull UUID userId) {
+
+    log.info("Received delete request for userId: {}", userId);
 
     userService.deleteUserById(userId);
 

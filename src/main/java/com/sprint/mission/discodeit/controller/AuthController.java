@@ -72,6 +72,8 @@ public class AuthController {
       )
       @RequestBody @Valid AuthRequestDTO.LoginRequest loginRequest) {
 
+    log.info("Login attempt for user: {}", loginRequest.username());
+
     UserDTO.User user = authService.login(UserDTO.toLoginCommand(
         loginRequest.username(),
         loginRequest.password()

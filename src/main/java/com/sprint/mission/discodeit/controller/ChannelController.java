@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -81,6 +82,8 @@ public class ChannelController {
           content = @Content(schema = @Schema(implementation = PublicChannelCreateRequest.class))
       )
       @RequestBody @Valid ChannelRequestDTO.PublicChannelCreateRequest publicChannelCreateRequest) {
+
+    log.info("Creating public channel with name: {}", publicChannelCreateRequest.name());
 
     ChannelDTO.CreatePublicChannelCommand createPublicChannelCommand = ChannelDTO.CreatePublicChannelCommand.builder()
         .name(publicChannelCreateRequest.name())
@@ -173,13 +176,15 @@ public class ChannelController {
   @PatchMapping(value = "/{channelId}", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FindChannelResponse> updatePublicChannel(
       @Parameter(description = "채널 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable UUID channelId,
+      @PathVariable @NotNull UUID channelId,
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "채널 수정 정보",
           required = true,
           content = @Content(schema = @Schema(implementation = ChannelUpdateRequest.class))
       )
       @RequestBody @Valid ChannelUpdateRequest channelUpdateRequest) {
+
+    log.info("Updating public channel with id: {}", channelId);
 
     ChannelDTO.UpdateChannelCommand updateChannelCommand = ChannelDTO.UpdateChannelCommand.builder()
         .id(channelId)
@@ -217,7 +222,9 @@ public class ChannelController {
   @DeleteMapping(value = "/{channelId}")
   public ResponseEntity<String> deleteChannel(
       @Parameter(description = "채널 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable UUID channelId) {
+      @PathVariable @NotNull UUID channelId) {
+
+    log.info("Deleting channel with id: {}", channelId);
 
     channelService.deleteChannelById(channelId);
 
