@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.dto.UserDTO;
 import com.sprint.mission.discodeit.entity.ChannelEntity;
 import com.sprint.mission.discodeit.entity.MessageEntity;
 import com.sprint.mission.discodeit.entity.UserEntity;
+import com.sprint.mission.discodeit.exception.channel.NoSuchChannelException;
 import com.sprint.mission.discodeit.exception.message.NoSuchMessageException;
 import com.sprint.mission.discodeit.exception.user.NoSuchUserException;
 import com.sprint.mission.discodeit.mapper.MessageEntityMapper;
@@ -145,6 +146,27 @@ class BasicMessageServiceTest {
 
     //when & then
     assertThrows(NoSuchUserException.class, () -> {
+      basicMessageService.createMessage(command);
+    });
+
+  }
+
+  @Test
+  @DisplayName("메시지 생성 실패 테스트 - 존재하지 않는 채널")
+  void createMessage_Fail_noSuchChannel() {
+
+    //given
+    MessageDTO.CreateMessageCommand command = new MessageDTO.CreateMessageCommand(
+        testContent, testChannelId, testUserId, List.of()
+    );
+
+    when(userRepository.existsById(testUserId))
+        .thenReturn(true);
+    when(channelRepository.existsById(testChannelId))
+        .thenReturn(false);
+
+    //when & then
+    assertThrows(NoSuchChannelException.class, () -> {
       basicMessageService.createMessage(command);
     });
 

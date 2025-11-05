@@ -203,6 +203,26 @@ class BasicChannelServiceTest {
   }
 
   @Test
+  @DisplayName("채널 업데이트 실패 테스트 - 잘못된 채널 이름")
+  void updateChannel_Fail_invalidChannelName() {
+
+    //given
+    String updatedName = "   ";
+    String updatedDescription = "Updated Description";
+    ChannelDTO.UpdateChannelCommand command = new ChannelDTO.UpdateChannelCommand(
+        testChannelId, updatedName, ChannelType.PUBLIC, null, updatedDescription);
+
+    when(channelRepository.existsById(testChannelId))
+        .thenReturn(true);
+
+    //when & then
+    assertThrows(RuntimeException.class, () -> {
+      basicChannelService.updateChannel(command);
+    });
+
+  }
+
+  @Test
   @DisplayName("채널 삭제 성공 테스트")
   void deleteChannelById_Success() {
 
