@@ -58,7 +58,7 @@ class UserControllerTest {
   @DisplayName("사용자 생성 - 성공")
   void createUser_Success() throws Exception {
     //given
-    var createUserRequest = new UserRequestDTO.UserCreateRequest(
+    UserRequestDTO.UserCreateRequest createUserRequest = new UserRequestDTO.UserCreateRequest(
         testUserId.toString(),
         testEmail,
         testPassword,

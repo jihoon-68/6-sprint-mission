@@ -171,7 +171,7 @@ public class UserController {
 
     UserDTO.User user = userService.updateUser(updateUserCommand);
 
-    return ResponseEntity.status(204).body(userApiMapper.toFindUserResponse(user));
+    return ResponseEntity.status(201).body(userApiMapper.toFindUserResponse(user));
 
   }
 

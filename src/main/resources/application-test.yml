@@ -1,3 +1,8 @@
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: C:\\spring\\codeit-bootcamp-spring\\6-sprint-mission\\src\\main\\resources\\data\\files\\
 spring:
   application:
     name: discodeit
