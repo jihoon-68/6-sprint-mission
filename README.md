@@ -1,81 +1,99 @@
 ## 요구사항
 
 ### 기본 요구사항
-- [x] 데이터베이스
-  - [x]  아래와 같이 데이터베이스 환경을 설정하세요.
-      - 데이터베이스: discodeit
-      - 유저: discodeit_user 
-      - 패스워드: discodeit1234
-  - [x] ERD를 참고하여 DDL을 작성하고, 테이블을 생성하세요. 
-- [x] Spring Data JPA 적용하기
-  - [x] Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
-  - [x] 앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
-  - [x] 디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
-  - [x] 엔티티 정의하기
-    - [x] 클래스 다이어그램을 참고해 도메인 모델의 공통 속성을 추상 클래스로 정의하고 상속 관계를 구현하세요.
-    - [x] JPA의 어노테이션을 활용해 createdAt, updatedAt 속성이 자동으로 설정되도록 구현하세요.
-    - [x] 클래스 다이어그램을 참고해 클래스 참조 관계를 수정하세요. 필요한 경우 생성자, update 메소드를 수정할 수 있습니다. 단, 아직 JPA Entity와 관련된 어노테이션은 작성하지 마세요.
-    - [x] ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보를 표로 정리해보세요.(이 내용은 PR에 첨부해주세요.)
-  
-    |엔티티 관계|다중성| 방향성 |부모-자식 관계|연관관계의 주인|
-    |---|---|-----|---|---|
-    |User - UserStatus|1:1| 양방향 |부모: User, 자식: UserStatus|UserStatus|
-    |User - ReadStatus|1:N| 단방향 |부모: User, 자식: ReadStatus|ReadStatus|
-    |User - Message|1:N| 단방향 |부모: User, 자식: Message|Message|
-    |Channel - Message|1:N| 단방향 |부모: Channel, 자식: Message|Message|
-    |Channel - ReadStatus|1:N| 단방향 |부모: Channel, 자식: ReadStatus|ReadStatus|
-    |User - BinaryContent|1:1| 양방향 |부모: User, 자식: BinaryContent|User|
-    |Message - BinaryContent|1:N| 단방향 |부모: Message, 자식: BinaryContent|Message|
-    - [x] JPA 주요 어노테이션을 활용해 ERD, 연관관계 매핑 정보를 도메인 모델에 반영해보세요. 
-    - [x] ERD의 외래키 제약 조건과 연관관계 매핑 정보의 부모-자식 관계를 고려해 영속성 전이와 고아 객체를 정의하세요. 
-- [x] 레포지토리와 서비스에 JPA 도입하기
-  - [x] 기존의 Repository 인터페이스를 JPARepository로 정의하고 쿼리메소드로 대체하세요. 
-  - [x] 영속성 컨텍스트의 특징에 맞추어 서비스 레이어를 수정해보세요. 
-- [x] DTO 적극 도입하기
-  - [x] Entity를 Controller 까지 그대로 노출했을 때 발생할 수 있는 문제점에 대해 정리해보세요. DTO를 적극 도입했을 때 보일러플레이트 코드가 많아지지만, 그럼에도 불구하고 어떤 이점이 있는지 알 수 있을거에요.(이 내용은 PR에 첨부해주세요.)
-  - Entity를 Controller까지 그대로 노출했을 때 발생할 수 있는 문제점:
-    - 민감한 정보까지 포함하여 response로 반환하므로 보안 문제가 발생한다.
-    - Entity 구조가 변경되면 API 응답 형식도 변경되어 클라이언트에 영향을 미친다.
-    - 불필요한 데이터까지 포함되어 response가 무거워지고 네트워크 트래픽이 증가한다.
-    - Entity와 API 응답 형식이 결합되어 있어 코드의 유지보수가 어려워진다.
-  - DTO를 적극 도입했을 때의 이점:
-    - 필요한 데이터만 포함된 DTO를 사용함으로써 민감한 정보를 감출 수 있다.
-    - DTO를 통해 API 응답 형식을 독립적으로 관리할 수 있어, Entity 구조 변경 시에도 API에 영향을 최소화할 수 있다.
-    - 필요한 데이터만 포함된 DTO를 반환함으로써 네트워크 트래픽을 줄일 수 있다.
-    - 유지보수 용이: Entity와 API 응답 형식이 분리되어 있어, 코드의 유지보수가 용이하다.
-  - [x] 다음의 클래스 다이어그램을 참고하여 DTO를 정의하세요.
-  - [x] Entity를 DTO로 매핑하는 로직을 책임지는 Mapper 컴포넌트를 정의해 반복되는 코드를 줄여보세요.
-- [x] BinaryContent 저장 로직 고도화
-  - [x] BinaryContent 엔티티는 파일의 메타 정보(fileName, size, contentType)만 표현하도록 bytes 속성을 제거하세요.
-  - [x] BinaryContent의 byte[] 데이터 저장을 담당하는 인터페이스를 설계하세요.
-  - [x] 서비스 레이어에서 기존에 BinaryContent를 저장하던 로직을 BinaryContentStorage를 활용하도록 리팩토링하세요.
-  - [x] BinaryContentController에 파일을 다운로드하는 API를 추가하고, BinaryContentStorage에 로직을 위임하세요.
-  - [x] 로컬 디스크 저장 방식으로 BinaryContentStorage 구현체를 구현하세요.
-  - [x] discodeit.storage.type 값이 local 인 경우에만 Bean으로 등록되어야 합니다.
-- [x] 페이징과 정렬
-  - [x] 메시지 목록을 조회할 때 다음의 조건에 따라 페이지네이션 처리를 해보세요. 
-  - [x] 일관된 페이지네이션 응답을 위해 제네릭을 활용해 DTO로 구현하세요. 
-  - [x] Slice 또는 Page 객체로부터 DTO를 생성하는 Mapper를 구현하세요. 
+- [x] 프로파일 기반 설정 관리
+  - [x] 개발, 운영 환경에 대한 프로파일을 구성하세요.
+    - [x] application-dev.yaml, application-prod.yaml 파일을 생성하세요.
+    - [x] 다음과 같은 설정값을 프로파일별로 분리하세요.
+      - [x] 데이터베이스 연결 정보
+      - [x] 서버 포트
+- [x] 로그 관리
+  - [x] Lombok의 @Slf4j 어노테이션을 활용해 로깅을 쉽게 추가할 수 있도록 구성하세요.
+  - [x] application.yaml에 기본 로깅 레벨을 설정하세요.
+  - [x] 환경 별 적절한 로깅 레벨을 프로파일 별로 설정해보세요.
+  - [x] Spring Boot의 기본 로깅 구현체인 Logback의 설정 파일을 구성하세요.
+    - [x] logback-spring.xml 파일을 생성하세요.
+    - [x] 다음 예시와 같은 로그 메시지를 출력하기 위한 로깅 패턴과 출력 방식을 커스터마이징하세요.
+    - [x] 콘솔과 파일에 동시에 로그를 기록하도록 설정하세요.
+      - [x] 파일은 {프로젝트 루트}/.logs 경로에 저장되도록 설정하세요.
+    - [x] 로그 파일은 일자별로 롤링되도록 구성하세요.
+    - [x] 로그 파일은 30일간 보관하도록 구성하세요.
+  - [x] 서비스 레이어와 컨트롤러 레이어의 주요 메소드에 로깅을 추가하세요.
+    - [x] 로깅 레벨을 적절히 사용하세요: ERROR, WARN, INFO, DEBUG
+    - [x] 다음과 같은 메소드에 로깅을 추가하세요:
+      - [x] 사용자 생성/수정/삭제
+      - [x] 채널 생성/수정/삭제
+      - [x] 메시지 생성/수정/삭제
+      - [x] 파일 업로드/다운로드
+- [x] 예외 처리 고도화
+  - [x] ErrorCode Enum 클래스를 통해 예외 코드명과 메시지를 정의하세요.
+  - [x] 모든 예외의 기본이 되는 DiscodeitException 클래스를 정의하세요.
+  - [x] DiscodeitException을 상속하는 주요 도메인 별 메인 예외 클래스를 정의하세요.
+  - [x] 도메인 메인 예외 클래스를 상속하는 구체적인 예외 클래스를 정의하세요.
+  - [x] 기존에 구현했던 예외를 커스텀 예외로 대체하세요.
+  - [x] ErrorResponse를 통해 일관된 예외 응답을 정의하세요.
+  - [x] 앞서 정의한 ErrorResponse와 @RestControllerAdvice를 활용해 예외를 처리하는 예외 핸들러를 구현하세요.
+- [x] 유효성 검사
+  - [x] Spring Validation 의존성을 추가하세요.
+  - [x] 주요 Request DTO에 제약 조건 관련 어노테이션을 추구하세요.
+  - [x] 컨트롤러에 @Valid 를 사용해 요청 데이터를 검증하세요.
+  - [x] 검증 실패 시 발생하는 MethodArgumentNotValidException을 전역 예외 핸들러에서 처리하세요.
+  - [x] 유효성 검증 실패 시 상세한 오류 메시지를 포함한 응답을 반환하세요.
+- [x] Actuator
+  - [x] Spring Boot Actuator 의존성을 추가하세요.
+  - [x] 기본 Actuator 엔트포인트를 설정하세요.
+  - [x] Actuator info를 위한 애플리케이션 정보를 추가하세요.
+  - [x] Spring Boot 서버를 실행 후 각종 정보를 확인해보세요.
+- [x] 단위 테스트
+  - [x] 서비스 레이어의 주요 메소드에 대한 단위 테스트를 작성하세요.
+    - [x] 다음 서비스의 핵심 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
+      - [x] UserService: create, update, delete 메소드
+      - [x] ChannelService: create(PUBLIC, PRIVATE), update, delete, findByUserId 메소드
+      - [x] MessageService: create, update, delete, findByChannelId 메소드
+    - [x] Mockito를 활용해 Repository 의존성을 모의(mock)하세요.
+    - [x] BDDMockito를 활용해 테스트 가독성을 높이세요.
+- [x] 슬라이스 테스트
+  - [x] 레포지토리 레이어의 슬라이스 테스트를 작성하세요.
+  - [x] 테스트 환경을 구성하는 프로파일을 구성하세요.
+  - [x] 테스트 실행 간 test 프로파일을 활성화 하세요.
+  - [x] PA Audit 기능을 활성화 하기 위해 테스트 클래스에 @EnableJpaAuditing을 추가하세요.
+  - [x] 주요 레포지토리(User, Channel, Message)의 주요 쿼리 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
+  - [x] 컨트롤러 레이어의 슬라이스 테스트를 작성하세요.
+    - [x] @WebMvcTest를 활용해 테스트를 구현하세요.
+    - [x] WebMvcTest에서 자동으로 등록되지 않는 유형의 Bean이 필요하다면 @Import를 활용해 추가하세요.
+    - [x] 주요 컨트롤러(User, Channel, Message)에 대해 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
+    - [x] MockMvc를 활용해 컨트롤러를 테스트하세요.
+    - [x] 서비스 레이어를 모의(mock)하여 컨트롤러 로직만 테스트하세요.
+    - [x] JSON 응답을 검증하는 테스트를 포함하세요.
+- [x] 통합 테스트
+  - [x] 통합 테스트 환경을 구성하세요.
+    - [x] @SpringBootTest를 활용해 Spring 애플리케이션 컨텍스트를 로드하세요.
+    - [x] H2 인메모리 데이터베이스를 활용하세요.
+    - [x] 테스트용 프로파일을 구성하세요.
+  - [x] 주요 API 엔드포인트에 대한 통합 테스트를 작성하세요.
+    - [x] 주요 API에 대해 최소 2개 이상의 테스트 케이스를 작성하세요.
+      - [x] 사용자 관련 API (생성, 수정, 삭제, 목록 조회)
+      - [x] 채널 관련 API (생성, 수정, 삭제)
+      - [x] 메시지 관련 API (생성, 수정, 삭제, 목록 조회)
+    - [x] 각 테스트는 @Transactional을 활용해 독립적으로 실행하세요.
+    
 
 ### 심화 요구사항
-- [x] N+1 문제
-  - [x] N+1 문제가 발생하는 쿼리를 찾고 해결해보세요.
-- [x] 읽기전용 트랜잭션 활용
-  - [x] 프로덕션 환경에서는 OSIV를 비활성화하는 경우가 많습니다. 이때 서비스 레이어의 조회 메소드에서 발생할 수 있는 문제를 식별하고, 읽기 전용 트랜잭션을 활용해 문제를 해결해보세요. 
-- [x] 오프셋 페이지네이션과 커서 페이지네이션 방식의 차이에 대해 정리해보세요.
-- 오프셋 페이지네이션과 커서 페이지네이션의 차이:
-  - 오프셋 페이지네이션:
-      - 특정 페이지 번호와 페이지 크기를 기반으로 데이터를 조회한다.
-      - SQL 쿼리에서 OFFSET과 LIMIT을 사용하여 데이터를 가져온다.
-      - 페이지 점프를 위해 앞의 데이터를 스캔해야 하므로, 대용량 데이터 환경에서 성능 저하가 발생할 수 있다.
-      - 데이터 변경 시 일관성이 깨질 수 있다.
-      - 구현이 비교적 간단하다.
-  - 커서 페이지네이션:
-      - 마지막으로 조회한 항목의 고유 식별자(커서)를 기반으로 다음 데이터를 조회한다.
-      - SQL 쿼리에서 WHERE 절을 사용하여 커서 이후의 데이터를 가져온다.
-      - 대용량 데이터 환경에서 더 나은 성능을 제공하며, 데이터 변경에도 일관성을 유지할 수 있다.
-      - 구현이 다소 복잡하다.
-      - 페이지 점프가 불가능하다.
-  - [x]  기존에 구현한 오프셋 페이지네이션을 커서 페이지네이션으로 리팩토링하세요. 
-- [x] MapStruct 적용
-  - [x] Entity와 DTO를 매핑하는 보일러플레이트 코드를 MapStruct 라이브러리를 활용해 간소화해보세요.
+- [x] MDC를 활용한 로깅 고도화
+  - [x] 요청 ID, 요청 URL, 요청 방식 등의 정보를 MDC에 추가하는 인터셉터를 구현하세요.
+    - [x] 클래스명: MDCLoggingInterceptor
+    - [x] 패키지명: com.**.discodeit.config
+    - [x] 요청 ID는 랜덤한 문자열로 생성합니다. (UUID)
+    - [x] 요청 ID는 응답 헤더에 포함시켜 더 많은 분석이 가능하도록 합니다. 
+  - [x] WebMvcConfigurer를 통해 MDCLoggingInterceptor를 등록하세요.
+  - [x] Logback 패턴에 MDC 값을 포함시키세요. 
+- [x] Spring Boot Admin을 활용한 메트릭 가시화
+  - [x] Spring Boot Admin 서버를 구현할 모듈을 생성하세요.
+  - [x] admin 모듈의 메인 클래스에 @EnableAdminServer 어노테이션을 추가하고, 서버는 9090번 포트로 설정합니다.
+  - [x] admin 서버 실행 후 localhost:9090/applications 에 접속해봅니다.
+  - [x] discodeit 프로젝트에 Spring Boot Admin Client를 적용합니다.
+  - [x] admin 대시보드 화면을 조작해보면서 각종 메트릭 정보를 확인해보세요.
+- [x] 테스트 커버리지 관리
+  - [x] JaCoCo 플러그인을 추가하세요.
+  - [x] 테스트 실행 후 생성된 리포트를 분석해보세요.
+  - [x] com.sprint.mission.discodeit.service.basic 패키지에 대해서 60% 이상의 코드 커버리지를 달성하세요.D
