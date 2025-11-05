@@ -233,7 +233,7 @@ public class MessageController {
       @ModelAttribute OffsetRequest pageable) {
 
     PagingDTO.OffsetPage<MessageDTO.Message> messagePage = messageService.findMessagesByChannelId(
-        channelId, PagingDTO.OffsetRequest.of(pageable.page(), pageable.size()));
+        channelId, PagingDTO.OffsetRequest.of(pageable.page(), pageable.size(), pageable.sort()));
 
     OffsetPageResponse<FindMessageResponse> response = PagingResponseDTO.OffsetPageResponse.<FindMessageResponse>builder()
         .number(messagePage.getNumber())

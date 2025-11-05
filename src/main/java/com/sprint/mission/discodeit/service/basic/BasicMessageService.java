@@ -138,7 +138,8 @@ public class BasicMessageService implements MessageService {
 
     Sort.Direction direction = pageable.getSort().split(",")[1].equalsIgnoreCase("DESC") ? Direction.DESC : Direction.ASC;
 
-    Page<MessageEntity> paging = messageRepository.findByChannelId(channelId, PageRequest.of(pageable.getPage(), pageable.getSize(), direction));
+    Page<MessageEntity> paging = messageRepository.findByChannelId(channelId,
+        PageRequest.of(pageable.getPage(), pageable.getSize(), direction, pageable.getSort().split(",")[0]));
 
     return PagingDTO.OffsetPage.<MessageDTO.Message>builder()
         .content(paging.getContent().stream()

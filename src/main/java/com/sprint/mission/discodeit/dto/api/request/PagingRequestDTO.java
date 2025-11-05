@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.api.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -10,14 +11,17 @@ public class PagingRequestDTO {
 
   @Builder
   public record OffsetRequest(
-      @NotBlank(message = "올바르지 않은 페이지 형식입니다.") int size,
-      @NotBlank(message = "올바르지 않은 페이지 형식입니다.") int page,
+      @PositiveOrZero(message = "올바르지 않은 페이지 크기 형식입니다.")
+      int size,
+      @PositiveOrZero(message = "올바르지 않은 페이지 번호 형식입니다.")
+      int page,
       String sort
   ) {}
 
   @Builder
   public record CursorRequest(
-      @NotBlank(message = "올바르지 않은 페이지 형식입니다.") int size,
+      @PositiveOrZero(message = "올바르지 않은 페이지 크기 형식입니다.")
+      int size,
       String sort
   ) {}
 }

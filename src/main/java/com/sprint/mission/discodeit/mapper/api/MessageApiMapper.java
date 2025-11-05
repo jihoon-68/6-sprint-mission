@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.api.response.BinaryContentResponseDTO;
 import com.sprint.mission.discodeit.dto.api.response.MessageResponseDTO;
 import com.sprint.mission.discodeit.dto.api.response.MessageResponseDTO.FindMessageResponse;
 import com.sprint.mission.discodeit.dto.api.response.UserResponseDTO;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,12 +23,14 @@ public class MessageApiMapper {
             .id(message.getAuthor().getId())
             .username(message.getAuthor().getUsername())
             .email(message.getAuthor().getEmail())
-            .profile(BinaryContentResponseDTO.ReadBinaryContentResponse.builder()
-                .id(message.getAuthor().getProfileId().getId())
-                .fileName(message.getAuthor().getProfileId().getFileName())
-                .size(message.getAuthor().getProfileId().getSize())
-                .contentType(message.getAuthor().getProfileId().getContentType())
-                .build())
+            .profile(Optional.ofNullable(message.getAuthor().getProfileId())
+                .map(profile -> BinaryContentResponseDTO.ReadBinaryContentResponse.builder()
+                    .id(profile.getId())
+                    .fileName(profile.getFileName())
+                    .size(profile.getSize())
+                    .contentType(profile.getContentType())
+                    .build())
+                .orElse(null))
             .isOnline(message.getAuthor().getIsOnline())
             .build())
         .attachments(message.getAttachments().stream().map(attachment ->
