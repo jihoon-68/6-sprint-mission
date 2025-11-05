@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.Instant;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class UserService {
 
     private final UserRepository userRepository;
@@ -40,7 +42,7 @@ public class UserService {
     // 유저 생성
     @Transactional
     public UserResponseDto create(UserCreateRequestDto dto,
-                                  Optional<BinaryContentCreateRequestDto> profileImageCreateDto) {
+                                  BinaryContentCreateRequestDto profileImageCreateDto) {
 
         if (userRepository.findByUsername(dto.username()).isPresent()){
             throw UserAlreadyExistsException.byUsername(dto.username());
@@ -63,22 +65,22 @@ public class UserService {
 
         user.setUserStatus(userStatus);
 
-        profileImageCreateDto
-                .ifPresent(profileRequest -> {
-                    byte[] bytes = profileRequest.bytes();
+        if (profileImageCreateDto != null) {
+            byte[] bytes = profileImageCreateDto.bytes();
 
-                    BinaryContent binaryContent = BinaryContent.builder()
-                            .user(user)
-                            .fileName(profileRequest.fileName())
-                            .extension(profileRequest.extension())
-                            .type(BinaryContentType.PROFILE_IMAGE)
-                            // .data(bytes)
-                            .size((long) bytes.length)
-                            .build();
+            BinaryContent binaryContent = BinaryContent.builder()
+                    .user(user)
+                    .fileName(profileImageCreateDto.fileName())
+                    .extension(profileImageCreateDto.extension())
+                    .type(BinaryContentType.PROFILE_IMAGE)
+                    // .data(bytes)
+                    .size((long) bytes.length)
+                    .build();
 
-                    binaryContentRepository.save(binaryContent);
-                    user.setProfileImage(binaryContent);
-                });
+            binaryContentRepository.save(binaryContent);
+            user.setProfileImage(binaryContent);
+        }
+
 
         userRepository.save(user);
         userStatusRepository.save(userStatus);
@@ -142,7 +144,7 @@ public class UserService {
     // 수정
     @Transactional
     public UserResponseDto update(UUID id, UserUpdateRequestDto dto,
-                                  Optional<BinaryContentCreateRequestDto> optionalProfileCreateRequest) {
+                                  BinaryContentCreateRequestDto profileCreateRequest) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -169,19 +171,19 @@ public class UserService {
             user.setPassword(dto.newPassword());
         }
 
-        optionalProfileCreateRequest
-                .ifPresent(profileRequest -> {
-                    BinaryContent binaryContent = BinaryContent.builder()
-                            .user(user)
-                            .fileName(profileRequest.fileName())
-                            .extension(profileRequest.extension())
-                            .type(BinaryContentType.PROFILE_IMAGE)
-                            // .data(profileRequest.bytes())
-                            .size((long) profileRequest.bytes().length)
-                            .build();
-                    binaryContentRepository.save(binaryContent);
-                    user.setProfileImage(binaryContent);
-                });
+        if (profileCreateRequest != null) {
+            BinaryContent binaryContent = BinaryContent.builder()
+                    .user(user)
+                    .fileName(profileCreateRequest.fileName())
+                    .extension(profileCreateRequest.extension())
+                    .type(BinaryContentType.PROFILE_IMAGE)
+                    // .data(profileRequest.bytes())
+                    .size((long) profileCreateRequest.bytes().length)
+                    .build();
+            binaryContentRepository.save(binaryContent);
+            user.setProfileImage(binaryContent);
+        }
+
 
         userRepository.save(user); // 명시적 저장
         log.info("사용자 수정이 완료되었습니다. id=" + user.getId());

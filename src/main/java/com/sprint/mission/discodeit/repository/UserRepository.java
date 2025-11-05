@@ -14,14 +14,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findById(UUID id);
     @Query("SELECT u FROM User u " +
             "LEFT JOIN FETCH u.userStatus " +
-            "LEFT JOIN FETCH u.profile " +
+            "LEFT JOIN FETCH u.profileImage " +
             "WHERE u.username = :username")
     Optional<User> findByUsernameWithStatusAndProfile(@Param("username") String username);
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     List<User> findAll();
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.userStatus LEFT JOIN FETCH u.profile")
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.userStatus LEFT JOIN FETCH u.profileImage")
     List<User> findAllWithStatusAndProfile();
 
     void delete(User user);
