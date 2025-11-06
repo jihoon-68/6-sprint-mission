@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller.global;
 
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.binarycontent.NoSuchBinaryContentException;
 import com.sprint.mission.discodeit.exception.channel.AllReadyExistChannelException;
 import com.sprint.mission.discodeit.exception.channel.InvalidChannelDataException;

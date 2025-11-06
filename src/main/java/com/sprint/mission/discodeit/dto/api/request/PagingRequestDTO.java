@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.api.request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.Builder;

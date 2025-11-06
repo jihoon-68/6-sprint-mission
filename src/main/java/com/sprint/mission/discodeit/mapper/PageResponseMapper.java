@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO.OffsetPageResponse;
 import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO;
+import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO.OffsetPageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;

@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ChannelDTO;
-import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
 import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.api.response.ChannelResponseDTO;
 import com.sprint.mission.discodeit.dto.api.response.ChannelResponseDTO.FindChannelResponse;
@@ -25,11 +25,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
