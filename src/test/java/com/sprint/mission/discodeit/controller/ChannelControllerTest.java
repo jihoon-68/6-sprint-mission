@@ -34,6 +34,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ChannelController.class)
 @Import(GlobalExceptionHandler.class)
+@TestPropertySource(properties = "spring.test.context.bean.override.mode=override")
 @DisplayName("ChannelController")
 class ChannelControllerTest {
 

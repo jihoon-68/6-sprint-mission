@@ -130,11 +130,11 @@ class BasicUserServiceTest {
     }
 
     @Test
-    @DisplayName("delete 성공 - 사용자 미존재라면 예외 없이 delete 호출")
+    @DisplayName("delete 성공 - 사용자 존재 시 삭제")
     void delete_success() {
         UUID userId = UUID.randomUUID();
 
-        given(userRepository.existsById(userId)).willReturn(false);
+        given(userRepository.existsById(userId)).willReturn(true);
 
         userService.delete(userId);
 
@@ -143,11 +143,11 @@ class BasicUserServiceTest {
     }
 
     @Test
-    @DisplayName("delete 실패 - 사용자 존재 시 UserNotFoundException 발생")
-    void delete_failure_userExists() {
+    @DisplayName("delete 실패 - 사용자 미존재 시 UserNotFoundException 발생")
+    void delete_failure_userNotFound() {
         UUID userId = UUID.randomUUID();
 
-        given(userRepository.existsById(userId)).willReturn(true);
+        given(userRepository.existsById(userId)).willReturn(false);
 
         assertThrows(UserNotFoundException.class, () -> userService.delete(userId));
         then(userRepository).should().existsById(userId);

@@ -147,17 +147,19 @@ class MessageApiIntegrationTest {
   }
 
   private TestContext prepareContext() throws Exception {
+    String userToken = UUID.randomUUID().toString().substring(0, 8);
+    String channelToken = UUID.randomUUID().toString().substring(0, 8);
     UserDto author = IntegrationTestUtils.createUser(
         mockMvc,
         objectMapper,
-        "integration-message-user-" + UUID.randomUUID(),
-        "integration-message-user-" + UUID.randomUUID() + "@example.com",
+        "msg-user-" + userToken,
+        "msg-user-" + userToken + "@example.com",
         "password"
     );
     ChannelDto channel = IntegrationTestUtils.createPublicChannel(
         mockMvc,
         objectMapper,
-        "integration-message-channel-" + UUID.randomUUID(),
+        "msg-channel-" + channelToken,
         "desc"
     );
     return new TestContext(author, channel);

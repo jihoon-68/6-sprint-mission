@@ -4,10 +4,11 @@ import java.time.Instant;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import org.springframework.http.HttpStatus;
+import lombok.Getter;
 
 @Builder
 @AllArgsConstructor
+@Getter
 public class ErrorResponse {
 
     private Instant timestamp;

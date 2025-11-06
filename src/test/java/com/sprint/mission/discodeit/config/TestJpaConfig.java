@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.TestPropertySources;
 
-@Configuration
+@TestConfiguration
 @EnableJpaAuditing
 public class TestJpaConfig {
 

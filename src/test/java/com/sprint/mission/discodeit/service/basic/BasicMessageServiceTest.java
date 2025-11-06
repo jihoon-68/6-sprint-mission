@@ -17,6 +17,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -27,7 +29,6 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -109,7 +110,7 @@ class BasicMessageServiceTest {
 
     given(channelRepository.findById(channelId)).willReturn(Optional.empty());
 
-    assertThrows(NoSuchElementException.class,
+    assertThrows(ChannelNotFoundException.class,
         () -> messageService.create(request, List.of()));
     then(channelRepository).should().findById(channelId);
     then(userRepository).shouldHaveNoInteractions();
@@ -143,7 +144,7 @@ class BasicMessageServiceTest {
 
     given(messageRepository.findById(messageId)).willReturn(Optional.empty());
 
-    assertThrows(NoSuchElementException.class,
+    assertThrows(MessageNotFoundException.class,
         () -> messageService.update(messageId, request));
     then(messageRepository).should().findById(messageId);
   }
@@ -168,7 +169,7 @@ class BasicMessageServiceTest {
 
     given(messageRepository.existsById(messageId)).willReturn(false);
 
-    assertThrows(NoSuchElementException.class, () -> messageService.delete(messageId));
+    assertThrows(MessageNotFoundException.class, () -> messageService.delete(messageId));
     then(messageRepository).should().existsById(messageId);
     then(messageRepository).shouldHaveNoMoreInteractions();
   }

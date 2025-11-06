@@ -19,7 +19,6 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -142,7 +141,7 @@ public class BasicUserService implements UserService {
     @Transactional
     @Override
     public void delete(UUID userId) {
-        if (userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             Map<String, Object> details = Map.of("userId", userId);
             throw new UserNotFoundException(details);
         }
