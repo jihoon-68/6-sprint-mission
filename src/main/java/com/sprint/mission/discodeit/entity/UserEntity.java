@@ -47,10 +47,6 @@ public class UserEntity extends BaseUpdatableEntity {
     this.password = password;
   }
 
-  public void updatePassword(String password) {
-    this.password = password;
-  }
-
   public void updateProfile(BinaryContentEntity profileId) {
     this.profileId = profileId;
   }
