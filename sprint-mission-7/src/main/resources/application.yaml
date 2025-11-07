@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: discodeit
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    #        default_batch_fetch_size: 100
+    open-in-view: false
+
+info:
+  app:
+    name: "Discodeit"
+    version: "1.7.0"          # Gradle의 buildInfo와 함께 보여도 OK
+    spring-boot: "3.4.0"
+    config:
+      datasource:
+        url: "${spring.datasource.url:unknown}"
+        driver-class-name: "${spring.datasource.driver-class-name:org.postgresql.Driver}"
+      jpa:
+        ddl-auto: "${spring.jpa.hibernate.ddl-auto:validate}"
+      storage:
+        type: "${discodeit.storage.type:local}"
+        path: "${discodeit.storage.local.root-path:.discodeit/storage}"
+      multipart:
+        max-file-size: "${spring.servlet.multipart.max-file-size:10MB}"
+        max-request-size: "${spring.servlet.multipart.max-request-size:30MB}"
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,loggers"
+  endpoint:
+    health:
+      show-details: always     # /actuator/health에 상세 표시
+    info:
+      enabled: true
+  info:
+    env:
+      enabled: true           # info에 우리가 적은 info.* 노출
+    java:
+      enabled: true           # Java 버전 노출
+    build:
+      enabled: true
+
+
+logging:
+  level:
+    root: info
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage

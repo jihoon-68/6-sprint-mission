@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+  <!-- 프로젝트 루트 기준 로그 디렉터리 (.logs) -->
+  <property name="LOG_HOME" value="${LOG_HOME:-.logs}"/>
+
+  <!-- 공통 패턴: yy-MM-dd HH:mm:ss.SSS [thread] LEVEL(logger max 36) - message -->
+  <!-- 예: 25-01-01 10:33:55.740 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - ... -->
+  <property name="LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+  <!-- 콘솔 출력 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <!-- 파일 출력 (일자별 롤링, 30일 보관) -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- 현재 활성 로그 파일 -->
+    <file>${LOG_HOME}/app.log</file>
+
+    <!-- 일자별 롤링 정책 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 매일 자정에 파일 교체, 과거 파일은 .gz로 압축 -->
+      <fileNamePattern>${LOG_HOME}/app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <!-- 보관기간: 30일 -->
+      <maxHistory>30</maxHistory>
+      <!-- (선택) 전체 용량 상한도 두고 싶다면 주석 해제
+      <totalSizeCap>5GB</totalSizeCap>
+      -->
+      <!-- 디렉터리 자동 생성 -->
+      <cleanHistoryOnStart>true</cleanHistoryOnStart>
+    </rollingPolicy>
+
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <!-- 루트 로거: 콘솔 + 파일 동시 기록 -->
+  <!-- 레벨은 application[-{profile}].yaml의 logging.level.root 값이 우선(없으면 INFO) -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+
+  <!-- 우리 패키지: 환경별 레벨을 yaml로 제어(권장).
+       만약 여기에서 고정하고 싶다면 아래처럼 명시 가능
+  <logger name="com.sprint.mission.discodeit" level="DEBUG" additivity="false">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+  </logger>
+  -->
+</configuration>
