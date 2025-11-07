@@ -1,13 +1,21 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
 import java.util.UUID;
 
+@Schema(description = "메시지 생성 요청 DTO")
 public record MessageCreateRequestDto(
+
+        @NotNull(message = "사용자 ID는 필수 입력값입니다.")
         UUID userId,
+
+        @NotNull(message = "채널 ID는 필수 입력값입니다.")
         UUID channelId,
-        String content,
-        List<BinaryContent> binaryContents // null 허용
+
+        @NotBlank(message = "메시지 내용을 입력해 주세요.")
+        String content
+        // List<BinaryContent> binaryContents // null 허용
 ) {}

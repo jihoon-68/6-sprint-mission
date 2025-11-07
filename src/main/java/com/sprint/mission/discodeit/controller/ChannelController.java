@@ -5,9 +5,11 @@ import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +23,9 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("/private")
-    public ResponseEntity<ChannelResponseDto> createPrivateChannel(@RequestBody PrivateChannelCreateRequestDto dto) {
+    public ResponseEntity<ChannelResponseDto> createPrivateChannel(
+            @Valid @RequestBody PrivateChannelCreateRequestDto dto
+    ) {
         ChannelResponseDto channel = channelService.createPrivateChannel(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED) // 201 Created
@@ -29,7 +33,9 @@ public class ChannelController {
     }
 
     @PostMapping("/public")
-    public ResponseEntity<ChannelResponseDto> createPublicChannel(@RequestBody PublicChannelCreateRequestDto dto) {
+    public ResponseEntity<ChannelResponseDto> createPublicChannel(
+            @Valid @RequestBody PublicChannelCreateRequestDto dto
+    ) {
         ChannelResponseDto channel = channelService.createPublicChannel(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED) // 201 Created
@@ -44,7 +50,7 @@ public class ChannelController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ChannelResponseDto> update(@PathVariable UUID id,
-                                                     @RequestBody PublicChannelUpdateRequestDto dto) { // TODO dto에서 id 분리
+                                                     @Valid @RequestBody PublicChannelUpdateRequestDto dto) {
         ChannelResponseDto channel = channelService.update(id, dto);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

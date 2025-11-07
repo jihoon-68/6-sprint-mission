@@ -1,29 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-public class ReadStatus implements Serializable {
-    private final UUID id;
-    private final UUID userId;
-    private final UUID channelId;
-    private final Instant createdAt;
+// user:channel(N:M)의 연결 테이블 역할도 수행.
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "read_statuses")
+public class ReadStatus extends BaseUpdatableEntity {
+
+    @Id
+    @Builder.Default
+    private UUID id = UUID.randomUUID();
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
+    // NULL 허용, 수정 가능.
+    private Instant lastReadAt;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
     private Instant updatedAt;
-    private Instant lastlyReadAt;
-
-    public ReadStatus(UUID userId, UUID channelId) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.createdAt = Instant.now();
-    }
-
-    public void setLastlyReadAt(Instant lastlyReadAt) {
-        this.lastlyReadAt = lastlyReadAt;
-        this.updatedAt = Instant.now();
-    }
 }

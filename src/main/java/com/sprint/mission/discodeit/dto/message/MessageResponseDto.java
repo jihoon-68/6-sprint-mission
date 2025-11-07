@@ -1,12 +1,21 @@
 package com.sprint.mission.discodeit.dto.message;
 
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import lombok.Builder;
+
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Builder
 public record MessageResponseDto(
     UUID id,
-    UUID authorId,
-    UUID channelId,
+    Instant createdAt,
+    Instant updatedAt,
     String content,
-    List<UUID> binaryContents
+    UUID channelId,
+    UserResponseDto author,
+    List<BinaryContentResponseDto> attachments
 ){}

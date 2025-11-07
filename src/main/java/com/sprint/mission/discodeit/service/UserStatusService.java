@@ -5,15 +5,20 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,75 +28,75 @@ public class UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final UserStatusMapper userStatusMapper;
 
+    @Transactional
     public UserStatusResponseDto create(UserStatusCreateRequestDto dto){
-        if (userRepository.findById(dto.userId()).isPresent()) {
-            if (userStatusRepository.findById(dto.userId()).isPresent()){
-                throw new IllegalStateException("해당 유저에 대해 UserStatus가 이미 존재합니다.");
-            }
-            UserStatus userStatus = new UserStatus(dto.userId());
-            userStatusRepository.save(userStatus);
-            return new UserStatusResponseDto(
-                    userStatus.getId(),
-                    userStatus.getUserId()
-                    // userStatus.getLastlyConnectedAt()
-            );
+
+        if (userStatusRepository.existsById(dto.userId())) {
+            throw new UserStatusAlreadyExistsException(dto.userId());
         }
-        else {
-            throw new NotFoundException("존재하지 않는 유저입니다.");
-        }
+
+        User user = userRepository.findById(dto.userId()).orElseThrow(
+                () -> new UserNotFoundException(dto.userId()));
+
+        UserStatus userStatus = userStatusMapper.toEntity(dto);
+        userStatus.setLastActiveAt(Instant.now());
+
+        userStatusRepository.save(userStatus);
+        log.info("UserStatus 생성 완료: " +  userStatus.getId());
+
+        return userStatusMapper.toDto(userStatus);
     }
 
+    @Transactional(readOnly = true)
     public UserStatusResponseDto findById(UUID id){
         UserStatus userStatus = userStatusRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
-        return new UserStatusResponseDto(
-                userStatus.getId(),
-                userStatus.getUserId()
-                // userStatus.getLastlyConnectedAt()
-        );
+                .orElseThrow(() -> new UserStatusNotFoundException(id));
+        return userStatusMapper.toDto(userStatus);
     }
 
+    @Transactional(readOnly = true)
     public List<UserStatusResponseDto> findAll(){
         List<UserStatus> userStatuses = userStatusRepository.findAll();
         return userStatuses.stream()
-                .map(us -> new UserStatusResponseDto(us.getId(), us.getUserId())) // us.getLastlyConnectedAt()
+                .map(userStatusMapper::toDto)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public UserStatusResponseDto update(UUID id, UserStatusUpdateRequestDto dto){
         UserStatus userStatus = userStatusRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
-        userStatus.setLastlyConnectedAt(Instant.now());
+                .orElseThrow(() -> new UserStatusNotFoundException(id));
+        userStatus.setLastActiveAt(Instant.now());
+        log.info("UserStatus 번경 완료: " + userStatus.getId());
         userStatusRepository.save(userStatus);
-        return new UserStatusResponseDto(
-                userStatus.getId(),
-                userStatus.getUserId()
-                // userStatus.getLastlyConnectedAt()
-        );
+
+        return userStatusMapper.toDto(userStatus);
     }
 
-    public UserStatusResponseDto updateByUserId(UUID userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+    @Transactional
+    public UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateRequestDto dto) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+                .orElseThrow(() -> UserStatusNotFoundException.byUserId(userId));
 
-        userStatus.setLastlyConnectedAt(Instant.now());
+        userStatus.setLastActiveAt(dto.newLastActiveAt());
+        log.info("UserStatus 번경 완료: " + userStatus.getId());
         userStatusRepository.save(userStatus);
-        return new UserStatusResponseDto(
-                userStatus.getId(),
-                userStatus.getUserId()
-                // userStatus.getLastlyConnectedAt()
-        );
+
+        return userStatusMapper.toDto(userStatus);
     }
 
+    @Transactional
     public void deleteById(UUID id){
-        userStatusRepository.deleteById(id); // 존재하지 않는 경우의 예외처리는 리포지토리에 구현됨.
+        userStatusRepository.deleteById(id);
         log.info("UserStatus 삭제 완료: " + id);
     }
 
-    public void clear(){
-        userStatusRepository.clear();
-    }
+//    @Transactional
+//    public void clear(){
+//        userStatusRepository.clear();
+//    }
 }

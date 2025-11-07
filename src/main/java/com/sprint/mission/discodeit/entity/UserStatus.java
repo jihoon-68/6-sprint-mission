@@ -1,34 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-@Getter
-public class UserStatus implements Serializable {
-    private final UUID id;
-    private final UUID userId;
-    private final Instant createdAt;
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdatableEntity {
+
+    @Id
+    @Builder.Default
+    private UUID id = UUID.randomUUID();
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // NULL 허용, 수정 가능.
+    private Instant lastActiveAt;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
     private Instant updatedAt;
-    private Instant lastlyConnectedAt;
 
     public boolean isOnline() {
         Instant fiveMinuteAgo = Instant.now().minus(5, ChronoUnit.MINUTES);
-        return lastlyConnectedAt.isAfter(fiveMinuteAgo); // 5분전 시각이 마지막 접속시간보다 뒤이면 false 반환
-    }
-
-    public UserStatus(UUID userId) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.lastlyConnectedAt = Instant.now();
-        this.createdAt = Instant.now();
-    }
-
-    public void setLastlyConnectedAt(Instant lastlyConnectedAt) {
-        this.lastlyConnectedAt = lastlyConnectedAt;
-        this.updatedAt = Instant.now();
+        return lastActiveAt.isAfter(fiveMinuteAgo); // 5분전 시각이 마지막 접속시간보다 뒤이면 false 반환
     }
 }
