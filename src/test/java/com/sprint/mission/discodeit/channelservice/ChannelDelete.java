@@ -13,8 +13,6 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.support.ChannelFixture;
-import com.sprint.mission.discodeit.support.MessageFixture;
-import com.sprint.mission.discodeit.support.ReadStatusFixture;
 import com.sprint.mission.discodeit.support.UserFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,12 +51,9 @@ public class ChannelDelete {
     public void channelDelete_success() {
         // given (준비)
         UUID channelId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-
         Channel channel = ChannelFixture.publicCreateChannel("기본", "기본");
         ChannelFixture.setChannelId(channel, channelId);
         User user = UserFixture.createUser(null);
-        UserFixture.setUserId(user, userId);
 
         List<Message> messages = List.of(Message.builder()
                 .channel(channel)
@@ -67,13 +62,11 @@ public class ChannelDelete {
                 .attachment(new ArrayList<>())
                 .build()
         );
-        MessageFixture.setMessageId(messages.get(0),UUID.randomUUID());
         List<ReadStatus> readStatuses = List.of(ReadStatus.builder()
                 .channel(channel)
                 .user(user)
                 .build()
         );
-        ReadStatusFixture.setReadStatusId(readStatuses.get(0), UUID.randomUUID());
 
         when(readStatusRepository.findAll()).thenReturn(readStatuses);
         when(messageRepository.findAll()).thenReturn(messages);
