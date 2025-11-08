@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.User.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 
 import java.lang.reflect.Field;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +28,7 @@ public class ChannelFixture {
                 .name(channel.getName())
                 .description(channel.getDescription())
                 .participants(participants)
-                .lastMessageAt(Instant.now())
+                .lastMessageAt(null)
                 .build();
     }
 

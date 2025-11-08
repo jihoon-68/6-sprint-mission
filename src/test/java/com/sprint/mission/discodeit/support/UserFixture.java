@@ -39,6 +39,9 @@ public class UserFixture {
     }
 
 
+
+
+
     public static void setStatus(User user, UserStatus status) {
         try {
             Class<?> userClass = User.class;
