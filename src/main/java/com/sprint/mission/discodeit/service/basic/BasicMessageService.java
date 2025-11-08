@@ -41,6 +41,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final MessageMapper messageMapper;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
@@ -70,29 +71,40 @@ public class BasicMessageService implements MessageService {
             messageRepository.save(message);
 
             log.info("메시자 생성 완료: messageId={}", message.getId());
-            return MessageMapper.INSTANCE.toDto(message);
+            return messageMapper.toDto(message);
         }
 
         Message message = new Message(user, channel, messageCreateRequest.content());
         messageRepository.save(message);
         log.info("메시자 생성 완료: messageId={}", message.getId());
-        return MessageMapper.INSTANCE.toDto(message);
+        return messageMapper.toDto(message);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
         log.info("메시지 목록 조회 요청 수신: channelId={}",channelId);
-        Slice<Message> slice;
-        if (cursor == null) {
-            slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
-        }else{
-            slice = messageRepository.findByCourseIdAndIdLessThanOrderByIdDesc(channelId, cursor, pageable);
-        }
-        System.out.println(slice.toString());
 
-        Slice<MessageDto> messageDtoSlice = slice.map(MessageMapper.INSTANCE::toDto);
-        return pageResponseMapper.fromSlice(messageDtoSlice);
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(ChannelNotFoundException::new);
+
+        Slice<Message> slice;
+        Instant NextCursor = null;
+        if (cursor == null) {
+            slice = messageRepository.findByChannelIdOrderByCreatedAtDesc(channel.getId(), pageable);
+        }else{
+            slice = messageRepository.findByCourseIdAndIdLessThanOrderByIdDesc(channel.getId(), cursor, pageable);
+        }
+        System.out.println(slice);
+
+        Slice<MessageDto> messageDtoSlice = slice.map(messageMapper::toDto);
+
+        System.out.println(messageDtoSlice);
+        if (messageDtoSlice.hasContent()) {
+            NextCursor = messageDtoSlice.getContent().get(messageDtoSlice.getContent().size()-1).createdAt();
+        }
+
+        return pageResponseMapper.fromSlice(messageDtoSlice,NextCursor);
     }
 
     @Override
@@ -104,7 +116,7 @@ public class BasicMessageService implements MessageService {
         messageUpdated.update(newContent);
         messageRepository.save(messageUpdated);
         log.info("메시지 업데이트 완료: messageId={}", messageId);
-        return MessageMapper.INSTANCE.toDto(messageUpdated);
+        return messageMapper.toDto(messageUpdated);
     }
 
     @Override
@@ -112,7 +124,9 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository
                 .findById(id).orElseThrow(MessageNotFoundException::new);
 
-        message.getAttachments().forEach(attachment -> messageRepository.deleteById(attachment.getId()));
+        message.getAttachments()
+                .forEach(attachment -> binaryContentRepository.deleteById(attachment.getId()));
+
         messageRepository.deleteById(id);
     }
 
