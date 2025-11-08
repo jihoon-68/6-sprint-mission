@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 @Service
 public class AuthService {
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 
@@ -34,6 +35,6 @@ public class AuthService {
         //로그인시 오프라인 -> 온라인으로
         user.getStatus().update(Instant.now());
         userStatusRepository.save(user.getStatus());
-        return UserMapper.INSTANCE.toDto(user);
+        return userMapper.toDto(user);
     }
 }
