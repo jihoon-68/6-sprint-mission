@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
@@ -26,6 +23,7 @@ public class BinaryContent extends BaseEntity{
 
 
     //채널에 파일 업로드
+    @Builder
     public BinaryContent(String fileName, Long size, String contentType) {
         this.fileName = fileName;
         this.size = size;
