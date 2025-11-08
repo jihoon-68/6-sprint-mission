@@ -36,7 +36,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelDto createPublic(PublicChannelCreateRequest request) {
         log.info("공개 채널 생성 요청 수신: channelName={} channelDescription={}",request.name(), request.description());
-        Channel channel = channelRepository.save(new Channel(request.name(), request.description()));
+        Channel channel = new Channel(request.name(), request.description());
+        channelRepository.save(channel);
         log.info("공개 채널 생성 완료: channelId={} ", channel.getId());
         return channelMapper.toDto(channel, new ArrayList<>(), null);
     }
@@ -56,24 +57,28 @@ public class BasicChannelService implements ChannelService {
                 .map(user -> new ReadStatus(channel, user))
                 .toList();
 
+        List<UserDto> userDtoList = userMapper.toDtoList(users);
+
         readStatusRepository.saveAll(readStatuses);
 
         channelRepository.save(channel);
         log.info("비공개 채널 생성 완료:  channelId={} ", channel.getId());
 
-        return channelMapper.toDto(channel, UserMapper.INSTANCE.toDtoList(users), null);
+        return channelMapper.toDto(channel,userDtoList, null);
     }
 
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
 
         log.info("채널 목록 조회 요청 수신: reqUserId={}", userId);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
         //공개 채널부터 조회
         List<Channel> channels = channelRepository.findByType(ChannelType.PUBLIC);
 
         //유저로 읽음 싱테 조회
         //읽음 상태로 타켓 유저가 있는 비공개 채널 전채 채널 리스트에 추가
-        readStatusRepository.findByUserId(userId).stream()
+        readStatusRepository.findByUserId(user.getId()).stream()
                 .filter(rs -> rs.getChannel().getType().equals(ChannelType.PRIVATE))
                 .forEach(rs -> channels.add(rs.getChannel()));
 
@@ -125,13 +130,16 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(UUID channelId) {
         log.info("채널 삭재 요청 수신:  channelId={}", channelId);
+
+        Channel channel=channelRepository.findById(channelId).orElseThrow(ChannelNotFoundException::new);
+
         readStatusRepository.findAll().stream()
-                .filter(rs -> rs.getChannel().getId().equals(channelId))
+                .filter(rs -> rs.getChannel().getId().equals(channel.getId()))
                 .forEach(rsDelete -> readStatusRepository.deleteById(rsDelete.getId()));
 
         messageRepository.findAll().stream()
-                .filter(m -> m.getChannel().getId().equals(channelId))
-                .forEach(mDelete -> readStatusRepository.deleteById(mDelete.getId()));
+                .filter(m -> m.getChannel().getId().equals(channel.getId()))
+                .forEach(mDelete -> messageRepository.deleteById(mDelete.getId()));
 
         channelRepository.deleteById(channelId);
         log.info("채널 삭재 완료");
