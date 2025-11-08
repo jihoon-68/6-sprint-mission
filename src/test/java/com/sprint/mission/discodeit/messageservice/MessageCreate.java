@@ -18,7 +18,6 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.support.BinaryContentFixture;
 import com.sprint.mission.discodeit.support.ChannelFixture;
 import com.sprint.mission.discodeit.support.MessageFixture;
 import com.sprint.mission.discodeit.support.UserFixture;
@@ -95,6 +94,7 @@ public class MessageCreate {
                 .size(300L)
                 .contentType("txt")
                 .build();
+
         MessageDto messageDto = MessageFixture.createMessageDto(message,userDto,channel,List.of(binaryContentDto));
 
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
@@ -110,8 +110,8 @@ public class MessageCreate {
 
         verify(userRepository,times(1)).findById(any(UUID.class));
         verify(channelRepository,times(1)).findById(any(UUID.class));
-        verify(binaryContentStorage,times(1)).put(isNull(), any(byte[].class));
-        verify(binaryContentRepository,times(1)).save(any(BinaryContent.class));
+        verify(binaryContentStorage,times(1)).put(any(UUID.class), any(byte[].class));
+        verify(binaryContentRepository,times(1)).saveAll(anyList());
         verify(messageRepository,times(1)).save(any(Message.class));
     }
 
