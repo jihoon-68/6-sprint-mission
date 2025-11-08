@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.dto.User.UpdateUserDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -34,11 +31,21 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(mappedBy = "user")
     private UserStatus status;
 
+
     public User(String username, String email, String password, BinaryContent profile) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.profile = profile;
+    }
+
+    @Builder
+    public User(String username, String email, String password, BinaryContent profile, UserStatus status) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.profile = profile;
+        this.status = status;
     }
 
 

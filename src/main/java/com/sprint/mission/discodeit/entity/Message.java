@@ -38,7 +38,6 @@ public class Message extends BaseUpdatableEntity {
     )
     private List<BinaryContent> attachments;
 
-
     public Message(User author, Channel channel, String content) {
         this.channel = channel;
         this.author = author;
@@ -46,11 +45,12 @@ public class Message extends BaseUpdatableEntity {
         this.attachments = new ArrayList<>();
     }
 
-    public Message(User author, Channel channel, String content, List<BinaryContent> attachmentIds) {
+    @Builder
+    public Message(User author, Channel channel, String content, List<BinaryContent> attachment) {
         this.channel = channel;
         this.author = author;
         this.content = content;
-        this.attachments = new ArrayList<>(attachmentIds);
+        this.attachments = new ArrayList<>(attachment);
     }
 
 
