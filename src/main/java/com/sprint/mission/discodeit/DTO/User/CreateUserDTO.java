@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.DTO.User;
+package com.sprint.mission.discodeit.dto.User;
 
 
 import java.util.UUID;
 
-public record CreateUserDTO(
+public record CreateUserDto(
         String userName,
         Integer age,
         String email,
