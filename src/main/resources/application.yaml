@@ -1,25 +1,5 @@
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,info,metrics,loggers"
-  endpoint:
-    health:
-      show-details: always
-    info:
-      env:
-        enabled: true
-info:
-  application:
-    name: discodeit
-    version: 1.7.0
-    java: 17
-    springboot: 3.4.0
-  author:
-    name: "Codeit"
-
 spring:
   profiles:
-    active: testß
+    active: dev
   application:
     name: discodeitß
