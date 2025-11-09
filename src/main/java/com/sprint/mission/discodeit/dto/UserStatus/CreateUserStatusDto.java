@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.dto.UserStatus;
+package com.sprint.mission.discodeit.DTO.UserStatus;
 
 import java.util.UUID;
 
-public record CreateUserStatusDto(
+public record CreateUserStatusDTO(
         UUID userId
 ) {}

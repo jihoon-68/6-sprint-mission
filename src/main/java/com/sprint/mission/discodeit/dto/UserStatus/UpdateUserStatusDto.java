@@ -1,38 +1,13 @@
-package com.sprint.mission.discodeit.dto.UserStatus;
+package com.sprint.mission.discodeit.DTO.UserStatus;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.Enum.UserStatusType;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record UpdateUserStatusDto(
+public record UpdateUserStatusDTO(
         UUID id,
-        Instant createdAt,
-        Instant updatedAt,
         UUID userId,
-        Instant lastActiveAt,
-        boolean online
-
-) {
-    public UpdateUserStatusDto(UserStatus userStatus) {
-        this(
-                userStatus.getId(),
-                userStatus.getCreatedAt(),
-                userStatus.getUpdatedAt(),
-                userStatus.getUser().getId(),
-                userStatus.getLastAccessAt(),
-                false
-        );
-    }
-
-    public static UpdateUserStatusDto getUserStatus(UUID id, Instant LastAccessAt) {
-        return new UpdateUserStatusDto(
-                null,
-                null,
-                null,
-                id,
-                LastAccessAt,
-                false
-        );
-    }
-}
+        Instant LastAccessAt,
+        UserStatusType AccessType
+) {}
