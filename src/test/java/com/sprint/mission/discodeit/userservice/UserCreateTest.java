@@ -114,7 +114,7 @@ public class UserCreateTest {
         //행위 검증
         verify(userRepository, times(1)).existsByUsername(request.username());
         verify(userRepository, times(1)).existsByEmail(request.email());
-        verify(binaryContentStorage, times(1)).put(any(UUID.class), any(byte[].class));
+        verify(binaryContentStorage, times(1)).put(isNull(), any(byte[].class));
         verify(binaryContentRepository, times(1)).save(any(BinaryContent.class));
         verify(userRepository, times(1)).save(any(User.class));
         verify(userStatusRepository, times(1)).save(any(UserStatus.class));
