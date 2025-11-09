@@ -20,6 +20,7 @@ import java.util.UUID;
 public class UserStatus extends BaseUpdatableEntity {
 
     @Id
+    @GeneratedValue
     @Builder.Default
     private UUID id = UUID.randomUUID();
 
@@ -28,16 +29,19 @@ public class UserStatus extends BaseUpdatableEntity {
     private User user;
 
     // NULL 허용, 수정 가능.
+    @Column(name = "last_active_at")
     private Instant lastActiveAt;
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @LastModifiedDate
+    @Column(name = "updated_at")
     private Instant updatedAt;
 
     public boolean isOnline() {
+        if (lastActiveAt == null) return false;
         Instant fiveMinuteAgo = Instant.now().minus(5, ChronoUnit.MINUTES);
         return lastActiveAt.isAfter(fiveMinuteAgo); // 5분전 시각이 마지막 접속시간보다 뒤이면 false 반환
     }

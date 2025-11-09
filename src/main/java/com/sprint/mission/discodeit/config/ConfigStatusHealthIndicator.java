@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.config;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -16,6 +16,5 @@ public class ConfigStatusHealthIndicator implements HealthIndicator {
         }
         return Health.up().withDetail("status", "모든 중요 설정이 정상적으로 로드되었습니다.").build();
     }
-
 
 }
