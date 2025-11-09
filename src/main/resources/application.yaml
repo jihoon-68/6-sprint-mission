@@ -3,3 +3,13 @@ spring:
     active: dev
   application:
     name: discodeitß
+file:
+  upload:
+    # OS별 외부 파일 저장 경로 설정
+    windows:
+      # 윈도우 OS용 파일 업로드 기본 경로
+      path: C:/myWs/uploadedFiles
+    mac:
+      # macOS용 파일 업로드 기본 경로
+      # /Users/mac/ 이부분이 각자 컴퓨터 맞게
+      path: /Users/mac/myWs/uploadedFilesimg
