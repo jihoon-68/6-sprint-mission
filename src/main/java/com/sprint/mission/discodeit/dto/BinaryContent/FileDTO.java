@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.BinaryContent;
+package com.sprint.mission.discodeit.dto.BinaryContent;
 
 import java.io.File;
 

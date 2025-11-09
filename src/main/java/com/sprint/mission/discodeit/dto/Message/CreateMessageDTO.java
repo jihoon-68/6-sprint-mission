@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.Message;
+package com.sprint.mission.discodeit.dto.Message;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

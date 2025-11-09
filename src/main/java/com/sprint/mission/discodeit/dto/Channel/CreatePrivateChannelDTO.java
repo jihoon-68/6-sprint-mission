@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.Channel;
+package com.sprint.mission.discodeit.dto.Channel;
 
 import com.sprint.mission.discodeit.Enum.ChannelType;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.Enum;
+package com.sprint.mission.discodeit.enumtype;
 
 public enum UserStatusType {
     ONLINE(true),

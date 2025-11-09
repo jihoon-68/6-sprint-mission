@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO.User;
+package com.sprint.mission.discodeit.dto.User;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

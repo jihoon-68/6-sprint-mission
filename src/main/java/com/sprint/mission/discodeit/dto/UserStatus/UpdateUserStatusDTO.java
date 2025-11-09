@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.DTO.UserStatus;
+package com.sprint.mission.discodeit.dto.UserStatus;
 
-import com.sprint.mission.discodeit.Enum.UserStatusType;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.time.Instant;
