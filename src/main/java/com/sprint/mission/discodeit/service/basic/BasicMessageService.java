@@ -49,6 +49,7 @@ public class BasicMessageService implements MessageService {
     private final PageResponseMapper pageResponseMapper;
 
     @Override
+    @Transactional
     public MessageDto create(List<MultipartFile> multipartFiles, MessageCreateRequest messageCreateRequest) {
         log.info("메시지 생성 요청 수신: channelId={} userId={}",messageCreateRequest.channelId(),messageCreateRequest.authorId());
         User user = userRepository.findById(messageCreateRequest.authorId())
@@ -63,10 +64,10 @@ public class BasicMessageService implements MessageService {
 
             for (BinaryContentSave binaryContentSave : messageBinaryContents) {
                 binaryContents.add(binaryContentSave.binaryContent());
+                binaryContentRepository.save(binaryContentSave.binaryContent());
                 binaryContentStorage.put(binaryContentSave.binaryContent().getId(), binaryContentSave.data());
             }
 
-            binaryContentRepository.saveAll(binaryContents);
             Message message = new Message(user, channel, messageCreateRequest.content(), binaryContents);
             messageRepository.save(message);
 
