@@ -1,8 +1,10 @@
-package com.sprint.mission.discodeit.DTO.Message;
+package com.sprint.mission.discodeit.dto.Message;
 
-import java.util.List;
-import java.util.UUID;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 
+@Builder
 public record MessageUpdateRequest(
-        String Content
+        @NotBlank
+        String newContent
 ) {}
