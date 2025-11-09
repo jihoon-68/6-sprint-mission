@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.support.BinaryContentFixture;
 import com.sprint.mission.discodeit.support.ChannelFixture;
 import com.sprint.mission.discodeit.support.MessageFixture;
 import com.sprint.mission.discodeit.support.UserFixture;
@@ -53,7 +54,7 @@ public class MessageDelete {
                 .size(10L)
                 .contentType("txt")
                 .build();
-
+        BinaryContentFixture.setBinaryContentId(binaryContent,UUID.randomUUID());
         Message message = MessageFixture.createMessage(new User(),new Channel(),"테스트",List.of(binaryContent));
         MessageFixture.setMessageId(message,messageId);
 
