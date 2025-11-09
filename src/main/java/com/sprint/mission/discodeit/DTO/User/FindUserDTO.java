@@ -19,12 +19,11 @@ public record FindUserDTO(
     public FindUserDTO(User user, UserStatus userStatus) {
         this(
                 user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getProfileId(),
-                userStatus.getAccessType().getValue()
+                userStatus.getLastAccessAt(),
+                userStatus.getAccessType()
         );
     }
 }

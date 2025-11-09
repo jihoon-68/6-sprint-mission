@@ -1,14 +1,19 @@
 package com.sprint.mission.discodeit.DTO.Channel;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 import com.sprint.mission.discodeit.DTO.User.FindUserDTO;
 =======
 import com.sprint.mission.discodeit.Enum.ChannelType;
 >>>>>>> 1f5633e (feat: API 스펙에 밎게 DTO 수정)
+=======
+
+>>>>>>> 7c7532b (박지훈 sprint3 (#2))
 import com.sprint.mission.discodeit.entity.Channel;
 
 import java.time.Instant;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -43,3 +48,12 @@ public record FindChannelDTO(
         );
     }
 }
+=======
+import java.util.UUID;
+
+public record FindChannelDTO(
+        Channel channel,
+        Instant recentMessage,
+        UUID userId
+) {}
+>>>>>>> 7c7532b (박지훈 sprint3 (#2))
