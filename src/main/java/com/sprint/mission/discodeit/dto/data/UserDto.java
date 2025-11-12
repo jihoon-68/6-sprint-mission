@@ -19,7 +19,11 @@ public class UserDto {
   private Boolean online = false;
 
   public void setProfile(BinaryContent profile) {
-    this.profile = Optional.of(BinaryContentMapper.INSTANCE.toDto(profile)).orElse(null);
+    if (profile == null) {
+      return;
+    }
+
+    this.profile = Optional.ofNullable(BinaryContentMapper.INSTANCE.toDto(profile)).orElse(null);
   }
 
   public void update(Boolean online) {
