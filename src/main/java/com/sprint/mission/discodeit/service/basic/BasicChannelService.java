@@ -8,7 +8,8 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -36,27 +37,40 @@ public class BasicChannelService implements ChannelService {
   public Channel createPublic(CreatePublicChannelRequest createPublicChannelRequest) {
     Channel channel = Channel.createPublic(createPublicChannelRequest.name(),
         createPublicChannelRequest.description());
-    return channelRepository.save(channel);
+
+    Channel saved = channelRepository.save(channel);
+
+    log.info("공개 채널 생성: {}", saved.getId());
+    log.debug("이름: {}, 설명: {}", saved.getName(), saved.getDescription());
+    return saved;
   }
 
   public Channel createPrivate(CreatePrivateChannelRequest createPrivateChannelRequest) {
     Channel channel = Channel.createPrivate();
-    Channel createdChannel = channelRepository.save(channel);
+    Channel saved = channelRepository.save(channel);
     for (UUID userId : createPrivateChannelRequest.participantIds()) {
       User user = userRepository.findById(userId)
-          .orElseThrow(() -> new NotFoundException("유저가 없습니다: " + userId));
+          .orElseThrow(() -> {
+            log.warn("User Not Found. userId: {}", userId);
+            return new UserNotFoundException();
+          });
       readStatusRepository.save(
-          new ReadStatus(user, createdChannel, channel.getCreatedAt()));
+          new ReadStatus(user, saved, channel.getCreatedAt()));
     }
-    return createdChannel;
+
+    log.info("비공개 채널 생성: {}", saved.getId());
+    log.debug("참가자: {}", createPrivateChannelRequest.participantIds());
+    return saved;
   }
 
   @Override
   @Transactional(readOnly = true)
   public Channel find(UUID channelId) {
     return channelRepository.findById(channelId)
-        .orElseThrow(
-            () -> new NotFoundException("Channel with id " + channelId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("Channel Not Found. channelId: {}", channelId);
+          return new ChannelNotFoundException();
+        });
   }
 
   @Override
@@ -78,17 +92,25 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel update(UUID channelId, UpdateChannelRequest updateChannelRequest) {
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(
-            () -> new NotFoundException("Channel with id " + channelId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("Channel Not Found. channelId: {}", channelId);
+          return new ChannelNotFoundException();
+        });
 
     channel.update(updateChannelRequest.newName(), updateChannelRequest.newDescription());
-    return channelRepository.save(channel);
+
+    Channel updated = channelRepository.save(channel);
+
+    log.info("채널 업데이트: {}", updated.getId());
+    log.debug("이름: {}, 설명: {}", updated.getName(), updated.getDescription());
+    return updated;
   }
 
   @Override
   public void delete(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
-      throw new NotFoundException("Channel with id " + channelId + " not found");
+      log.warn("Channel Not Found. channelId: {}", channelId);
+      throw new ChannelNotFoundException();
     }
     // 같은 채널에서 나온 읽기상태들 삭제
     List<UUID> readStatusIds = readStatusRepository.findAllByChannel_Id(channelId)
@@ -104,5 +126,7 @@ public class BasicChannelService implements ChannelService {
     messageRepository.deleteAllById(messageIds);
     // 채널 id로 삭제
     channelRepository.deleteById(channelId);
+
+    log.info("채널 삭제: {}", channelId);
   }
 }

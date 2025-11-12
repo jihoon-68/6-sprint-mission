@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -16,6 +14,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -71,14 +70,24 @@ public class BasicUserService implements UserService {
     user.setUserStatus(userStatus);
     user.setProfile(binaryContentOptional.orElse(null));
 
-    return userRepository.save(user);
+    User saved = userRepository.save(user);
+
+    log.info("유저 생성: id={}", saved.getId());
+    if (saved.getProfile() != null) {
+      log.info("프로필 사진 업로드: {}", saved.getProfile().getId());
+    }
+    log.debug("이름: {}, 이메일: {}", saved.getUsername(), saved.getEmail());
+    return saved;
   }
 
   @Override
   @Transactional(readOnly = true)
   public User find(UUID userId) {
     return userRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("User not found. userId: {}", userId);
+          return new UserNotFoundException(Map.of("유저 고유 아이디", userId));
+        });
   }
 
   // 유저 목록 새로고침할때마다 상태 업데이트
@@ -102,7 +111,10 @@ public class BasicUserService implements UserService {
   public User update(UUID userId, UpdateUserRequest updateUserRequest,
       Optional<MultipartFile> profile) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("User not found. userId: {}", userId);
+          return new UserNotFoundException(Map.of("유저 고유 아이디", userId));
+        });
     user.update(updateUserRequest.newUsername(), updateUserRequest.newEmail(),
         updateUserRequest.newPassword());
 
@@ -113,8 +125,9 @@ public class BasicUserService implements UserService {
               BinaryContent bc = new BinaryContent(file.getOriginalFilename(), file.getSize(),
                   file.getContentType()
               );
-              storage.put(bc.getId(), file.getBytes());
-              return binaryContentRepository.save(bc);
+              BinaryContent updated = binaryContentRepository.save(bc);
+              storage.put(updated.getId(), file.getBytes());
+              return updated;
             } else {
               user.getProfile()
                   .update(file.getOriginalFilename(), file.getSize(), file.getContentType());
@@ -129,29 +142,42 @@ public class BasicUserService implements UserService {
     user.update(binaryContent.orElse(null));
 
     UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
-        .orElseThrow(() -> new NotFoundException("유저 상태 업데이트 도중에 유저 아이디를 찾지 못했습니다"));
+        .orElseThrow(() -> {
+          log.warn("UserStatus not found. userId: {}", userId);
+          return new UserNotFoundException(Map.of("유저 고유 아이디", userId));
+        });
     userStatus.update(Instant.now());
     userStatusRepository.save(userStatus);
 
-    userRepository.findByUsername(user.getUsername())
-        .ifPresent(u -> user.update(userStatus.isOnline()));
+    User updated = userRepository.save(user);
 
-    return userRepository.save(user);
+    log.info("유저 정보 업데이트: id={}", updated.getId());
+    if (updated.getProfile() != null) {
+      log.info("프로필 사진 업로드: {}", updated.getProfile().getId());
+    }
+    log.debug("이름: {}, 이메일: {}", updated.getUsername(), updated.getEmail());
+    return updated;
   }
 
   @Override
   public void delete(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new NotFoundException("User with id " + userId + " not found");
+      log.warn("User not found. userId: {}", userId);
+      throw new UserNotFoundException(Map.of("유저 고유 아이디", userId));
     }
     // 유저의 프로필 사진 객체 삭제
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundException("UserService delete: userId 없음"));
+        .orElseThrow(() -> {
+          log.warn("User not found. userId: {}", userId);
+          return new UserNotFoundException(Map.of("유저 고유 아이디", userId));
+        });
     binaryContentRepository.deleteById(user.getProfile().getId());
     // 유저 상태들 삭제
     UserStatus userStatus = user.getUserStatus();
     userStatusRepository.deleteById(userStatus.getId());
     // 유저 id로 삭제
     userRepository.deleteById(userId);
+
+    log.info("유저 삭제: id={}", userId);
   }
 }

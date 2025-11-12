@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 public record CreatePublicChannelRequest(
-    @NotEmpty(message = "{channel.name.notempty}")
+    @NotBlank(message = "channel.name.required")
     @Size(max = 100)
     String name,
-    @NotEmpty(message = "{channel.description.notempty}")
+    @NotBlank(message = "channel.description.required")
     @Size(max = 500)
     String description
 ) {
