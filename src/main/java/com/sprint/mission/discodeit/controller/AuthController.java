@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.api.AuthApiDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.dto.api.UserApiDTO;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.dto.api.request.AuthRequestDTO;
+import com.sprint.mission.discodeit.dto.api.request.AuthRequestDTO.LoginRequest;
+import com.sprint.mission.discodeit.dto.api.response.UserResponseDTO.FindUserResponse;
 import com.sprint.mission.discodeit.mapper.api.AuthApiMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -16,9 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +49,7 @@ public class AuthController {
           @ApiResponse(
               responseCode = "200",
               description = "로그인 성공",
-              content = @Content(schema = @Schema(implementation = UserApiDTO.FindUserResponse.class))
+              content = @Content(schema = @Schema(implementation = FindUserResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -66,45 +64,23 @@ public class AuthController {
       }
   )
   @PostMapping(value = "/login")
-  public ResponseEntity<UserApiDTO.FindUserResponse> login(
+  public ResponseEntity<FindUserResponse> login(
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "로그인 요청 정보",
           required = true,
-          content = @Content(schema = @Schema(implementation = AuthApiDTO.LoginRequest.class))
+          content = @Content(schema = @Schema(implementation = LoginRequest.class))
       )
-      @RequestBody @Valid AuthApiDTO.LoginRequest loginRequest) {
+      @RequestBody @Valid AuthRequestDTO.LoginRequest loginRequest) {
 
-    UserDTO.User user = authService.login(UserDTO.LoginCommand.builder()
-        .username(loginRequest.username())
-        .password(loginRequest.password())
-        .build());
+    log.info("Login attempt for user: {}", loginRequest.username());
 
-    return ResponseEntity.ok(authApiMapper.userToFindUserResponse(user));
+    UserDTO.User user = authService.login(UserDTO.toLoginCommand(
+        loginRequest.username(),
+        loginRequest.password()
+    ));
 
-  }
+    return ResponseEntity.ok(authApiMapper.toFindUserResponse(user));
 
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleNoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-  }
-
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleIllegalArgumentException(
-      IllegalArgumentException e) {
-
-    log.error("IllegalArgumentException occurred", e);
-
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
   }
 
 }

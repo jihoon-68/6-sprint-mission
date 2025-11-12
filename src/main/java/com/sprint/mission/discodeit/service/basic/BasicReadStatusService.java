@@ -2,15 +2,17 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ReadStatusDTO;
 import com.sprint.mission.discodeit.entity.ReadStatusEntity;
-import com.sprint.mission.discodeit.exception.AllReadyExistDataBaseRecordException;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.exception.channel.NoSuchChannelException;
+import com.sprint.mission.discodeit.exception.readstatus.AllReadyExistReadStatusException;
+import com.sprint.mission.discodeit.exception.readstatus.NoSuchReadStatusException;
+import com.sprint.mission.discodeit.exception.user.NoSuchUserException;
 import com.sprint.mission.discodeit.mapper.ReadStatusEntityMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,15 +32,18 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusDTO.ReadStatus createReadStatus(ReadStatusDTO.CreateReadStatusCommand request) {
 
     if (!userRepository.existsById(request.userId())) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     if (!channelRepository.existsById(request.channelId())) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
     if (existReadStatusByUserIdAndChannelId(request.userId(), request.channelId())) {
-      throw new AllReadyExistDataBaseRecordException("Read status already exists.");
+      throw new AllReadyExistReadStatusException(Map.of(
+          "userId", request.userId(),
+          "channelId", request.channelId()
+      ));
     }
 
     ReadStatusEntity readStatusEntity = ReadStatusEntity.builder()
@@ -47,7 +52,7 @@ public class BasicReadStatusService implements ReadStatusService {
         .lastReadAt(request.lastReadTimeAt())
         .build();
 
-    return readStatusEntityMapper.entityToReadStatus(readStatusRepository.save(readStatusEntity));
+    return readStatusEntityMapper.toReadStatus(readStatusRepository.save(readStatusEntity));
 
   }
 
@@ -62,32 +67,32 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public Optional<ReadStatusDTO.ReadStatus> findReadStatusById(UUID id) {
+  public ReadStatusDTO.ReadStatus findReadStatusById(UUID id) {
 
     ReadStatusEntity readStatusEntity = readStatusRepository.findById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such read status."));
+        .orElseThrow(NoSuchReadStatusException::new);
 
-    return Optional.ofNullable(readStatusEntityMapper.entityToReadStatus(readStatusEntity));
+    return readStatusEntityMapper.toReadStatus(readStatusEntity);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Optional<ReadStatusDTO.ReadStatus> findReadStatusByUserIdAndChannelId(UUID userId,
+  public ReadStatusDTO.ReadStatus findReadStatusByUserIdAndChannelId(UUID userId,
       UUID channelId) {
 
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
     ReadStatusEntity readStatusEntity = readStatusRepository.findByUserIdAndChannelId(userId,
             channelId)
-        .orElseThrow(() -> new IllegalArgumentException("No such read status."));
+        .orElseThrow(NoSuchReadStatusException::new);
 
-    return Optional.ofNullable(readStatusEntityMapper.entityToReadStatus(readStatusEntity));
+    return readStatusEntityMapper.toReadStatus(readStatusEntity);
 
   }
 
@@ -95,12 +100,12 @@ public class BasicReadStatusService implements ReadStatusService {
   public List<ReadStatusDTO.ReadStatus> findAllReadStatusByUserId(UUID userId) {
 
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     return readStatusRepository.findByUserId(userId)
         .stream()
-        .map(readStatusEntityMapper::entityToReadStatus)
+        .map(readStatusEntityMapper::toReadStatus)
         .toList();
   }
 
@@ -109,19 +114,19 @@ public class BasicReadStatusService implements ReadStatusService {
   public List<ReadStatusDTO.ReadStatus> findAllReadStatusByChannelId(UUID channelId) {
 
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
     return readStatusRepository.findByChannelId(channelId)
         .stream()
-        .map(readStatusEntityMapper::entityToReadStatus)
+        .map(readStatusEntityMapper::toReadStatus)
         .toList();
   }
 
   @Override
   public List<ReadStatusDTO.ReadStatus> findAllReadStatus() {
     return readStatusRepository.findAll().stream()
-        .map(readStatusEntityMapper::entityToReadStatus)
+        .map(readStatusEntityMapper::toReadStatus)
         .toList();
   }
 
@@ -130,11 +135,11 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusDTO.ReadStatus updateReadStatus(ReadStatusDTO.UpdateReadStatusCommand request) {
 
     ReadStatusEntity readStatusEntity = readStatusRepository.findById(request.id())
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such read status."));
+        .orElseThrow(NoSuchReadStatusException::new);
 
     readStatusEntity.updateLastReadAt(request.lastReadAt());
 
-    return readStatusEntityMapper.entityToReadStatus(readStatusRepository.save(readStatusEntity));
+    return readStatusEntityMapper.toReadStatus(readStatusRepository.save(readStatusEntity));
 
   }
 
@@ -143,7 +148,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public void deleteReadStatusById(UUID id) {
 
     if (!readStatusRepository.existsById(id)) {
-      throw new NoSuchDataBaseRecordException("No such read status.");
+      throw new NoSuchReadStatusException();
     }
 
     readStatusRepository.deleteById(id);
@@ -155,11 +160,11 @@ public class BasicReadStatusService implements ReadStatusService {
   public void deleteReadStatusByUserIdAndChannelId(UUID userId, UUID channelId) {
 
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
     readStatusRepository.deleteByUserIdAndChannelId(userId, channelId);
@@ -171,7 +176,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public void deleteAllReadStatusByUserId(UUID userId) {
 
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     readStatusRepository.deleteByUserId(userId);
@@ -183,7 +188,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public void deleteAllReadStatusByChannelId(UUID channelId) {
 
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      throw new NoSuchChannelException();
     }
 
     readStatusRepository.deleteByChannelId(channelId);
@@ -196,7 +201,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     uuidList.forEach(uuid -> {
       if (!readStatusRepository.existsById(uuid)) {
-        throw new NoSuchDataBaseRecordException("No such read status.");
+        throw new NoSuchReadStatusException();
       }
     });
 

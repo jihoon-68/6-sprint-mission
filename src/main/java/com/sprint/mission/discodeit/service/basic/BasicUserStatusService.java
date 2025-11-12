@@ -3,13 +3,15 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.UserStatusDTO;
 import com.sprint.mission.discodeit.entity.UserEntity;
 import com.sprint.mission.discodeit.entity.UserStatusEntity;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.exception.user.NoSuchUserException;
+import com.sprint.mission.discodeit.exception.userstatus.AllReadyExistUserStatusException;
+import com.sprint.mission.discodeit.exception.userstatus.NoSuchUserStatusException;
 import com.sprint.mission.discodeit.mapper.UserStatusEntityMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,11 +30,11 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatusDTO.UserStatus createUserStatus(UserStatusDTO.CreateUserStatusCommand request) {
 
     if (!userRepository.existsById(request.userId())) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     if (existUserStatusByUserId(request.userId())) {
-      throw new IllegalArgumentException("User status already exists.");
+      throw new AllReadyExistUserStatusException(Map.of("userId", request.userId()));
     }
 
     UserEntity userEntity = userRepository.findById(request.userId()).get();
@@ -41,7 +43,7 @@ public class BasicUserStatusService implements UserStatusService {
         .user(userEntity)
         .build();
 
-    return userStatusEntityMapper.entityToUserStatus(userStatusRepository.save(userStatusEntity));
+    return userStatusEntityMapper.toUserStatus(userStatusRepository.save(userStatusEntity));
 
   }
 
@@ -56,34 +58,34 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public Optional<UserStatusDTO.UserStatus> findUserStatusById(UUID id) {
+  public UserStatusDTO.UserStatus findUserStatusById(UUID id) {
 
     UserStatusEntity userStatusEntity = userStatusRepository.findById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+        .orElseThrow(NoSuchUserStatusException::new);
 
-    return Optional.ofNullable(userStatusEntityMapper.entityToUserStatus(userStatusEntity));
+    return userStatusEntityMapper.toUserStatus(userStatusEntity);
 
   }
 
   @Transactional(readOnly = true)
   @Override
-  public Optional<UserStatusDTO.UserStatus> findUserStatusByUserId(UUID userId) {
+  public UserStatusDTO.UserStatus findUserStatusByUserId(UUID userId) {
 
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      throw new NoSuchUserException();
     }
 
     UserStatusEntity userStatusEntity = userStatusRepository.findByUserId(userId)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+        .orElseThrow(NoSuchUserStatusException::new);
 
-    return Optional.ofNullable(userStatusEntityMapper.entityToUserStatus(userStatusEntity));
+    return userStatusEntityMapper.toUserStatus(userStatusEntity);
 
   }
 
   @Override
   public List<UserStatusDTO.UserStatus> findAllUserStatus() {
     return userStatusRepository.findAll().stream()
-        .map(userStatusEntityMapper::entityToUserStatus)
+        .map(userStatusEntityMapper::toUserStatus)
         .toList();
 
   }
@@ -93,11 +95,11 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatusDTO.UserStatus updateUserStatus(UserStatusDTO.UpdateUserStatusCommand request) {
 
     UserStatusEntity userStatusEntity = userStatusRepository.findById(request.id())
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+        .orElseThrow(NoSuchUserStatusException::new);
 
     userStatusEntity.updateLastActiveAt(request.lastActiveAt());
 
-    return userStatusEntityMapper.entityToUserStatus(userStatusRepository.save(userStatusEntity));
+    return userStatusEntityMapper.toUserStatus(userStatusRepository.save(userStatusEntity));
 
   }
 
@@ -106,7 +108,7 @@ public class BasicUserStatusService implements UserStatusService {
   public void deleteUserStatusById(UUID id) {
 
     if (!userStatusRepository.existsById(id)) {
-      throw new NoSuchDataBaseRecordException("No such user status.");
+      throw new NoSuchUserStatusException();
     }
 
     userStatusRepository.deleteById(id);
@@ -118,7 +120,7 @@ public class BasicUserStatusService implements UserStatusService {
   public void deleteUserStatusByUserId(UUID userId) {
 
     if (!userStatusRepository.existsById(userId)) {
-      throw new NoSuchDataBaseRecordException("No such user status.");
+      throw new NoSuchUserStatusException();
     }
 
     userStatusRepository.deleteByUserId(userId);
@@ -131,7 +133,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     uuidList.forEach(uuid -> {
       if (!userStatusRepository.existsById(uuid)) {
-        throw new NoSuchDataBaseRecordException("No such user status.");
+        throw new NoSuchUserStatusException();
       }
     });
 

@@ -13,11 +13,11 @@ public interface UserEntityMapper {
       @Mapping(target = "profileId", source = "profileId"),
       @Mapping(target = "isOnline", expression = "java(userEntity.isOnline())")
   })
-  UserDTO.User entityToUser(UserEntity userEntity);
+  UserDTO.User toUser(UserEntity userEntity);
 
   @Mappings({
       //@Mapping(target = "profileId", source = "profileId")
   })
-  UserEntity userToEntity(UserDTO.User user);
+  UserEntity toEntity(UserDTO.User user);
 
 }

@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ChannelDTO;
-import com.sprint.mission.discodeit.dto.api.BinaryContentApiDTO;
-import com.sprint.mission.discodeit.dto.api.ChannelApiDTO;
-import com.sprint.mission.discodeit.dto.api.ChannelApiDTO.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.api.ChannelApiDTO.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.dto.api.UserApiDTO;
+import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.api.request.ChannelRequestDTO.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.api.response.ChannelResponseDTO;
+import com.sprint.mission.discodeit.dto.api.response.ChannelResponseDTO.FindChannelResponse;
 import com.sprint.mission.discodeit.enums.ChannelType;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.ChannelApiMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,16 +19,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,7 +63,7 @@ public class ChannelController {
           @ApiResponse(
               responseCode = "201",
               description = "채널 생성 성공",
-              content = @Content(schema = @Schema(implementation = ChannelApiDTO.FindChannelResponse.class))
+              content = @Content(schema = @Schema(implementation = FindChannelResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -74,13 +73,15 @@ public class ChannelController {
       }
   )
   @PostMapping(value = "/public", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ChannelApiDTO.FindChannelResponse> createPublicChannel(
+  public ResponseEntity<FindChannelResponse> createPublicChannel(
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "공개 채널 생성 요청 정보",
           required = true,
-          content = @Content(schema = @Schema(implementation = ChannelApiDTO.PublicChannelCreateRequest.class))
+          content = @Content(schema = @Schema(implementation = PublicChannelCreateRequest.class))
       )
-      @RequestBody @Valid ChannelApiDTO.PublicChannelCreateRequest publicChannelCreateRequest) {
+      @RequestBody @Valid ChannelRequestDTO.PublicChannelCreateRequest publicChannelCreateRequest) {
+
+    log.info("Creating public channel with name: {}", publicChannelCreateRequest.name());
 
     ChannelDTO.CreatePublicChannelCommand createPublicChannelCommand = ChannelDTO.CreatePublicChannelCommand.builder()
         .name(publicChannelCreateRequest.name())
@@ -89,7 +90,7 @@ public class ChannelController {
 
     ChannelDTO.Channel channel = channelService.createChannel(createPublicChannelCommand);
 
-    return ResponseEntity.status(201).body(ChannelApiDTO.FindChannelResponse.builder()
+    return ResponseEntity.status(201).body(ChannelResponseDTO.FindChannelResponse.builder()
         .id(channel.getId())
         .type(channel.getType())
         .name(channel.getName())
@@ -112,7 +113,7 @@ public class ChannelController {
           @ApiResponse(
               responseCode = "201",
               description = "채널 생성 성공",
-              content = @Content(schema = @Schema(implementation = ChannelApiDTO.FindChannelResponse.class))
+              content = @Content(schema = @Schema(implementation = FindChannelResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -122,7 +123,7 @@ public class ChannelController {
       }
   )
   @PostMapping(value = "/private", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ChannelApiDTO.FindChannelResponse> createPrivateChannel(
+  public ResponseEntity<FindChannelResponse> createPrivateChannel(
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "비공개 채널 생성 요청 정보",
           required = true,
@@ -138,7 +139,7 @@ public class ChannelController {
 
     ChannelDTO.Channel channel = channelService.createPrivateChannel(createPrivateChannelCommand);
 
-    return ResponseEntity.status(201).body(channelApiMapper.channelToFindChannelResponse(channel));
+    return ResponseEntity.status(201).body(channelApiMapper.toFindChannelResponse(channel));
 
   }
 
@@ -156,7 +157,7 @@ public class ChannelController {
           @ApiResponse(
               responseCode = "200",
               description = "채널 수정 성공",
-              content = @Content(schema = @Schema(implementation = ChannelApiDTO.FindChannelResponse.class))
+              content = @Content(schema = @Schema(implementation = FindChannelResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -171,15 +172,17 @@ public class ChannelController {
       }
   )
   @PatchMapping(value = "/{channelId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<ChannelApiDTO.FindChannelResponse> updatePublicChannel(
+  public ResponseEntity<FindChannelResponse> updatePublicChannel(
       @Parameter(description = "채널 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable UUID channelId,
+      @PathVariable @NotNull UUID channelId,
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "채널 수정 정보",
           required = true,
           content = @Content(schema = @Schema(implementation = ChannelUpdateRequest.class))
       )
       @RequestBody @Valid ChannelUpdateRequest channelUpdateRequest) {
+
+    log.info("Updating public channel with id: {}", channelId);
 
     ChannelDTO.UpdateChannelCommand updateChannelCommand = ChannelDTO.UpdateChannelCommand.builder()
         .id(channelId)
@@ -189,7 +192,7 @@ public class ChannelController {
 
     ChannelDTO.Channel channel = channelService.updateChannel(updateChannelCommand);
 
-    return ResponseEntity.status(200).body(channelApiMapper.channelToFindChannelResponse(channel));
+    return ResponseEntity.status(200).body(channelApiMapper.toFindChannelResponse(channel));
 
   }
 
@@ -217,7 +220,9 @@ public class ChannelController {
   @DeleteMapping(value = "/{channelId}")
   public ResponseEntity<String> deleteChannel(
       @Parameter(description = "채널 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable UUID channelId) {
+      @PathVariable @NotNull UUID channelId) {
+
+    log.info("Deleting channel with id: {}", channelId);
 
     channelService.deleteChannelById(channelId);
 
@@ -238,44 +243,18 @@ public class ChannelController {
           @ApiResponse(
               responseCode = "200",
               description = "채널 목록 조회 성공",
-              content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChannelApiDTO.FindChannelResponse.class)))
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindChannelResponse.class)))
           )
       }
   )
   @GetMapping()
-  public List<ChannelApiDTO.FindChannelResponse> findChannelsByUserId(
+  public List<FindChannelResponse> findChannelsByUserId(
       @Parameter(description = "사용자 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @RequestParam UUID userId) {
 
     return channelService.findChannelsByUserId(userId).stream()
-        .map(channelApiMapper::channelToFindChannelResponse)
+        .map(channelApiMapper::toFindChannelResponse)
         .toList();
-
-  }
-
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleNoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(404).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-
-  }
-
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleIllegalArgumentException(
-      IllegalArgumentException e) {
-
-    log.error("IllegalArgumentException occurred", e);
-
-    return ResponseEntity.status(400).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
 
   }
 

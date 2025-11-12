@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.api.BinaryContentApiDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.dto.api.response.BinaryContentResponseDTO.ReadBinaryContentResponse;
 import com.sprint.mission.discodeit.mapper.api.BinaryContentApiMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -14,14 +13,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +55,7 @@ public class BinaryContentController {
               description = "바이너리 콘텐츠 조회 성공",
               content = @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  schema = @Schema(implementation = BinaryContentApiDTO.ReadBinaryContentResponse.class)
+                  schema = @Schema(implementation = ReadBinaryContentResponse.class)
               )
           ),
           @ApiResponse(
@@ -68,14 +66,15 @@ public class BinaryContentController {
       }
   )
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentApiDTO.ReadBinaryContentResponse> readBinaryContent(
+  public ResponseEntity<ReadBinaryContentResponse> readBinaryContent(
       @Parameter(description = "바이너리 콘텐츠 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable("binaryContentId") UUID id) {
+      @PathVariable("binaryContentId") @NotNull UUID id) {
 
-    BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("BinaryContent not found"));
+    log.info("Reading binary content with ID: {}", id);
 
-    return ResponseEntity.ok(binaryContentApiMapper.binaryContentToReadBinaryContentResponse(readBinaryContentResult));
+    BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id);
+
+    return ResponseEntity.ok(binaryContentApiMapper.toReadBinaryContentResponse(readBinaryContentResult));
 
   }
 
@@ -94,13 +93,13 @@ public class BinaryContentController {
               description = "바이너리 콘텐츠 목록 조회 성공",
               content = @Content(
                   mediaType = MediaType.APPLICATION_JSON_VALUE,
-                  array = @ArraySchema(schema = @Schema(implementation = BinaryContentApiDTO.ReadBinaryContentResponse.class))
+                  array = @ArraySchema(schema = @Schema(implementation = ReadBinaryContentResponse.class))
               )
           )
       }
   )
   @GetMapping()
-  public ResponseEntity<List<BinaryContentApiDTO.ReadBinaryContentResponse>> readBinaryContentsByIdIn(
+  public ResponseEntity<List<ReadBinaryContentResponse>> readBinaryContentsByIdIn(
       @Parameter(
           description = "바이너리 콘텐츠 ID 목록",
           required = true,
@@ -109,7 +108,7 @@ public class BinaryContentController {
       @RequestParam("binaryContentIds") List<UUID> idList) {
 
     return ResponseEntity.ok(binaryContentService.findAllBinaryContentByIdIn(idList).stream()
-        .map(binaryContentApiMapper::binaryContentToReadBinaryContentResponse)
+        .map(binaryContentApiMapper::toReadBinaryContentResponse)
         .toList());
 
   }
@@ -139,45 +138,13 @@ public class BinaryContentController {
   @GetMapping("{binaryContentId}/download")
   public ResponseEntity<?> downloadBinaryContent(
       @Parameter(description = "바이너리 콘텐츠 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable("binaryContentId") UUID id) {
+      @PathVariable("binaryContentId") @NotNull UUID id) {
 
-    BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such BinaryContent"));
+    log.info("Downloading binary content with ID: {}", id);
+
+    BinaryContentDTO.BinaryContent readBinaryContentResult = binaryContentService.findBinaryContentById(id);
 
     return binaryContentStorage.download(readBinaryContentResult);
-
-  }
-
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleNoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(404).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-
-  }
-
-  /**
-   * 잘못된 인자 예외 처리
-   *
-   * @param e 발생한 예외
-   * @return 에러 응답
-   */
-  @io.swagger.v3.oas.annotations.Hidden
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> handleIllegalArgumentException(
-      IllegalArgumentException e) {
-
-    log.error("IllegalArgumentException occurred", e);
-
-    return ResponseEntity.status(400).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
 
   }
 

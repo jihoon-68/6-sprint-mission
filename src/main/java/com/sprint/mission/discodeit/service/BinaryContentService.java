@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContentCreateCommand;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface BinaryContentService {
@@ -12,7 +11,7 @@ public interface BinaryContentService {
 
   boolean existBinaryContentById(UUID id);
 
-  Optional<BinaryContentDTO.BinaryContent> findBinaryContentById(UUID id);
+  BinaryContentDTO.BinaryContent findBinaryContentById(UUID id);
 
   List<BinaryContentDTO.BinaryContent> findAllBinaryContentByIdIn(List<UUID> uuidList);
 

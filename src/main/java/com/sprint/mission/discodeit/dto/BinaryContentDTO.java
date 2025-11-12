@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.enums.ContentType;
-import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContentDTO {
 
   @Getter

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.ChannelDTO;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
@@ -13,7 +12,7 @@ public interface ChannelService {
 
   boolean existChannelById(UUID id);
 
-  Optional<ChannelDTO.Channel> findChannelById(UUID id);
+  ChannelDTO.Channel findChannelById(UUID id);
 
   List<ChannelDTO.Channel> findChannelsByUserId(UUID userId);
 

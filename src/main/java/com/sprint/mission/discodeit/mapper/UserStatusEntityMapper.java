@@ -12,11 +12,11 @@ public interface UserStatusEntityMapper {
   @Mappings({
       @Mapping(target = "userId", source = "user.id")
   })
-  UserStatusDTO.UserStatus entityToUserStatus(UserStatusEntity entity);
+  UserStatusDTO.UserStatus toUserStatus(UserStatusEntity entity);
 
   @Mappings({
       //@Mapping(target = "user.id", source = "userId")
   })
-  UserStatusEntity userStatusToEntity(UserStatusDTO.UserStatus userStatus);
+  UserStatusEntity toEntity(UserStatusDTO.UserStatus userStatus);
 
 }

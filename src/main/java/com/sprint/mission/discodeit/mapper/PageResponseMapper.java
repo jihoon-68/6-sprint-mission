@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.api.PagingApiDTO.OffsetPageResponse;
+import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO;
+import com.sprint.mission.discodeit.dto.api.response.PagingResponseDTO.OffsetPageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class PageResponseMapper<T> {
 
   public OffsetPageResponse<T> fromSlice(Slice<T> slice) {
-    return OffsetPageResponse.<T>builder()
+    return PagingResponseDTO.OffsetPageResponse.<T>builder()
         .content(slice.getContent())
         .number(slice.getNumber())
         .size(slice.getSize())
@@ -19,7 +20,7 @@ public class PageResponseMapper<T> {
   }
 
   public OffsetPageResponse<T> fromPage(Page<T> page) {
-    return OffsetPageResponse.<T>builder()
+    return PagingResponseDTO.OffsetPageResponse.<T>builder()
         .content(page.getContent())
         .number(page.getNumber())
         .size(page.getSize())

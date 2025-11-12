@@ -1,14 +1,15 @@
-package com.sprint.mission.discodeit.dto.api;
+package com.sprint.mission.discodeit.dto.api.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprint.mission.discodeit.enums.ChannelType;
 import jakarta.validation.constraints.NotBlank;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
-public class ChannelApiDTO {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ChannelRequestDTO {
 
   @Builder
   public record PublicChannelCreateRequest(
@@ -34,18 +35,4 @@ public class ChannelApiDTO {
       String description) {
 
   }
-
-  @Builder
-  public record FindChannelResponse(
-      UUID id,
-      ChannelType type,
-      String name,
-      String description,
-      List<UserApiDTO.FindUserResponse> participants,
-      Instant lastMessageAt
-  ) {
-
-  }
-
-
 }

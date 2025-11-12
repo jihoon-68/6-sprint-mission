@@ -4,12 +4,13 @@ import com.sprint.mission.discodeit.dto.BinaryContentDTO.BinaryContentCreateComm
 import com.sprint.mission.discodeit.dto.UserDTO;
 import com.sprint.mission.discodeit.dto.UserStatusDTO;
 import com.sprint.mission.discodeit.dto.api.ErrorApiDTO;
-import com.sprint.mission.discodeit.dto.api.UserApiDTO;
-import com.sprint.mission.discodeit.dto.api.UserApiDTO.CheckUserOnlineResponse;
-import com.sprint.mission.discodeit.dto.api.UserApiDTO.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.api.request.UserRequestDTO;
+import com.sprint.mission.discodeit.dto.api.request.UserRequestDTO.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.api.request.UserRequestDTO.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.api.request.UserRequestDTO.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.api.response.UserResponseDTO.CheckUserOnlineResponse;
+import com.sprint.mission.discodeit.dto.api.response.UserResponseDTO.FindUserResponse;
 import com.sprint.mission.discodeit.enums.ContentType;
-import com.sprint.mission.discodeit.exception.AllReadyExistDataBaseRecordException;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
 import com.sprint.mission.discodeit.mapper.api.UserApiMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -22,16 +23,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,7 +72,7 @@ public class UserController {
           @ApiResponse(
               responseCode = "201",
               description = "사용자 생성 성공",
-              content = @Content(schema = @Schema(implementation = UserApiDTO.FindUserResponse.class))
+              content = @Content(schema = @Schema(implementation = FindUserResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -82,21 +82,23 @@ public class UserController {
       }
   )
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<UserApiDTO.FindUserResponse> signup(
+  public ResponseEntity<FindUserResponse> signup(
       @Parameter(description = "사용자 생성 요청 정보", required = true,
           content = @Content(mediaType = "application/json",
-              schema = @Schema(implementation = UserApiDTO.UserCreateRequest.class)))
-      @RequestPart("userCreateRequest") @Valid UserApiDTO.UserCreateRequest userCreateRequest,
+              schema = @Schema(implementation = UserCreateRequest.class)))
+      @RequestPart("userCreateRequest") @Valid UserRequestDTO.UserCreateRequest userCreateRequest,
       @Parameter(description = "프로필 이미지 파일")
       @RequestPart(value = "profile", required = false) MultipartFile profile)
       throws IOException {
+
+    log.info("Received signup request email: {}", userCreateRequest.email());
 
     UserDTO.CreateUserCommand createUserCommand = UserDTO.CreateUserCommand.builder()
         .username(userCreateRequest.username())
         .email(userCreateRequest.email())
         .password(userCreateRequest.password())
         .description(userCreateRequest.description())
-        .profileImage(profile == null ? null : BinaryContentCreateCommand.builder()
+        .profileImage(profile == null || profile.isEmpty() ? null : BinaryContentCreateCommand.builder()
             .fileName(profile.getName())
             .data(profile.getBytes())
             .contentType(ContentType.IMAGE)
@@ -105,7 +107,7 @@ public class UserController {
 
     UserDTO.User user = userService.createUser(createUserCommand);
 
-    return ResponseEntity.status(201).body(userApiMapper.userToFindUserResponse(user));
+    return ResponseEntity.status(201).body(userApiMapper.toFindUserResponse(user));
 
   }
 
@@ -125,7 +127,7 @@ public class UserController {
           @ApiResponse(
               responseCode = "200",
               description = "프로필 수정 성공",
-              content = @Content(schema = @Schema(implementation = UserApiDTO.FindUserResponse.class))
+              content = @Content(schema = @Schema(implementation = FindUserResponse.class))
           ),
           @ApiResponse(
               responseCode = "400",
@@ -141,7 +143,7 @@ public class UserController {
   )
   @PatchMapping(value = "/{userId}", consumes = {MediaType.APPLICATION_JSON_VALUE,
       MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<UserApiDTO.FindUserResponse> userUpdateProfile(
+  public ResponseEntity<FindUserResponse> userUpdateProfile(
       @Parameter(description = "사용자 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable UUID userId,
       @Parameter(description = "사용자 수정 정보", required = true,
@@ -152,14 +154,16 @@ public class UserController {
       @RequestPart(value = "profile", required = false) MultipartFile profile)
       throws IOException {
 
+    log.info("Received profile update request for userId: {}", userId);
+
     UserDTO.UpdateUserCommand updateUserCommand = UserDTO.UpdateUserCommand.builder()
         .id(userId)
         .username(userUpdateRequest.username())
         .email(userUpdateRequest.email())
         .currentPassword(userUpdateRequest.currentPassword())
         .newPassword(userUpdateRequest.newPassword())
-        .isProfileImageUpdated(!profile.isEmpty())
-        .profileImage(profile != null ?
+        .isProfileImageUpdated(profile != null && !profile.isEmpty())
+        .profileImage(profile != null && !profile.isEmpty() ?
             BinaryContentCreateCommand.builder()
                 .fileName(profile.getName())
                 .data(profile.getBytes())
@@ -170,7 +174,7 @@ public class UserController {
 
     UserDTO.User user = userService.updateUser(updateUserCommand);
 
-    return ResponseEntity.status(204).body(userApiMapper.userToFindUserResponse(user));
+    return ResponseEntity.status(201).body(userApiMapper.toFindUserResponse(user));
 
   }
 
@@ -198,7 +202,9 @@ public class UserController {
   @DeleteMapping("/{userId}")
   public ResponseEntity<String> deleteUser(
       @Parameter(description = "사용자 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
-      @PathVariable UUID userId) {
+      @PathVariable @NotNull UUID userId) {
+
+    log.info("Received delete request for userId: {}", userId);
 
     userService.deleteUserById(userId);
 
@@ -218,15 +224,15 @@ public class UserController {
           @ApiResponse(
               responseCode = "200",
               description = "사용자 목록 조회 성공",
-              content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserApiDTO.FindUserResponse.class)))
+              content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindUserResponse.class)))
           )
       }
   )
   @GetMapping()
-  public ResponseEntity<List<UserApiDTO.FindUserResponse>> findAll() {
+  public ResponseEntity<List<FindUserResponse>> findAll() {
 
-    List<UserApiDTO.FindUserResponse> userList = userService.findAllUsers().stream()
-        .map(userApiMapper::userToFindUserResponse)
+    List<FindUserResponse> userList = userService.findAllUsers().stream()
+        .map(userApiMapper::toFindUserResponse)
         .toList();
 
     return ResponseEntity.status(201).body(userList);
@@ -256,12 +262,11 @@ public class UserController {
       }
   )
   @GetMapping("/{userId}/userStatus")
-  public ResponseEntity<UserApiDTO.CheckUserOnlineResponse> checkUserOnlineStatus(
+  public ResponseEntity<CheckUserOnlineResponse> checkUserOnlineStatus(
       @Parameter(description = "사용자 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable UUID userId) {
 
-    UserStatusDTO.UserStatus userStatus = userStatusService.findUserStatusByUserId(userId)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+    UserStatusDTO.UserStatus userStatus = userStatusService.findUserStatusByUserId(userId);
 
     return ResponseEntity.ok(userApiMapper.userStatusToCheckUserOnlineResponse(userStatus));
 
@@ -296,18 +301,17 @@ public class UserController {
       }
   )
   @PatchMapping(value = "/{userId}/userStatus", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UserApiDTO.CheckUserOnlineResponse> updateUserOnlineStatus(
+  public ResponseEntity<CheckUserOnlineResponse> updateUserOnlineStatus(
       @Parameter(description = "사용자 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
       @PathVariable UUID userId,
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
           description = "사용자 상태 업데이트 정보",
           required = true,
-          content = @Content(schema = @Schema(implementation = UserApiDTO.UserStatusUpdateRequest.class))
+          content = @Content(schema = @Schema(implementation = UserStatusUpdateRequest.class))
       )
-      @RequestBody @Valid UserApiDTO.UserStatusUpdateRequest userStatusUpdateRequest) {
+      @RequestBody @Valid UserRequestDTO.UserStatusUpdateRequest userStatusUpdateRequest) {
 
-    UserStatusDTO.UserStatus userStatus = userStatusService.findUserStatusByUserId(userId)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user status."));
+    UserStatusDTO.UserStatus userStatus = userStatusService.findUserStatusByUserId(userId);
 
     userStatus = userStatusService.updateUserStatus(UserStatusDTO.UpdateUserStatusCommand.builder()
         .id(userStatus.getId())
@@ -315,32 +319,6 @@ public class UserController {
         .build());
 
     return ResponseEntity.ok(userApiMapper.userStatusToCheckUserOnlineResponse(userStatus));
-
-  }
-
-  @ExceptionHandler(NoSuchDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> NoSuchDataBaseRecordException(
-      NoSuchDataBaseRecordException e) {
-
-    log.error("NoSuchDataBaseRecordException occurred", e);
-
-    return ResponseEntity.status(404).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.NOT_FOUND.value())
-        .message(e.getMessage())
-        .build());
-
-  }
-
-  @ExceptionHandler(AllReadyExistDataBaseRecordException.class)
-  public ResponseEntity<ErrorApiDTO.ErrorApiResponse> AllReadyExistDataException(
-      AllReadyExistDataBaseRecordException e) {
-
-    log.error("AllReadyExistDataException occurred", e);
-
-    return ResponseEntity.status(400).body(ErrorApiDTO.ErrorApiResponse.builder()
-        .code(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build());
 
   }
 

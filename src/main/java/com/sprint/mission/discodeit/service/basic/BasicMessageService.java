@@ -3,12 +3,12 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.dto.MessageDTO.Message;
 import com.sprint.mission.discodeit.dto.PagingDTO;
-import com.sprint.mission.discodeit.dto.PagingDTO.CursorPage;
 import com.sprint.mission.discodeit.dto.PagingDTO.OffsetPage;
-import com.sprint.mission.discodeit.dto.PagingDTO.OffsetRequest;
 import com.sprint.mission.discodeit.entity.BinaryContentEntity;
 import com.sprint.mission.discodeit.entity.MessageEntity;
-import com.sprint.mission.discodeit.exception.NoSuchDataBaseRecordException;
+import com.sprint.mission.discodeit.exception.channel.NoSuchChannelException;
+import com.sprint.mission.discodeit.exception.message.NoSuchMessageException;
+import com.sprint.mission.discodeit.exception.user.NoSuchUserException;
 import com.sprint.mission.discodeit.mapper.MessageEntityMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -18,9 +18,9 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -45,18 +46,20 @@ public class BasicMessageService implements MessageService {
   public MessageDTO.Message createMessage(MessageDTO.CreateMessageCommand request) {
 
     if (!userRepository.existsById(request.userId())) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      log.warn("User with id {} does not exist", request.userId());
+      throw new NoSuchUserException();
     }
 
     if (!channelRepository.existsById(request.channelId())) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      log.warn("Channel with id {} does not exist", request.channelId());
+      throw new NoSuchChannelException();
     }
 
     MessageEntity messageEntity = MessageEntity.builder()
         .author(userRepository.findById(request.userId())
-            .orElseThrow(() -> new NoSuchDataBaseRecordException("No such user.")))
+            .orElseThrow(NoSuchUserException::new))
         .channel(channelRepository.findById(request.channelId())
-            .orElseThrow(() -> new NoSuchDataBaseRecordException("No such channel.")))
+            .orElseThrow(NoSuchChannelException::new))
         .content(request.content())
         .build();
 
@@ -78,7 +81,9 @@ public class BasicMessageService implements MessageService {
 
     }
 
-    return messageEntityMapper.entityToMessage(messageRepository.save(messageEntity));
+    log.debug("Creating message with id {}", messageEntity.getId());
+
+    return messageEntityMapper.toMessage(messageRepository.save(messageEntity));
 
   }
 
@@ -88,12 +93,15 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Optional<MessageDTO.Message> findMessageById(UUID id) {
+  public MessageDTO.Message findMessageById(UUID id) {
 
     MessageEntity messageEntity = messageRepository.findById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message."));
+        .orElseThrow(() -> {
+          log.warn("Message with id {} does not exist", id);
+          throw new NoSuchMessageException();
+        });
 
-    return Optional.ofNullable(messageEntityMapper.entityToMessage(messageEntity));
+    return messageEntityMapper.toMessage(messageEntity);
   }
 
   @Transactional(readOnly = true)
@@ -101,14 +109,15 @@ public class BasicMessageService implements MessageService {
   public OffsetPage<MessageDTO.Message> findMessagesByAuthorId(UUID authorId, PagingDTO.OffsetRequest pageable) {
 
     if (!userRepository.existsById(authorId)) {
-      throw new NoSuchDataBaseRecordException("No such user.");
+      log.warn("User with id {} does not exist", authorId);
+      throw new NoSuchUserException();
     }
 
     Page<MessageEntity> paging = messageRepository.findByAuthorId(authorId, PageRequest.of(pageable.getPage(), pageable.getSize()));
 
     return OffsetPage.<MessageDTO.Message>builder()
         .content(paging.getContent().stream()
-            .map(messageEntityMapper::entityToMessage)
+            .map(messageEntityMapper::toMessage)
             .toList())
         .number(paging.getNumber())
         .size(paging.getSize())
@@ -123,16 +132,18 @@ public class BasicMessageService implements MessageService {
   public PagingDTO.OffsetPage<MessageDTO.Message> findMessagesByChannelId(UUID channelId, PagingDTO.OffsetRequest pageable) {
 
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      log.warn("Channel with id {} does not exist", channelId);
+      throw new NoSuchChannelException();
     }
 
     Sort.Direction direction = pageable.getSort().split(",")[1].equalsIgnoreCase("DESC") ? Direction.DESC : Direction.ASC;
 
-    Page<MessageEntity> paging = messageRepository.findByChannelId(channelId, PageRequest.of(pageable.getPage(), pageable.getSize(), direction));
+    Page<MessageEntity> paging = messageRepository.findByChannelId(channelId,
+        PageRequest.of(pageable.getPage(), pageable.getSize(), direction, pageable.getSort().split(",")[0]));
 
     return PagingDTO.OffsetPage.<MessageDTO.Message>builder()
         .content(paging.getContent().stream()
-            .map(messageEntityMapper::entityToMessage)
+            .map(messageEntityMapper::toMessage)
             .toList())
         .number(paging.getNumber())
         .size(paging.getSize())
@@ -147,18 +158,17 @@ public class BasicMessageService implements MessageService {
   public PagingDTO.CursorPage<Message> findMessagesByChannelIdAndCreatedAt(UUID channelId, String createdAt, PagingDTO.CursorRequest pageable) {
 
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchDataBaseRecordException("No such channel.");
+      log.warn("Channel with id {} does not exist", channelId);
+      throw new NoSuchChannelException();
     }
-
-    //Sort.Direction direction = pageable.getSort().split(",")[1].equalsIgnoreCase("DESC") ? Direction.DESC : Direction.ASC;
 
     Slice<MessageEntity> slice = messageRepository.findByChannelIdAndCreatedAt(channelId, Instant.parse(createdAt), pageable.getSize());
 
     return PagingDTO.CursorPage.<Message>builder()
         .content(slice.getContent().stream()
-            .map(messageEntityMapper::entityToMessage)
+            .map(messageEntityMapper::toMessage)
             .toList())
-        .nextCursor(slice.hasNext() ? messageEntityMapper.entityToMessage(slice.getContent().get(slice.getContent().size() - 1)) : null)
+        .nextCursor(slice.hasNext() ? messageEntityMapper.toMessage(slice.getContent().get(slice.getContent().size() - 1)) : null)
         .size(slice.getSize())
         .hasNext(slice.hasNext())
         .build();
@@ -172,7 +182,7 @@ public class BasicMessageService implements MessageService {
 
     return OffsetPage.<MessageDTO.Message>builder()
         .content(paging.getContent().stream()
-            .map(messageEntityMapper::entityToMessage)
+            .map(messageEntityMapper::toMessage)
             .toList())
         .number(paging.getNumber())
         .size(paging.getSize())
@@ -187,14 +197,17 @@ public class BasicMessageService implements MessageService {
   public MessageDTO.Message updateMessage(MessageDTO.UpdateMessageCommand request) {
 
     if (!messageRepository.existsById(request.id())) {
-      throw new NoSuchDataBaseRecordException("No such message.");
+      log.warn("Message with id {} does not exist", request.id());
+      throw new NoSuchMessageException();
     }
 
     MessageEntity updatedMessageEntity = messageRepository.findById(request.id())
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message."));
+        .orElseThrow(NoSuchMessageException::new);
     updatedMessageEntity.updateMessage(request.content());
 
-    return messageEntityMapper.entityToMessage(messageRepository.save(updatedMessageEntity));
+    log.debug("Updating message with id {}", updatedMessageEntity.getId());
+
+    return messageEntityMapper.toMessage(messageRepository.save(updatedMessageEntity));
 
   }
 
@@ -203,12 +216,14 @@ public class BasicMessageService implements MessageService {
   public void deleteMessageById(UUID id) {
 
     binaryContentRepository.deleteAllByIdIn(messageRepository.findById(id)
-        .orElseThrow(() -> new NoSuchDataBaseRecordException("No such message.")).getAttachments()
+        .orElseThrow(NoSuchMessageException::new).getAttachments()
         .stream()
         .map(BinaryContentEntity::getId)
         .toList());
 
     messageRepository.deleteById(id);
+
+    log.debug("Deleted message with id {}", id);
 
   }
 }
