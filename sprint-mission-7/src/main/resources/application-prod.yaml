@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL}          # 예: jdbc:postgresql://rds-host:5432/discodeit
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+# 운영에서 포트 정책이 다르면 여기서만 변경
+server:
+  port: 8080
+
+# 운영 로깅은 너무 시끄럽지 않게
+logging:
+  level:
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: warn
+    org.hibernate.orm.jdbc.bind: warn
