@@ -8,7 +8,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.UUID;
 
-// 특정 HTTP 요청과 관련된 모든 로그를 쉽게 식별
+// 특정 HTTP 요청과 관련된 모든 로그를 쉽게 식별 (미션7-심화)
 @Component
 public class MDCLoggingInterceptor implements HandlerInterceptor {
 

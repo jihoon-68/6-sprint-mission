@@ -10,20 +10,27 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    User save(User user);
-    Optional<User> findById(UUID id);
-    @Query("SELECT u FROM User u " +
-            "LEFT JOIN FETCH u.userStatus " +
-            "LEFT JOIN FETCH u.profileImage " +
-            "WHERE u.username = :username")
-    Optional<User> findByUsernameWithStatusAndProfile(@Param("username") String username);
-    Optional<User> findByUsername(String username);
-    Optional<User> findByEmail(String email);
-    List<User> findAll();
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.userStatus LEFT JOIN FETCH u.profileImage")
+    @Query("""
+            SELECT u FROM User u
+            LEFT JOIN FETCH u.userStatus
+            LEFT JOIN FETCH u.profileImage
+            WHERE u.username = :username
+    """)
+    Optional<User> findByUsernameWithStatusAndProfile(@Param("username") String username);
+
+    Optional<User> findByUsername(String username);
+
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+
+    Optional<User> findByEmail(String email);
+
+    @Query("""
+        SELECT u FROM User u
+        LEFT JOIN FETCH u.userStatus
+        LEFT JOIN FETCH u.profileImage
+    """)
     List<User> findAllWithStatusAndProfile();
 
-    void delete(User user);
-    // void clear();
 }

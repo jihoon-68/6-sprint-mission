@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.sprint.mission'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'de.codecentric:spring-boot-admin-starter-server:3.3.6'
+    implementation 'de.codecentric:spring-boot-admin-server-ui:3.3.6'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.3.6'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' // 모니터링을 위해 필수
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}

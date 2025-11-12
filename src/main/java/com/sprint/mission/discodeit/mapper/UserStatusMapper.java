@@ -17,6 +17,8 @@ public interface UserStatusMapper {
 
     @Mapping(source = "dto.userId", target = "user.id")
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "lastActiveAt", ignore = true)
     UserStatus toEntity(UserStatusCreateRequestDto dto);
 

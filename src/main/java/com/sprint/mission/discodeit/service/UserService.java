@@ -44,11 +44,11 @@ public class UserService {
     public UserResponseDto create(UserCreateRequestDto dto,
                                   BinaryContentCreateRequestDto profileImageCreateDto) {
 
-        if (userRepository.findByUsername(dto.username()).isPresent()){
+        if (userRepository.existsByUsername(dto.username())){
             throw UserAlreadyExistsException.byUsername(dto.username());
         }
 
-        if (userRepository.findByEmail(dto.email()).isPresent()) {
+        if (userRepository.existsByEmail(dto.email())) {
             throw new UserAlreadyExistsException(dto.email());
         }
 
@@ -80,7 +80,6 @@ public class UserService {
             binaryContentRepository.save(binaryContent);
             user.setProfileImage(binaryContent);
         }
-
 
         userRepository.save(user);
         userStatusRepository.save(userStatus);

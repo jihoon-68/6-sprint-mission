@@ -1,68 +1,67 @@
-CREATE TABLE user (
-    id uuid PRIMARY KEY,
-    created_at timestamptz NOT NULL,
-    updated_at timestamptz,
-    username varchar(50) UNIQUE NOT NULL,
-    email varchar(100) UNIQUE NOT NULL,
-    password varchar(60) NOT NULL,
-    profile_id uuid,
-    CONSTRAINT fk_profile_id FOREIGN KEY (profile_id) REFERENCES binary_contents(id) ON DELETE SET NULL
+-- users
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(60) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP
 );
 
-CREATE TABLE binary_content (
-    id uuid PRIMARY KEY,
-    created_at timestamptz NOT NULL,
-    file_name varchar(255) NOT NULL,
-    size bigint NOT NULL,
-    content_type varchar(100) NOT NULL,
-    bytes bytea NOT NULL
+-- channels
+CREATE TABLE channels (
+    id UUID PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP
 );
 
-CREATE TABLE channel (
-    id uuid PRIMARY KEY,
-    created_at timestamptz NOT NULL,
-    updated_at timestamptz,
-    name varchar(100),
-    description varchar(500),
-    type varchar(10) CHECK (type IN ('PUBLIC', 'PRIVATE')) NOT NULL
+-- messages
+CREATE TABLE messages (
+    id UUID PRIMARY KEY,
+    user_id UUID,
+    channel_id UUID,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+    CONSTRAINT fk_message_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_message_channel FOREIGN KEY (channel_id) REFERENCES channels(id)
 );
 
-CREATE TABLE message (
-    id uuid PRIMARY KEY,
-    created_at timestamptz NOT NULL,
-    updated_at timestamptz,
-    content text,
-    channel_id uuid NOT NULL,
-    author_id uuid,
-    CONSTRAINT fk_channel_id FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE,
-    CONSTRAINT fk_author_id FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
+-- read_statuses
+CREATE TABLE read_statuses (
+    id UUID PRIMARY KEY,
+    user_id UUID,
+    channel_id UUID,
+    last_read_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+    CONSTRAINT fk_read_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_read_channel FOREIGN KEY (channel_id) REFERENCES channels(id)
 );
 
-CREATE TABLE user_status (
-    id uuid PRIMARY KEY,
-    created_at timestamptz NOT NULL,
-    updated_at timestamptz,
-    user_id uuid UNIQUE NOT NULL,
-    last_active_at timestamptz NOT NULL,
-    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+-- user_statuses
+CREATE TABLE user_statuses (
+    id UUID PRIMARY KEY,
+    user_id UUID UNIQUE,
+    last_active_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+    CONSTRAINT fk_status_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE read_status (
-    id uuid PRIMARY KEY,
-    created_at timestamptz NOT NULL,
-    updated_at timestamptz,
-    user_id uuid,
-    channel_id uuid,
-    last_read_at timestamptz NOT NULL,
-    CONSTRAINT unique_user_channel UNIQUE (user_id, channel_id),
-    CONSTRAINT fk_read_status_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_read_status_channel FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE
-);
-
-CREATE TABLE message_attachment (
-    message_id uuid NOT NULL,
-    attachment_id uuid NOT NULL,
-    PRIMARY KEY (message_id, attachment_id),
-    CONSTRAINT fk_message_id FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
-    CONSTRAINT fk_attachment_id FOREIGN KEY (attachment_id) REFERENCES binary_contents(id) ON DELETE CASCADE
+-- binary_contents
+CREATE TABLE binary_contents (
+    id UUID PRIMARY KEY,
+    message_id UUID,
+    user_id UUID,
+    type VARCHAR(50) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    extension VARCHAR(20) NOT NULL,
+    size BIGINT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    CONSTRAINT fk_binary_message FOREIGN KEY (message_id) REFERENCES messages(id),
+    CONSTRAINT fk_binary_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
