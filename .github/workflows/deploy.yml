@@ -72,12 +72,13 @@ jobs:
             --cluster ${{ secrets.AWS_ECS_CLUSTRE_NAME }} \
             --service ${{ secrets.AWS_ECS_SERVICES_NAME }} \
             --desired-count 0 
+
       - name: ECS 서비스 업데이트
         run: |
           aws ecs update-service \
             --cluster ${{ secrets.AWS_ECS_CLUSTRE_NAME }} \
             --service ${{ secrets.AWS_ECS_SERVICES_NAME }} \
-            --task-definition ${{ steps.render-task-def.outputs.task-definition }} \
+            --task-definition ${{ secrets.AWS_TASK_NAME }} \
             --desired-count 1 \
             --force-new-deployment 
 
