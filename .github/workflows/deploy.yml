@@ -70,7 +70,7 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster ${{ secrets.AWS_ECS_CLUSTRE_NAME }} \
-            --service ${{ AWS_ECS_SERVICES_NAME }} \
+            --service ${{ secrets.AWS_ECS_SERVICES_NAME }} \
             --desired-count 0 
 
       - name: ECS 서비스 업데이트
