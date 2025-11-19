@@ -50,11 +50,13 @@ class UserStatusRepositoryTest {
     // given
     Instant now = Instant.now();
     User user = createTestUserWithStatus("testUser", "test@example.com", now);
-    UUID userId = user.getId();
+
 
     // 영속성 컨텍스트 초기화
     entityManager.flush();
     entityManager.clear();
+
+    UUID userId = user.getId();
 
     // when
     Optional<UserStatus> foundStatus = userStatusRepository.findByUserId(userId);
