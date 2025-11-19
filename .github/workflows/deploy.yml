@@ -19,7 +19,7 @@ jobs:
           distribution: 'corretto'
 
       - name: Grant execute permission for gradlew
-        uses: chmod +x gradlew
+        run: chmod +x gradlew
 
       - name: Compile and test with Gradle
         run: ./gradlew test
