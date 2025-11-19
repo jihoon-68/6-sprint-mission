@@ -69,18 +69,21 @@ jobs:
       - name: ECS 서비스 중지(프리티어 환경 고려)
         run: |
           aws ecs update-service \
-            --cluster ${{ vars.ECS_CLUSTER }} \
-            --service ${{ vars.ECS_SERVICE }} \
-            --desired-count 0
+            --cluster ${{ secrets.AWS_ECS_CLUSTRE_NAME }} \
+            --service ${{ AWS_ECS_SERVICES_NAME }} \
+            --desired-count 0 
 
       - name: ECS 서비스 업데이트
         run: |
           aws ecs update-service \
-            --cluster ${{ vars.ECS_CLUSTER }} \
-            --service ${{ vars.ECS_SERVICE }} \
-            --task-definition $NEW_TASK_DEF_ARN \
+            --cluster ${{ secrets.AWS_ECS_CLUSTRE_NAME }} \
+            --service ${{ secrets.AWS_ECS_SERVICES_NAME }} \
+            --task-definition ${{ steps.render-task-def.outputs.task-definition-arn }} \
             --desired-count 1 \
-            --force-new-deployment
+            --force-new-deployment \
+            --wait-for-service-stability true
+            
+          
 
       - name: Verify deployment status
         run:
