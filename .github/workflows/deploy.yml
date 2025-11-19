@@ -78,7 +78,7 @@ jobs:
           aws ecs update-service \
             --cluster ${{ secrets.AWS_ECS_CLUSTRE_NAME }} \
             --service ${{ secrets.AWS_ECS_SERVICES_NAME }} \
-            --task-definition ${{ steps.render-task-def.outputs.task-definition-arn }} \
+            --task-definition task-definition.json\
             --desired-count 1 \
             --force-new-deployment \
             --wait-for-service-stability true
