@@ -73,17 +73,13 @@ jobs:
             --service ${{ secrets.AWS_ECS_SERVICES_NAME }} \
             --desired-count 0 
 
-      - name: ECS 서비스 업데이트
-        run: |
-          aws ecs update-service \
-            --cluster ${{ secrets.AWS_ECS_CLUSTRE_NAME }} \
-            --service ${{ secrets.AWS_ECS_SERVICES_NAME }} \
-            --task-definition task-definition.json\
-            --desired-count 1 \
-            --force-new-deployment \
-            --wait-for-service-stability true
-            
-          
+      - name: ECS 서비스 배포 및 업데이트
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          service: ${{ secrets.AWS_ECS_SERVICES_NAME }}
+          cluster: ${{ secrets.AWS_ECS_CLUSTRE_NAME }}
+          wait-for-service-stability: true
 
       - name: Verify deployment status
         run:
