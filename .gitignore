@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 discodeit.env
 docker-compose.yaml
+.env
 
 ### IntelliJ IDEA ###
 .idea
