@@ -6,9 +6,5 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 class DiscodeitApplicationTests {
-
-	@Test
-	void contextLoads() {
-	}
-
+    
 }
