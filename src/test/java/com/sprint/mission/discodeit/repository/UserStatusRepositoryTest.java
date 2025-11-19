@@ -49,7 +49,7 @@ class UserStatusRepositoryTest {
   void findByUserId_ExistingUserId_ReturnsUserStatus() {
     // given
 
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.MICROS);
     User user = createTestUserWithStatus("testUser", "test@example.com", now);
     UUID userId = user.getId();
 
@@ -63,7 +63,7 @@ class UserStatusRepositoryTest {
     // then
     assertThat(foundStatus).isPresent();
     assertThat(foundStatus.get().getUser().getId()).isEqualTo(userId);
-    //assertThat(foundStatus.get().getLastActiveAt()).isEqualTo(now);
+    assertThat(foundStatus.get().getLastActiveAt()).isEqualTo(now);
   }
 
   @Test
