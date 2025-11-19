@@ -33,6 +33,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,7 +118,7 @@ class BasicMessageServiceTest {
 
   @Test
   @DisplayName("메시지 생성 성공")
-  void createMessage_Success() {
+  void createMessage_Success() throws FileUploadException {
     // given
     MessageCreateRequest request = new MessageCreateRequest(content, channelId, authorId);
     BinaryContentCreateRequest attachmentRequest = new BinaryContentCreateRequest("test.txt", "text/plain", new byte[100]);

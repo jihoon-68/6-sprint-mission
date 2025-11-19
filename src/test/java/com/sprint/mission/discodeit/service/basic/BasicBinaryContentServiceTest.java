@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,7 +71,7 @@ class BasicBinaryContentServiceTest {
 
   @Test
   @DisplayName("바이너리 콘텐츠 생성 성공")
-  void createBinaryContent_Success() {
+  void createBinaryContent_Success() throws FileUploadException {
     // given
     BinaryContentCreateRequest request = new BinaryContentCreateRequest(fileName, contentType,
         bytes);
