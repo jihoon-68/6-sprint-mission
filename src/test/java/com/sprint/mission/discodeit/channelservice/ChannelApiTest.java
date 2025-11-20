@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.jdbc.Sql;ß
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ public class ChannelApiTest {
     }
 
     @Test
-    @DisplayName("공개 채널 잘못된 요청 실패 검증")
+    @DisplayName("공개 채널 이름 미입력 잘못된 요청 실패 검증")
     void createPublicApiTest_fail() {
         PublicChannelCreateRequest request = PublicChannelCreateRequest.builder()
                 .name(null)
@@ -77,7 +77,7 @@ public class ChannelApiTest {
     }
 
     @Test
-    @DisplayName("비공개 채널 잘못된 요청 실패 검증")
+    @DisplayName("비공개 채널 유저 미입력 잘못된 요청 실패 검증")
     void createCPrivateApiTest_fail() {
         List<UUID> userIds = new ArrayList<>();
 
