@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.Channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.Channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,8 @@ public class ChannelApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         ChannelDto channelDto = response.getBody();
         assertThat(channelDto).isNotNull();
+        assertThat(channelDto.name()).isEqualTo(request.name());
+        assertThat(channelDto.description()).isEqualTo(request.description());
 
     }
 
@@ -61,6 +64,8 @@ public class ChannelApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         ChannelDto channelDto = response.getBody();
         assertThat(channelDto).isNotNull();
+        assertThat(channelDto.participants().get(0).id()).isEqualTo(request.participantIds().get(0));
+        assertThat(channelDto.participants().get(1).id()).isEqualTo(request.participantIds().get(1));
 
     }
 
@@ -72,7 +77,6 @@ public class ChannelApiTest {
                 .description("테스트중")
                 .build();
         ResponseEntity<ChannelDto> response = this.restTemplate.postForEntity("/api/channels/public", request, ChannelDto.class);
-
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
