@@ -75,16 +75,21 @@ public class AuthService {
         if(!(userDetails instanceof DiscodeitUserDetails discodeitUserDetails)){
             throw new AuthException(ErrorCode.INVALID_USER_DETAILS);
         }
+        try{
+            String newAccess = jwtTokenProvider.createAccessToken(discodeitUserDetails);
+            String newRefresh = jwtTokenProvider.createRefreshToken(discodeitUserDetails);
 
-        String newAccess = jwtTokenProvider.createAccessToken(discodeitUserDetails);
-        String newRefresh = jwtTokenProvider.createRefreshToken(discodeitUserDetails);
+            UserDto userDto = discodeitUserDetails.getUserDto();
 
-        UserDto userDto = discodeitUserDetails.getUserDto();
+            JwtInformation newInfo = new JwtInformation(userDto, newAccess, newRefresh);
+            jwtRegistry.rotateJwtInformation(refreshToken, newInfo);
 
-        JwtInformation newInfo = new JwtInformation(userDto, newAccess, newRefresh);
-        jwtRegistry.rotateJwtInformation(refreshToken, newInfo);
+            return newInfo;
+        } catch (JOSEException e){
+            log.error("Failed to generate new tokens for user: {}", userName, e);
+            throw new AuthException(ErrorCode.INVALID_AUTH);
+        }
 
-        return newInfo;
     }
 
 
