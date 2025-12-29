@@ -5,15 +5,20 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.sprint.mission.discodeit.dto.User.UserDto;
 import com.sprint.mission.discodeit.entity.TokenInfo;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -36,25 +41,33 @@ public class JwtTokenProvider {
         }
     }
 
-    public String createAccessToken(String username, String role) {
-        return generateToken(username,role,jwtProperties.getAccessTokenValidityInMs());
+    public String createAccessToken(DiscodeitUserDetails userDetails) {
+        return generateToken(userDetails,jwtProperties.getAccessTokenValidityInMs(), "access");
     }
 
-    public String createRefreshToken(String username, String role) {
-        return generateToken(username,role,jwtProperties.getRefreshTokenValidityInMs());
+    public String createRefreshToken(DiscodeitUserDetails userDetails) {
+        return generateToken(userDetails,jwtProperties.getRefreshTokenValidityInMs(), "refresh");
     }
 
-    public String generateToken(String userName, String role, long validityInMs){
+    public String generateToken(DiscodeitUserDetails userDetails, long validityInMs, String tokenType){
         try{
            Date now = new Date();
            Date expirationTime = new Date(now.getTime()+validityInMs);
 
+           String tokenId = UUID.randomUUID().toString();
+           UserDto userDto = userDetails.getUserDto();
+
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .issuer(jwtProperties.getIssuer())
-                    .subject(userName)
+                    .subject(userDto.username())
+                    .jwtID(tokenId)
+                    .claim("userId", userDto.id().toString())
+                    .claim("type", tokenType)
+                    .claim("roles", userDetails.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .collect(Collectors.toList()))
                     .issueTime(now)
                     .expirationTime(expirationTime)
-                    .claim("role",role)
                     .build();
 
             SignedJWT signedJWT = new SignedJWT(
