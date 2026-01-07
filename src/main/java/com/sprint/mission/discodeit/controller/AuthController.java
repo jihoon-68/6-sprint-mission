@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.User.UserDto;
 import com.sprint.mission.discodeit.dto.User.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtInformation;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import com.sprint.mission.discodeit.security.jwt.TokenUtil;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController implements AuthApi {
 
     private final AuthService authService;
+    private final JwtTokenProvider tokenProvider;
 
     @GetMapping("me")
     public ResponseEntity<UserDto> getMe(@AuthenticationPrincipal DiscodeitUserDetails userDetails) {
@@ -51,8 +53,8 @@ public class AuthController implements AuthApi {
     }
 
     @PostMapping("refresh")
-    public ResponseEntity<?> refresh(
-            @CookieValue(value = "REFRESH_TOKEN",required = false) String refreshToken,
+    public ResponseEntity<JwtDto> refresh(
+            @CookieValue(value = "REFRESH_TOKEN") String refreshToken,
             HttpServletResponse response
     ){
         JwtInformation newInfo = authService.refreshToken(refreshToken);
